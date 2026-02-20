@@ -26,54 +26,78 @@ LEAGUE_LOGO_MAP = {
 # AMBIL STREAM LINK + LOGO LIGA
 # ==============================
 
-def get_stream_and_league_logo(driver, match_url, liga):
-    print("   [>] Membuka halaman match")
-
-    try:
-        driver.get(match_url)
-        time.sleep(5)
-
-        driver.execute_script("""
-            document.querySelectorAll('.modal,.popup,.fixed,[id*=ads]').forEach(e=>e.remove());
-        """)
-
-        # paksa video play supaya m3u8 muncul
-        driver.execute_script("""
-            var vids = document.querySelectorAll("video");
-            vids.forEach(v => { v.muted=true; v.play().catch(()=>{}); });
-        """)
-
-        time.sleep(10)
-
-        # 1️⃣ Ambil dari performance log
-        try:
-            logs = driver.get_log("performance")
-            for entry in logs:
-                msg = entry.get("message", "")
-                if ".m3u8" in msg:
-                    m = re.search(r'"url":"(https://.*?\.m3u8.*?)"', msg)
-                    if m:
-                        return m.group(1).replace("\\/", "/"), LEAGUE_LOGO_MAP.get(liga, "")
-        except:
-            pass
-
-        # 2️⃣ Fallback dari HTML
-        html = driver.page_source
-        m = re.search(r"https://[^\"']+\.m3u8[^\"']*", html)
-        if m:
-            return m.group(0), LEAGUE_LOGO_MAP.get(liga, "")
-
-    except Exception as e:
-        print("   [!] Error ambil stream:", e)
-
-    return "Not Found", LEAGUE_LOGO_MAP.get(liga, "")
 
 # ==============================
 # KIRIM KE FIREBASE
 # ==============================
 
 def kirim_ke_firebase(data):
-    if not FIREBASE_URL:
+    if notdef get_stream_and_league_logo(driver, match_url, liga):
+    print("   [>] Membuka halaman match")
+
+    league_logo = LEAGUE_LOGO_MAP.get(liga, "")
+
+    try:
+        driver.get(match_url)
+        time.sleep(6)
+
+        # Hapus popup & ads
+        driver.execute_script("""
+            document.querySelectorAll('.modal,.popup,.fixed,[id*=ads]').forEach(e=>e.remove());
+        """)
+
+        # Jika ada iframe player, masuk ke dalamnya
+        iframes = driver.find_elements(By.TAG_NAME, "iframe")
+        for frame in iframes:
+            src = frame.get_attribute("src") or ""
+            if any(x in src for x in ["player", "embed", "stream", "live"]):
+                driver.switch_to.frame(frame)
+                break
+
+        # Paksa play video
+        driver.execute_script("""
+            var vids = document.querySelectorAll("video");
+            vids.forEach(v => {
+                v.muted = true;
+                v.play().catch(()=>{});
+            });
+        """)
+
+        time.sleep(12)
+
+        # Kembali ke main context
+        driver.switch_to.default_content()
+
+        # ==============================
+        # 1️⃣ Ambil dari performance log
+        # ==============================
+        try:
+            logs = driver.get_log("performance")
+            for entry in logs:
+                msg = entry.get("message", "")
+                if ".m3u8" in msg:
+                    m = re.search(r'https://[^\\"]+\.m3u8[^\\"]*', msg)
+                    if m:
+                        stream = m.group(0).replace("\\/", "/")
+                        print("   [√] Stream ditemukan dari performance log")
+                        return stream, league_logo
+        except:
+            pass
+
+        # ==============================
+        # 2️⃣ Fallback dari HTML
+        # ==============================
+        html = driver.page_source
+        m = re.search(r"https://[^\s\"']+\.m3u8[^\s\"']*", html)
+        if m:
+            print("   [√] Stream ditemukan dari HTML")
+            return m.group(0), league_logo
+
+    except Exception as e:
+        print("   [!] Error ambil stream:", e)
+
+    print("   [!] Stream tidak ditemukan")
+    return "Not Found", league_logo FIREBASE_URL:
         print("[!] FIREBASE_URL tidak ditemukan")
         return
 
@@ -195,4 +219,5 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
