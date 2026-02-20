@@ -15,7 +15,7 @@ from selenium.webdriver.support import expected_conditions as EC
 # Ganti dengan URL dan Secret Firebase Anda
 FIREBASE_URL = os.getenv("FIREBASE_URL", "https://your-project.firebaseio.com")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET", "your-secret-key")
-TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
+TARGET_URL = "https://bunchatv.net/truc-tiep"
 
 # ID Kategori yang tetap agar tidak membuat kategori baru di Firebase
 # Pastikan ID ini sesuai dengan yang dibaca oleh aplikasi Android Anda
@@ -220,3 +220,4 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
