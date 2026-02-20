@@ -12,65 +12,53 @@ from selenium.webdriver.support import expected_conditions as EC
 # ==============================
 # KONFIGURASI
 # ==============================
-# Gunakan Environment Variables atau isi langsung jika testing
+# Ganti dengan URL dan Secret Firebase Anda
 FIREBASE_URL = os.getenv("FIREBASE_URL", "https://your-project.firebaseio.com")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET", "your-secret-key")
 TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
 
-# Fallback logo jika logo liga tidak ditemukan di halaman
-LEAGUE_LOGO_MAP = {
-    "Ukrainian Youth Team Championship": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
-    "Myanmar Professional League": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
-}
+# ID Kategori yang tetap agar tidak membuat kategori baru di Firebase
+# Pastikan ID ini sesuai dengan yang dibaca oleh aplikasi Android Anda
+FIXED_CATEGORY_ID = "EVENT1" 
 
 # ==============================
-# UTIL AMBIL SRC IMAGE (ANTI LAZY LOAD)
+# UTIL AMBIL SRC IMAGE
 # ==============================
 def get_img_src(img):
-    return (
-        img.get_attribute("src")
-        or img.get_attribute("data-src")
-        or ""
-    )
+    return img.get_attribute("src") or img.get_attribute("data-src") or ""
 
 # ==============================
 # AMBIL STREAM + LOGO LIGA (HALAMAN DETAIL)
 # ==============================
-def get_stream_and_league_logo(driver, match_url, liga):
+def get_stream_and_league_logo(driver, match_url):
     league_logo = ""
     try:
         driver.get(match_url)
         time.sleep(5)
+        
+        # Bersihkan overlay iklan
+        driver.execute_script("document.querySelectorAll('.modal,.popup,.fixed,[id*=ads]').forEach(e=>e.remove());")
 
-        # Hapus overlay/ads agar tidak mengganggu performance log
-        driver.execute_script("""
-            document.querySelectorAll('.modal,.popup,.fixed,[id*=ads]').forEach(e=>e.remove());
-        """)
-
-        # Scrape Logo Liga berdasarkan 'alt' text
+        # Scrape Logo Liga (mencari elemen gambar yang mengandung kata 'logo' atau 'league')
         logos = driver.find_elements(By.TAG_NAME, "img")
         for img in logos:
-            alt = (img.get_attribute("alt") or "").lower()
             src = get_img_src(img)
-            if liga.lower() in alt and src:
+            alt = (img.get_attribute("alt") or "").lower()
+            if "logo" in alt and src:
                 league_logo = src
                 break
 
-        if not league_logo:
-            league_logo = LEAGUE_LOGO_MAP.get(liga, "https://cdn-icons-png.flaticon.com/512/53/53283.png")
-
-        # Cari Iframe Player
+        # Cari Iframe Player untuk mentrigger stream
         iframes = driver.find_elements(By.TAG_NAME, "iframe")
         for frame in iframes:
             src = frame.get_attribute("src") or ""
             if any(x in src for x in ["player", "embed", "stream", "live"]):
                 driver.switch_to.frame(frame)
                 break
-
-        # Tunggu buffer stream
-        time.sleep(10)
         
-        # Ambil link .m3u8 dari log jaringan
+        time.sleep(8) # Tunggu log jaringan muncul
+        
+        # Ambil .m3u8 dari Performance Logs
         try:
             logs = driver.get_log("performance")
             for entry in logs:
@@ -82,67 +70,68 @@ def get_stream_and_league_logo(driver, match_url, liga):
         except:
             pass
 
-        # Fallback: Cari di HTML mentah
+        # Fallback: Cari di Page Source
         html = driver.page_source
         m = re.search(r"https://[^\s\"']+\.m3u8[^\s\"']*", html)
         if m:
             return m.group(0), league_logo
 
     except Exception as e:
-        print(f"   [!] Gagal ambil detail: {e}")
-
+        print(f"   [!] Error detail match: {e}")
+    
     return "Not Found", league_logo
 
 # ==============================
-# KIRIM KE FIREBASE
+# KIRIM KE FIREBASE (AUTO-REPLACE)
 # ==============================
 def kirim_ke_firebase(data):
     if not FIREBASE_URL or not FIREBASE_SECRET:
         print("[!] Konfigurasi Firebase tidak lengkap")
         return
 
-    # Kita gunakan ID kategori yang tetap (misal: -EVENT_FIXED) 
-    # agar data lama di lokasi ini otomatis tertimpa/terhapus
-    category_key = "EVENT_LIVE" 
+    # 1. Gunakan ID tetap, JANGAN pakai timestamp atau UUID untuk kategori
+    # Ini akan mencegah terciptanya node baru seperti -EVENT_177160...
+    category_key = "EVENT1" 
 
-    # Payload dasar untuk kategori
+    # 2. Siapkan struktur kategori
     category_payload = {
         "category_name": "LIVE MATCH",
         "order": 1,
         "sourceUrl": TARGET_URL,
-        "channels": {} # Akan diisi di bawah
+        "channels": {} 
     }
 
-    # Masukkan hasil scrapping ke dalam dictionary channels
+    # 3. Masukkan semua hasil scrap ke dalam node channels
     for item in data:
         if item["streamUrl"] == "Not Found":
             continue
         
+        # ID unik hanya untuk setiap pertandingan di dalam kategori
         channel_key = uuid.uuid4().hex
         category_payload["channels"][channel_key] = item
 
-    # ALAMAT TUJUAN: langsung ke lokasi kategori tersebut
-    # Menggunakan PUT akan menghapus semua channel lama di bawah kategori ini
+    # 4. TARGET URL: Langsung menuju ke folder kategori EVENT1
+    # Menambahkan .json adalah syarat REST API Firebase
     url = f"{FIREBASE_URL}/playlist/{category_key}.json?auth={FIREBASE_SECRET}"
 
-    print(f"Mengupdate Firebase (Auto-reset data lama): {category_key}")
+    print(f"Mengupdate Firebase (Menimpa data lama): {category_key}")
 
     try:
-        # Gunakan PUT untuk me-replace data lama secara total
+        # PENTING: Gunakan requests.put()
+        # PUT akan MENGHAPUS isi EVENT1 yang lama dan MENGGANTINYA dengan yang baru
         res = requests.put(url, json=category_payload, timeout=25)
         
         if res.status_code == 200:
-            print(f"[√] Berhasil! Data lama dihapus, {len(data)} match baru ditambahkan.")
+            print(f"[√] Berhasil! Kategori {category_key} telah di-reset dan diperbarui.")
         else:
             print(f"[!] Gagal kirim: {res.status_code} - {res.text}")
     except Exception as e:
         print(f"[!] Error koneksi Firebase: {e}")
-
 # ==============================
 # MAIN SCRAPER
 # ==============================
 def jalankan_scraper():
-    print("\n===== START SCRAPER (DIRECT SITE TIME) =====\n")
+    print("\n===== SCRAPER START (FIXED MODE) =====\n")
 
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
@@ -158,37 +147,39 @@ def jalankan_scraper():
         )
 
         cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
-        initial_matches = []
+        match_list = []
 
         for card in cards:
             url = card.get_attribute("href")
             teks = card.text.strip()
             if url and len(teks) > 10:
                 imgs = [get_img_src(img) for img in card.find_elements(By.TAG_NAME, "img")]
-                initial_matches.append({"url": url, "text": teks, "imgs": imgs})
+                match_list.append({"url": url, "text": teks, "imgs": imgs})
 
-        for item in initial_matches:
+        for item in match_list:
             try:
-                # Masuk ke halaman detail untuk ambil jam pasti & stream
-                stream_url, league_logo = get_stream_and_league_logo(driver, item["url"], "")
+                # 1. Ambil Stream & Source
+                stream_url, league_logo = get_stream_and_league_logo(driver, item["url"])
                 
-                # --- AMBIL JAM LANGSUNG DARI HALAMAN DETAIL ---
-                # Berdasarkan screenshot, waktu ada di elemen teks "Thời gian: 00:30 ngày 21/02"
+                # 2. Ambil Jam Mulai dari Halaman Detail (FIX REGEX)
                 page_text = driver.page_source
-                time_match = re.search(r"(\d{2}:\d{2})\s+ngày\s+(\d{2}/\d{2})", page_text)
+                # Mencari pola XX:XX ... XX/XX (Jam dan Tanggal)
+                time_match = re.search(r"(\d{2}:\d{2}).*?(\d{2}/\d{2})", page_text)
                 
                 now_dt = datetime.now()
                 if time_match:
-                    jam_menit = time_match.group(1) # "00:30"
-                    tgl_bln = time_match.group(2)   # "21/02"
-                    # Format: 00:30 21/02/2026
-                    start_dt = datetime.strptime(f"{jam_menit} {tgl_bln}/{now_dt.year}", "%H:%M %d/%m/%Y")
-                    start_ts = int(start_dt.timestamp() * 1000)
+                    jam_menit = time_match.group(1) # Contoh: "00:30"
+                    tgl_bln = time_match.group(2)   # Contoh: "21/02"
+                    try:
+                        # Gabungkan jam, tanggal, dan tahun sekarang
+                        start_dt = datetime.strptime(f"{jam_menit} {tgl_bln}/{now_dt.year}", "%H:%M %d/%m/%Y")
+                        start_ts = int(start_dt.timestamp() * 1000)
+                    except:
+                        start_ts = int(time.time() * 1000)
                 else:
-                    # Fallback jika gagal regex
                     start_ts = int(time.time() * 1000)
 
-                # Parsing Nama Tim dari teks card awal
+                # 3. Bersihkan Nama Tim
                 lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
                 clean_lines = [l for l in lines if not re.match(r"^\d{2}:\d{2}$", l) and not l.isdigit()]
                 
@@ -214,10 +205,10 @@ def jalankan_scraper():
                     "playerType": "internal_with_headers",
                     "userAgent": "Mozilla/5.0"
                 })
-                print(f"[OK] {home} vs {away} jam {jam_menit if time_match else 'Live'}")
+                print(f"[OK] {home} vs {away} | Waktu: {jam_menit if time_match else 'Live'}")
 
             except Exception as e:
-                print(f"[!] Error detail match: {e}")
+                print(f"[!] Error match: {e}")
 
     finally:
         driver.quit()
@@ -229,5 +220,3 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
-
-
