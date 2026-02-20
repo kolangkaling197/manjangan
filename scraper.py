@@ -116,121 +116,104 @@ def kirim_ke_firebase(data):
 
 def jalankan_scraper():
     print(f"\n{'='*50}\n[*] STARTING XOILAC STREAM SCRAPER\n{'='*50}")
-    
+
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-blink-features=AutomationControlled")
-    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
-    
+    options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
     driver = uc.Chrome(
-    options=options,
-    version_main=144,
-    use_subprocess=True
+        options=options,
+        version_main=144,
+        use_subprocess=True
     )
+
     hasil_akhir = []
 
     try:
         driver.get(TARGET_URL)
         print("[*] Menunggu halaman utama stabil...")
-        time.sleep(15) 
+        time.sleep(15)
 
-        # 1. Bersihkan popup beranda
-        driver.execute_script("document.querySelectorAll('.modal, .popup, .fixed').forEach(el => el.remove());")
+        driver.execute_script(
+            "document.querySelectorAll('.modal, .popup, .fixed').forEach(el => el.remove());"
+        )
 
-        # 2. Ambil elemen pertandingan
-        wait = WebDriverWait(driver, 20)
         cards = driver.find_elements(By.XPATH, "//a[contains(@href, 'truc-tiep')]")
-        
+
         temp_list = []
         seen_urls = set()
+
         for card in cards:
             url = card.get_attribute("href")
             teks = card.text.strip()
+
             if url and url not in seen_urls and len(teks) > 10:
                 imgs = [img.get_attribute("src") for img in card.find_elements(By.TAG_NAME, "img")]
                 temp_list.append({"teks": teks, "url": url, "imgs": imgs})
                 seen_urls.add(url)
 
         print(f"[*] Berhasil menarik {len(temp_list)} daftar pertandingan.")
-        print(f"[*] Memulai pengambilan link .m3u8 per halaman...\n")
 
         for item in temp_list:
             try:
-                # 1. Bersihkan semua baris teks
-                lines = [l.strip() for l in item['teks'].split('\n') if l.strip()]
-                
-                # 2. Filter Baris Secara Agresif
-                # Buang kata iklan, kata VS, dan format menit pertandingan
+                lines = [l.strip() for l in item["teks"].split("\n") if l.strip()]
+
                 trash = ["CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", "-", "PHT"]
                 clean_lines = []
                 scores = []
 
                 for l in lines:
-                    # Cek apakah baris adalah menit (contoh: 78', 45+2', 1')
-                    is_minute = "'" in l or (l.isdigit() and int(l) > 10) # Asumsi skor tidak mungkin > 10
-                    
-                    # Jika baris adalah angka murni (skor 0-9)
+                    is_minute = "'" in l or (l.isdigit() and int(l) > 10)
+
                     if l.isdigit() and len(l) == 1:
                         scores.append(l)
-                    # Jika bukan angka skor, bukan menit, dan bukan sampah
                     elif not is_minute and not any(t in l.upper() for t in trash) and len(l) > 2:
                         clean_lines.append(l)
 
-                # 3. Penentuan Nama Tim, Liga, dan Skor yang Presisi
                 if len(clean_lines) >= 3:
-                    # Struktur: [Nama Liga, Tim Home, Tim Away]
                     liga = clean_lines[0]
                     home_n = clean_lines[1]
                     away_n = clean_lines[2]
                 elif len(clean_lines) == 2:
-                    # Jika liga tidak terdeteksi, anggap baris 1 & 2 adalah tim
                     liga = "International Match"
                     home_n = clean_lines[0]
                     away_n = clean_lines[1]
                 else:
-                    continue 
+                    continue
 
-                # Ambil skor dari list yang sudah dikumpulkan
                 score_h = scores[0] if len(scores) > 0 else "0"
                 score_a = scores[1] if len(scores) > 1 else "0"
 
-                match_name = f"{home_n} vs {away_n}"
-
-                # 4. Susun Data Final
                 data = {
                     "id": len(hasil_akhir) + 1,
                     "liga": liga,
                     "jadwal": "LIVE NOW",
                     "home": {
-                        "nama": home_n, 
+                        "nama": home_n,
                         "score": score_h,
-                        "logo": item['imgs'][0] if item['imgs'] else ""
+                        "logo": item["imgs"][0] if item["imgs"] else ""
                     },
                     "away": {
-                        "nama": away_n, 
-                        "score": score_away if 'score_away' in locals() else score_a, # Safety check
-                        "logo": item['imgs'][1] if len(item['imgs']) > 1 else ""
+                        "nama": away_n,
+                        "score": score_a,
+                        "logo": item["imgs"][1] if len(item["imgs"]) > 1 else ""
                     },
-                    "link_halaman": item['url'],
-                    "stream_url": ""
+                    "link_halaman": item["url"],
+                    "stream_url": get_live_stream_link(driver, item["url"], f"{home_n} vs {away_n}")
                 }
 
-                # 5. Ekstraksi m3u8
-                data['stream_url'] = get_live_stream_link(driver, item['url'], match_name)
-                
                 hasil_akhir.append(data)
-                print(f"   [√] BERHASIL: {home_n} ({score_h}) - ({score_a}) {away_n} [{liga}]")
-                print(f"   {'-'*30}")
 
             except Exception as e:
-                print(f"   [!] Gagal memproses item: {e}")
-                continue
+                print("[!] Gagal memproses item:", e)
 
     except Exception as e:
-        print(f"\n[!] ERROR UTAMA: {e}")
+        print("[!] ERROR UTAMA:", e)
+
     finally:
         driver.quit()
 
@@ -240,11 +223,11 @@ def jalankan_scraper():
         kirim_ke_firebase(hasil_akhir)
     else:
         print("\n[!] Tidak ada data untuk dikirim")
- 
-
+        
 if __name__ == "__main__":
 
     jalankan_scraper()
+
 
 
 
