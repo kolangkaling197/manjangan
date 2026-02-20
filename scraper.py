@@ -4,11 +4,13 @@ import requests
 import time
 import re
 import undetected_chromedriver as uc
+from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # --- KONFIGURASI ---
+FIREBASE_URL = os.getenv("FIREBASE_URL")
 TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
 FOLDER_ASSETS = "data_scraped/logos"
 FILE_OUTPUT = "data_scraped/jadwal_bola.json"
@@ -88,6 +90,29 @@ def get_live_stream_link(driver, match_page_url, match_name):
     except Exception as e:
         print(f"   [!] ERROR: {e}")
     return "Not Found"
+
+def kirim_ke_firebase(data):
+    if not FIREBASE_URL:
+        print("[!] FIREBASE_URL tidak ditemukan")
+        return
+
+    try:
+        payload = {
+            "last_update": datetime.utcnow().isoformat(),
+            "total_match": len(data),
+            "matches": data
+        }
+
+        url = f"{FIREBASE_URL}/live_matches.json"
+        res = requests.put(url, json=payload, timeout=15)
+
+        if res.status_code == 200:
+            print("[√] Data berhasil dikirim ke Firebase")
+        else:
+            print("[!] Gagal kirim:", res.text)
+
+    except Exception as e:
+        print("[!] Error kirim Firebase:", e)
 
 def jalankan_scraper():
     print(f"\n{'='*50}\n[*] STARTING XOILAC STREAM SCRAPER\n{'='*50}")
@@ -209,17 +234,16 @@ def jalankan_scraper():
         driver.quit()
 
     # 5. Simpan Hasil (Pastikan variabel hasil_akhir tidak kosong)
-    if hasil_akhir:
-        os.makedirs(os.path.dirname(FILE_OUTPUT), exist_ok=True)
-        with open(FILE_OUTPUT, 'w', encoding='utf-8') as f:
-            json.dump(hasil_akhir, f, indent=4, ensure_ascii=False)
-        print(f"\n[SUKSES] {len(hasil_akhir)} data berhasil disimpan di {FILE_OUTPUT}")
-    else:
-        print("\n[!] Selesai, tapi hasil_akhir kosong. Cek filter trash Anda.")
+   if hasil_akhir:
+       print(f"\n[SUKSES] {len(hasil_akhir)} data berhasil dikumpulkan")
+       kirim_ke_firebase(hasil_akhir)
+   else:
+       print("\n[!] Tidak ada data untuk dikirim")
  
 
 if __name__ == "__main__":
 
     jalankan_scraper()
+
 
 
