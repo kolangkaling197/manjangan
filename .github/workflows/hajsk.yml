@@ -1,0 +1,26 @@
+name: Auto Scraper
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Chrome
+        run: |
+          sudo apt update
+          sudo apt install chromium-browser -y
+
+      - name: Install Python Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Scraper
+        run: |
+          python scraper.py
