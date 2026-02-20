@@ -99,10 +99,11 @@ def jalankan_scraper():
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
-    # options.add_argument('--headless') # Matikan jika ingin debug visual
-    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     
-    driver = uc.Chrome(options=options)
+    driver = uc.Chrome(
+    options=options,
+    use_subprocess=True
+    )
     hasil_akhir = []
 
     try:
@@ -220,4 +221,5 @@ def jalankan_scraper():
 if __name__ == "__main__":
 
     jalankan_scraper()
+
 
