@@ -23,12 +23,23 @@ LEAGUE_LOGO_MAP = {
 }
 
 # ==============================
-# AMBIL STREAM LINK
+# UTIL AMBIL SRC IMAGE (ANTI LAZY LOAD)
+# ==============================
+
+def get_img_src(img):
+    return (
+        img.get_attribute("src")
+        or img.get_attribute("data-src")
+        or ""
+    )
+
+# ==============================
+# AMBIL STREAM + LOGO LIGA
 # ==============================
 
 def get_stream_and_league_logo(driver, match_url, liga):
 
-    league_logo = LEAGUE_LOGO_MAP.get(liga, "")
+    league_logo = ""
 
     try:
         driver.get(match_url)
@@ -38,7 +49,26 @@ def get_stream_and_league_logo(driver, match_url, liga):
             document.querySelectorAll('.modal,.popup,.fixed,[id*=ads]').forEach(e=>e.remove());
         """)
 
-        # Masuk iframe jika ada
+        # ==============================
+        # SCRAPE LOGO LIGA DARI HALAMAN
+        # ==============================
+
+        logos = driver.find_elements(By.TAG_NAME, "img")
+        for img in logos:
+            alt = (img.get_attribute("alt") or "").lower()
+            src = get_img_src(img)
+
+            if liga.lower() in alt and src:
+                league_logo = src
+                break
+
+        if not league_logo:
+            league_logo = LEAGUE_LOGO_MAP.get(liga, "")
+
+        # ==============================
+        # MASUK IFRAME PLAYER
+        # ==============================
+
         iframes = driver.find_elements(By.TAG_NAME, "iframe")
         for frame in iframes:
             src = frame.get_attribute("src") or ""
@@ -55,7 +85,10 @@ def get_stream_and_league_logo(driver, match_url, liga):
         time.sleep(10)
         driver.switch_to.default_content()
 
-        # Ambil dari performance log
+        # ==============================
+        # PERFORMANCE LOG
+        # ==============================
+
         try:
             logs = driver.get_log("performance")
             for entry in logs:
@@ -67,7 +100,10 @@ def get_stream_and_league_logo(driver, match_url, liga):
         except:
             pass
 
-        # Fallback HTML
+        # ==============================
+        # FALLBACK HTML
+        # ==============================
+
         html = driver.page_source
         m = re.search(r"https://[^\s\"']+\.m3u8[^\s\"']*", html)
         if m:
@@ -80,7 +116,7 @@ def get_stream_and_league_logo(driver, match_url, liga):
 
 
 # ==============================
-# KIRIM FIREBASE
+# FIREBASE
 # ==============================
 
 def kirim_ke_firebase(data):
@@ -142,7 +178,6 @@ def jalankan_scraper():
 
         cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
 
-        # SIMPAN URL SAJA (ANTI STALE)
         match_list = []
 
         for card in cards:
@@ -150,7 +185,8 @@ def jalankan_scraper():
             teks = card.text.strip()
 
             if url and len(teks) > 10:
-                imgs = [img.get_attribute("src") for img in card.find_elements(By.TAG_NAME, "img")]
+                imgs = [get_img_src(img) for img in card.find_elements(By.TAG_NAME, "img")]
+
                 match_list.append({
                     "url": url,
                     "text": teks,
@@ -159,16 +195,36 @@ def jalankan_scraper():
 
         print(f"Total match ditemukan: {len(match_list)}")
 
-        # Loop pakai data statis
+        # ==============================
+        # LOOP MATCH (ANTI MENIT JADI TIM)
+        # ==============================
+
         for item in match_list:
             try:
                 lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
-                if len(lines) < 2:
+
+                clean_lines = []
+                scores = []
+
+                for l in lines:
+
+                    # Skip menit contoh 83' 45+2'
+                    if re.match(r"^\d+('\+?\d*)?$", l):
+                        continue
+
+                    # Skip skor angka
+                    if l.isdigit() and len(l) <= 2:
+                        scores.append(l)
+                        continue
+
+                    clean_lines.append(l)
+
+                if len(clean_lines) < 3:
                     continue
 
-                liga = lines[0]
-                home = lines[1]
-                away = lines[2] if len(lines) > 2 else ""
+                liga = clean_lines[0]
+                home = clean_lines[1]
+                away = clean_lines[2]
 
                 team1_logo = item["imgs"][0] if len(item["imgs"]) > 0 else ""
                 team2_logo = item["imgs"][1] if len(item["imgs"]) > 1 else ""
