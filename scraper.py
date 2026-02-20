@@ -92,7 +92,13 @@ def get_live_stream_link(driver, match_page_url, match_name):
 def jalankan_scraper():
     print(f"\n{'='*50}\n[*] STARTING XOILAC STREAM SCRAPER\n{'='*50}")
     
-    options = uc.ChromeOptions() options.add_argument("--headless=new") options.add_argument("--no-sandbox") options.add_argument("--disable-dev-shm-usage") options.add_argument("--disable-gpu") options.add_argument("--disable-blink-features=AutomationControlled") options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+    options = uc.ChromeOptions()
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     # options.add_argument('--headless') # Matikan jika ingin debug visual
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     
@@ -214,3 +220,4 @@ def jalankan_scraper():
 if __name__ == "__main__":
 
     jalankan_scraper()
+
