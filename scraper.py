@@ -5,6 +5,8 @@ import re
 import uuid
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 # ==============================
 # KONFIGURASI
@@ -25,19 +27,18 @@ LEAGUE_LOGO_MAP = {
 # ==============================
 
 def get_stream_and_league_logo(driver, match_url, liga):
-    print("   [>] Membuka halaman match")
 
     league_logo = LEAGUE_LOGO_MAP.get(liga, "")
 
     try:
         driver.get(match_url)
-        time.sleep(6)
+        time.sleep(5)
 
         driver.execute_script("""
             document.querySelectorAll('.modal,.popup,.fixed,[id*=ads]').forEach(e=>e.remove());
         """)
 
-        # switch ke iframe jika ada
+        # Masuk iframe jika ada
         iframes = driver.find_elements(By.TAG_NAME, "iframe")
         for frame in iframes:
             src = frame.get_attribute("src") or ""
@@ -45,12 +46,10 @@ def get_stream_and_league_logo(driver, match_url, liga):
                 driver.switch_to.frame(frame)
                 break
 
+        # Paksa play
         driver.execute_script("""
             var vids = document.querySelectorAll("video");
-            vids.forEach(v => {
-                v.muted = true;
-                v.play().catch(()=>{});
-            });
+            vids.forEach(v => { v.muted = true; v.play().catch(()=>{}); });
         """)
 
         time.sleep(10)
@@ -64,26 +63,24 @@ def get_stream_and_league_logo(driver, match_url, liga):
                 if ".m3u8" in msg:
                     m = re.search(r'https://[^\\"]+\.m3u8[^\\"]*', msg)
                     if m:
-                        stream = m.group(0).replace("\\/", "/")
-                        print("   [√] Stream ditemukan")
-                        return stream, league_logo
+                        return m.group(0).replace("\\/", "/"), league_logo
         except:
             pass
 
-        # fallback dari HTML
+        # Fallback HTML
         html = driver.page_source
         m = re.search(r"https://[^\s\"']+\.m3u8[^\s\"']*", html)
         if m:
             return m.group(0), league_logo
 
     except Exception as e:
-        print("   [!] Error ambil stream:", e)
+        print("   [!] Error stream:", e)
 
     return "Not Found", league_logo
 
 
 # ==============================
-# KIRIM KE FIREBASE
+# KIRIM FIREBASE
 # ==============================
 
 def kirim_ke_firebase(data):
@@ -106,7 +103,7 @@ def kirim_ke_firebase(data):
     res = requests.put(url, json=playlist, timeout=20)
 
     if res.status_code == 200:
-        print("[√] Data berhasil dikirim ke Firebase")
+        print("[√] Data berhasil dikirim")
     else:
         print("[!] Gagal kirim:", res.text)
 
@@ -117,7 +114,7 @@ def kirim_ke_firebase(data):
 
 def jalankan_scraper():
 
-    print("\n========== START SCRAPER ==========\n")
+    print("\n===== START SCRAPER =====\n")
 
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
@@ -136,21 +133,36 @@ def jalankan_scraper():
 
     try:
         driver.get(TARGET_URL)
-        time.sleep(10)
+
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_all_elements_located(
+                (By.XPATH, "//a[contains(@href,'truc-tiep')]")
+            )
+        )
 
         cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
 
+        # SIMPAN URL SAJA (ANTI STALE)
+        match_list = []
+
         for card in cards:
-            try:
-                url = card.get_attribute("href")
-                teks = card.text.strip()
+            url = card.get_attribute("href")
+            teks = card.text.strip()
 
-                if not url or len(teks) < 10:
-                    continue
-
+            if url and len(teks) > 10:
                 imgs = [img.get_attribute("src") for img in card.find_elements(By.TAG_NAME, "img")]
+                match_list.append({
+                    "url": url,
+                    "text": teks,
+                    "imgs": imgs
+                })
 
-                lines = [l.strip() for l in teks.split("\n") if l.strip()]
+        print(f"Total match ditemukan: {len(match_list)}")
+
+        # Loop pakai data statis
+        for item in match_list:
+            try:
+                lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
                 if len(lines) < 2:
                     continue
 
@@ -158,10 +170,14 @@ def jalankan_scraper():
                 home = lines[1]
                 away = lines[2] if len(lines) > 2 else ""
 
-                team1_logo = imgs[0] if len(imgs) > 0 else ""
-                team2_logo = imgs[1] if len(imgs) > 1 else ""
+                team1_logo = item["imgs"][0] if len(item["imgs"]) > 0 else ""
+                team2_logo = item["imgs"][1] if len(item["imgs"]) > 1 else ""
 
-                stream_url, league_logo = get_stream_and_league_logo(driver, url, liga)
+                stream_url, league_logo = get_stream_and_league_logo(
+                    driver,
+                    item["url"],
+                    liga
+                )
 
                 now = int(time.time() * 1000)
 
@@ -195,7 +211,7 @@ def jalankan_scraper():
                 print(f"[OK] {home} vs {away}")
 
             except Exception as e:
-                print("[!] Error proses match:", e)
+                print("[!] Error match:", e)
 
     except Exception as e:
         print("[!] ERROR UTAMA:", e)
@@ -206,11 +222,8 @@ def jalankan_scraper():
     if hasil:
         kirim_ke_firebase(hasil)
     else:
-        print("[!] Tidak ada data dikirim")
+        print("[!] Tidak ada data")
 
-
-# ==============================
 
 if __name__ == "__main__":
     jalankan_scraper()
-
