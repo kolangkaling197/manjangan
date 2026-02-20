@@ -13,6 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 # ==============================
 
 FIREBASE_URL = os.getenv("FIREBASE_URL")
+FIREBASE_SECRET = os.getenv("FIREBASE_SECRET")
 TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
 
 LEAGUE_LOGO_MAP = {
@@ -125,9 +126,12 @@ def kirim_ke_firebase(data):
         print("[!] FIREBASE_URL tidak ditemukan")
         return
 
+    if not FIREBASE_SECRET:
+        print("[!] FIREBASE_SECRET tidak ditemukan")
+        return
+
     now = int(time.time() * 1000)
 
-    # Buat node kategori EVENT
     category_key = "-EVENT_" + str(now)
 
     payload = {
@@ -144,18 +148,21 @@ def kirim_ke_firebase(data):
             continue
 
         channel_key = uuid.uuid4().hex
-
         payload[category_key]["channels"][channel_key] = item
 
-    url = f"{FIREBASE_URL}/playlist.json"
+    url = f"{FIREBASE_URL}/playlist.json?auth={FIREBASE_SECRET}"
+
+    print("Kirim ke:", url)
 
     res = requests.patch(url, json=payload, timeout=20)
 
-    if res.status_code == 200:
-        print("[√] Data EVENT berhasil dikirim ke playlist/EVENT/channels")
-    else:
-        print("[!] Gagal kirim:", res.text)
+    print("Status:", res.status_code)
+    print("Response:", res.text)
 
+    if res.status_code == 200:
+        print("[√] Data EVENT berhasil dikirim")
+    else:
+        print("[!] Gagal kirim")
 
 # ==============================
 # SCRAPER UTAMA
@@ -294,5 +301,6 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
 
