@@ -98,36 +98,45 @@ def get_stream_and_league_logo(driver, match_url, liga):
 # ==============================
 def kirim_ke_firebase(data):
     if not FIREBASE_URL or not FIREBASE_SECRET:
-        print("[!] Konfigurasi Firebase tidak lengkap!")
+        print("[!] Konfigurasi Firebase tidak lengkap")
         return
 
-    now = int(time.time() * 1000)
-    category_key = "-EVENT_" + str(now)
+    # Kita gunakan ID kategori yang tetap (misal: -EVENT_FIXED) 
+    # agar data lama di lokasi ini otomatis tertimpa/terhapus
+    category_key = "EVENT_LIVE" 
 
-    payload = {
-        category_key: {
-            "category_name": "EVENT1",
-            "order": 15,
-            "sourceUrl": TARGET_URL,
-            "channels": {}
-        }
+    # Payload dasar untuk kategori
+    category_payload = {
+        "category_name": "LIVE MATCH",
+        "order": 1,
+        "sourceUrl": TARGET_URL,
+        "channels": {} # Akan diisi di bawah
     }
 
+    # Masukkan hasil scrapping ke dalam dictionary channels
     for item in data:
         if item["streamUrl"] == "Not Found":
             continue
+        
         channel_key = uuid.uuid4().hex
-        payload[category_key]["channels"][channel_key] = item
+        category_payload["channels"][channel_key] = item
 
-    url = f"{FIREBASE_URL}/playlist.json?auth={FIREBASE_SECRET}"
-    print(f"Updating Firebase: {url}")
-    
-    res = requests.patch(url, json=payload, timeout=25)
-    
-    if res.status_code == 200:
-        print("[√] Berhasil kirim data ke Firebase")
-    else:
-        print(f"[!] Gagal kirim: {res.status_code}")
+    # ALAMAT TUJUAN: langsung ke lokasi kategori tersebut
+    # Menggunakan PUT akan menghapus semua channel lama di bawah kategori ini
+    url = f"{FIREBASE_URL}/playlist/{category_key}.json?auth={FIREBASE_SECRET}"
+
+    print(f"Mengupdate Firebase (Auto-reset data lama): {category_key}")
+
+    try:
+        # Gunakan PUT untuk me-replace data lama secara total
+        res = requests.put(url, json=category_payload, timeout=25)
+        
+        if res.status_code == 200:
+            print(f"[√] Berhasil! Data lama dihapus, {len(data)} match baru ditambahkan.")
+        else:
+            print(f"[!] Gagal kirim: {res.status_code} - {res.text}")
+    except Exception as e:
+        print(f"[!] Error koneksi Firebase: {e}")
 
 # ==============================
 # MAIN SCRAPER
@@ -220,4 +229,5 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
