@@ -3,6 +3,7 @@ import json
 import requests
 import time
 import re
+import uuid
 import undetected_chromedriver as uc
 from datetime import datetime
 from selenium.webdriver.common.by import By
@@ -97,17 +98,50 @@ def kirim_ke_firebase(data):
         return
 
     try:
-        payload = {
-            "last_update": datetime.utcnow().isoformat(),
-            "total_match": len(data),
-            "matches": data
-        }
+        playlist = {}
+        now = int(time.time() * 1000)
 
-        url = f"{FIREBASE_URL}/live_matches.json"
-        res = requests.put(url, json=payload, timeout=15)
+        for item in data:
+            if item["stream_url"] == "Not Found":
+                continue
+
+            key = uuid.uuid4().hex
+
+            league_logo = item["home"]["logo"]  # sementara pakai logo tim
+            # jika nanti kamu punya mapping logo liga, bisa ganti di sini
+
+            playlist[key] = {
+                "channelName": f"[{item['liga']}] {item['home']['nama']} vs {item['away']['nama']}",
+                "leagueName": item["liga"],
+                "leagueLogo": league_logo,
+
+                "team1Name": item["home"]["nama"],
+                "team1Logo": item["home"]["logo"],
+
+                "team2Name": item["away"]["nama"],
+                "team2Logo": item["away"]["logo"],
+
+                "channelLogo": league_logo,
+
+                "contentType": "event_pertandingan",
+                "description": "LIVE",
+                "playerType": "internal_with_headers",
+                "referer": "https://bunchatv.net/",
+                "userAgent": "Mozilla/5.0",
+
+                "status": "live",
+                "startTime": now,
+                "endTime": now + 7200000,
+                "order": now,
+
+                "streamUrl": item["stream_url"]
+            }
+
+        url = f"{FIREBASE_URL}/playlist.json"
+        res = requests.put(url, json=playlist, timeout=20)
 
         if res.status_code == 200:
-            print("[√] Data berhasil dikirim ke Firebase")
+            print("[√] Playlist lengkap berhasil dikirim")
         else:
             print("[!] Gagal kirim:", res.text)
 
@@ -227,6 +261,7 @@ def jalankan_scraper():
 if __name__ == "__main__":
 
     jalankan_scraper()
+
 
 
 
