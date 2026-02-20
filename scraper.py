@@ -234,17 +234,18 @@ def jalankan_scraper():
     finally:
         driver.quit()
 
-    # 5. Simpan Hasil (Pastikan variabel hasil_akhir tidak kosong)
-   if hasil_akhir:
-       print(f"\n[SUKSES] {len(hasil_akhir)} data berhasil dikumpulkan")
-       kirim_ke_firebase(hasil_akhir)
-   else:
-       print("\n[!] Tidak ada data untuk dikirim")
+    # Kirim ke Firebase
+    if hasil_akhir:
+        print(f"\n[SUKSES] {len(hasil_akhir)} data berhasil dikumpulkan")
+        kirim_ke_firebase(hasil_akhir)
+    else:
+        print("\n[!] Tidak ada data untuk dikirim")
  
 
 if __name__ == "__main__":
 
     jalankan_scraper()
+
 
 
 
