@@ -125,21 +125,34 @@ def kirim_ke_firebase(data):
         print("[!] FIREBASE_URL tidak ditemukan")
         return
 
-    playlist = {}
     now = int(time.time() * 1000)
+
+    # Buat node kategori EVENT
+    category_key = "-EVENT_" + str(now)
+
+    payload = {
+        category_key: {
+            "category_name": "EVENT",
+            "order": now,
+            "sourceUrl": TARGET_URL,
+            "channels": {}
+        }
+    }
 
     for item in data:
         if item["streamUrl"] == "Not Found":
             continue
 
-        key = uuid.uuid4().hex
-        playlist[key] = item
+        channel_key = uuid.uuid4().hex
+
+        payload[category_key]["channels"][channel_key] = item
 
     url = f"{FIREBASE_URL}/playlist.json"
-    res = requests.put(url, json=playlist, timeout=20)
+
+    res = requests.patch(url, json=payload, timeout=20)
 
     if res.status_code == 200:
-        print("[√] Data berhasil dikirim")
+        print("[√] Data EVENT berhasil dikirim ke playlist/EVENT/channels")
     else:
         print("[!] Gagal kirim:", res.text)
 
@@ -248,8 +261,6 @@ def jalankan_scraper():
                     "team2Name": away,
                     "team2Logo": team2_logo,
 
-                    "channelLogo": league_logo,
-
                     "contentType": "event_pertandingan",
                     "description": "LIVE",
                     "playerType": "internal_with_headers",
@@ -283,3 +294,4 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
