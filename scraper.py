@@ -132,8 +132,8 @@ def kirim_ke_firebase(data):
 
     payload = {
         category_key: {
-            "category_name": "EVENT",
-            "order": now,
+            "category_name": "EVENT1",
+            "order": 15,
             "sourceUrl": TARGET_URL,
             "channels": {}
         }
@@ -294,4 +294,5 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
