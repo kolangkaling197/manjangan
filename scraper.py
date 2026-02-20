@@ -1,5 +1,4 @@
 import os
-import json
 import requests
 import time
 import re
@@ -7,156 +6,108 @@ import uuid
 import undetected_chromedriver as uc
 from datetime import datetime
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
-# --- KONFIGURASI ---
+# ==============================
+# KONFIGURASI
+# ==============================
+
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
-FOLDER_ASSETS = "data_scraped/logos"
-FILE_OUTPUT = "data_scraped/jadwal_bola.json"
 
-def download_logo(url, nama_tim):
-    """Mengunduh logo tim dan menyimpannya secara lokal dengan nama yang bersih."""
-    if not url or "http" not in url: 
-        return "assets/default_logo.png"
-        
-    if not os.path.exists(FOLDER_ASSETS): 
-        os.makedirs(FOLDER_ASSETS)
-    
-    # Membersihkan nama file dari karakter ilegal
-    nama_aman = "".join([c for c in nama_tim if c.isalnum() or c in (' ', '_')]).strip().replace(' ', '_')
-    path_file = os.path.join(FOLDER_ASSETS, f"{nama_aman}.png")
-    
-    if not os.path.exists(path_file):
-        try:
-            # Menggunakan header agar tidak diblokir saat download gambar
-            headers = {'User-Agent': 'Mozilla/5.0'}
-            respon = requests.get(url, headers=headers, timeout=10)
-            if respon.status_code == 200:
-                with open(path_file, 'wb') as f:
-                    f.write(respon.content)
-                return path_file
-        except Exception as e:
-            print(f"      [!] Gagal download logo {nama_tim}: {e}")
-            return url
-    return path_file
+# Mapping logo liga (lebih stabil daripada scraping)
+LEAGUE_LOGO_MAP = {
+    "Ukrainian Youth Team Championship": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
+    "Myanmar Professional League": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
+    "National Premier Leagues Victoria": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
+    "International Match": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
+}
 
-def get_live_stream_link(driver, match_page_url, match_name):
-    """Mengambil link m3u8 dengan pembersihan iklan dan force interaction."""
-    print(f"\n   [>] SEDANG MEMPROSES: {match_name}")
+# ==============================
+# AMBIL STREAM LINK + LOGO LIGA
+# ==============================
+
+def get_stream_and_league_logo(driver, match_url, liga):
+    print("   [>] Membuka halaman match")
+
     try:
-        driver.get(match_page_url)
-        time.sleep(5) # Tunggu halaman muat sebentar
+        driver.get(match_url)
+        time.sleep(5)
 
-        # Bersihkan Iklan Overlay yang menghalangi player
         driver.execute_script("""
-            var ads = document.querySelectorAll('[id*="ads"], [class*="ads"], [style*="z-index: 9999"], .sh-overlay, .modal');
-            ads.forEach(ad => ad.remove());
+            document.querySelectorAll('.modal,.popup,.fixed,[id*=ads]').forEach(e=>e.remove());
         """)
 
-        # Cari iframe dan pindah ke dalamnya jika ada
-        iframes = driver.find_elements(By.TAG_NAME, "iframe")
-        for i, frame in enumerate(iframes):
-            src = frame.get_attribute("src") or ""
-            if any(x in src for x in ["bitmovin", "player", "stream", "embed"]):
-                driver.switch_to.frame(frame)
-                print(f"   [>] Berpindah ke iframe #{i}")
-                break
+        # paksa video play supaya m3u8 muncul
+        driver.execute_script("""
+            var vids = document.querySelectorAll("video");
+            vids.forEach(v => { v.muted=true; v.play().catch(()=>{}); });
+        """)
 
-        # Klik area video untuk memancing m3u8
+        time.sleep(10)
+
+        # 1️⃣ Ambil dari performance log
         try:
-            video_el = driver.find_elements(By.XPATH, "//video | //div[@id='player'] | //div[contains(@class, 'play')]")
-            if video_el:
-                driver.execute_script("arguments[0].click();", video_el[0])
-        except: pass
+            logs = driver.get_log("performance")
+            for entry in logs:
+                msg = entry.get("message", "")
+                if ".m3u8" in msg:
+                    m = re.search(r'"url":"(https://.*?\.m3u8.*?)"', msg)
+                    if m:
+                        return m.group(1).replace("\\/", "/"), LEAGUE_LOGO_MAP.get(liga, "")
+        except:
+            pass
 
-        print("   [>] Menunggu traffic network (15 detik)...")
-        time.sleep(15)
-        
-        driver.switch_to.default_content()
-        logs = driver.get_log('performance')
-        
-        for entry in logs:
-            message = entry.get('message')
-            if '.m3u8' in message:
-                url_match = re.search(r'"url":"(https://.*?\.m3u8.*?)"', message)
-                if url_match:
-                    stream_url = url_match.group(1).replace('\\/', '/')
-                    if "ads" not in stream_url.lower():
-                        print(f"   [√] LOG FOUND: m3u8 Captured!")
-                        return stream_url
-                    
-        print("   [!] LOG: Tidak ditemukan (Mungkin belum Live).")
+        # 2️⃣ Fallback dari HTML
+        html = driver.page_source
+        m = re.search(r"https://[^\"']+\.m3u8[^\"']*", html)
+        if m:
+            return m.group(0), LEAGUE_LOGO_MAP.get(liga, "")
+
     except Exception as e:
-        print(f"   [!] ERROR: {e}")
-    return "Not Found"
+        print("   [!] Error ambil stream:", e)
+
+    return "Not Found", LEAGUE_LOGO_MAP.get(liga, "")
+
+# ==============================
+# KIRIM KE FIREBASE
+# ==============================
 
 def kirim_ke_firebase(data):
     if not FIREBASE_URL:
         print("[!] FIREBASE_URL tidak ditemukan")
         return
 
-    try:
-        playlist = {}
-        now = int(time.time() * 1000)
+    playlist = {}
+    now = int(time.time() * 1000)
 
-        for item in data:
-            if item["stream_url"] == "Not Found":
-                continue
+    for item in data:
+        if item["streamUrl"] == "Not Found":
+            continue
 
-            key = uuid.uuid4().hex
+        key = uuid.uuid4().hex
 
-            league_logo = item["home"]["logo"]  # sementara pakai logo tim
-            # jika nanti kamu punya mapping logo liga, bisa ganti di sini
+        playlist[key] = item
 
-            playlist[key] = {
-                "channelName": f"[{item['liga']}] {item['home']['nama']} vs {item['away']['nama']}",
-                "leagueName": item["liga"],
-                "leagueLogo": league_logo,
+    url = f"{FIREBASE_URL}/playlist.json"
+    res = requests.put(url, json=playlist, timeout=20)
 
-                "team1Name": item["home"]["nama"],
-                "team1Logo": item["home"]["logo"],
+    if res.status_code == 200:
+        print("[√] Data berhasil dikirim ke Firebase")
+    else:
+        print("[!] Gagal kirim:", res.text)
 
-                "team2Name": item["away"]["nama"],
-                "team2Logo": item["away"]["logo"],
-
-                "channelLogo": league_logo,
-
-                "contentType": "event_pertandingan",
-                "description": "LIVE",
-                "playerType": "internal_with_headers",
-                "referer": "https://bunchatv.net/",
-                "userAgent": "Mozilla/5.0",
-
-                "status": "live",
-                "startTime": now,
-                "endTime": now + 7200000,
-                "order": now,
-
-                "streamUrl": item["stream_url"]
-            }
-
-        url = f"{FIREBASE_URL}/playlist.json"
-        res = requests.put(url, json=playlist, timeout=20)
-
-        if res.status_code == 200:
-            print("[√] Playlist lengkap berhasil dikirim")
-        else:
-            print("[!] Gagal kirim:", res.text)
-
-    except Exception as e:
-        print("[!] Error kirim Firebase:", e)
+# ==============================
+# SCRAPER UTAMA
+# ==============================
 
 def jalankan_scraper():
-    print(f"\n{'='*50}\n[*] STARTING XOILAC STREAM SCRAPER\n{'='*50}")
+    print("\n========== START SCRAPER ==========\n")
 
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
-    options.add_argument("--disable-blink-features=AutomationControlled")
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
     driver = uc.Chrome(
@@ -165,85 +116,70 @@ def jalankan_scraper():
         use_subprocess=True
     )
 
-    hasil_akhir = []
+    hasil = []
 
     try:
         driver.get(TARGET_URL)
-        print("[*] Menunggu halaman utama stabil...")
-        time.sleep(15)
+        time.sleep(10)
 
-        driver.execute_script(
-            "document.querySelectorAll('.modal, .popup, .fixed').forEach(el => el.remove());"
-        )
-
-        cards = driver.find_elements(By.XPATH, "//a[contains(@href, 'truc-tiep')]")
-
-        temp_list = []
-        seen_urls = set()
+        cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
 
         for card in cards:
-            url = card.get_attribute("href")
-            teks = card.text.strip()
-
-            if url and url not in seen_urls and len(teks) > 10:
-                imgs = [img.get_attribute("src") for img in card.find_elements(By.TAG_NAME, "img")]
-                temp_list.append({"teks": teks, "url": url, "imgs": imgs})
-                seen_urls.add(url)
-
-        print(f"[*] Berhasil menarik {len(temp_list)} daftar pertandingan.")
-
-        for item in temp_list:
             try:
-                lines = [l.strip() for l in item["teks"].split("\n") if l.strip()]
+                url = card.get_attribute("href")
+                teks = card.text.strip()
 
-                trash = ["CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", "-", "PHT"]
-                clean_lines = []
-                scores = []
-
-                for l in lines:
-                    is_minute = "'" in l or (l.isdigit() and int(l) > 10)
-
-                    if l.isdigit() and len(l) == 1:
-                        scores.append(l)
-                    elif not is_minute and not any(t in l.upper() for t in trash) and len(l) > 2:
-                        clean_lines.append(l)
-
-                if len(clean_lines) >= 3:
-                    liga = clean_lines[0]
-                    home_n = clean_lines[1]
-                    away_n = clean_lines[2]
-                elif len(clean_lines) == 2:
-                    liga = "International Match"
-                    home_n = clean_lines[0]
-                    away_n = clean_lines[1]
-                else:
+                if not url or len(teks) < 10:
                     continue
 
-                score_h = scores[0] if len(scores) > 0 else "0"
-                score_a = scores[1] if len(scores) > 1 else "0"
+                imgs = [img.get_attribute("src") for img in card.find_elements(By.TAG_NAME, "img")]
 
-                data = {
-                    "id": len(hasil_akhir) + 1,
-                    "liga": liga,
-                    "jadwal": "LIVE NOW",
-                    "home": {
-                        "nama": home_n,
-                        "score": score_h,
-                        "logo": item["imgs"][0] if item["imgs"] else ""
-                    },
-                    "away": {
-                        "nama": away_n,
-                        "score": score_a,
-                        "logo": item["imgs"][1] if len(item["imgs"]) > 1 else ""
-                    },
-                    "link_halaman": item["url"],
-                    "stream_url": get_live_stream_link(driver, item["url"], f"{home_n} vs {away_n}")
-                }
+                lines = [l.strip() for l in teks.split("\n") if l.strip()]
+                if len(lines) < 2:
+                    continue
 
-                hasil_akhir.append(data)
+                liga = lines[0]
+                home = lines[1]
+                away = lines[2] if len(lines) > 2 else ""
+
+                team1_logo = imgs[0] if len(imgs) > 0 else ""
+                team2_logo = imgs[1] if len(imgs) > 1 else ""
+
+                stream_url, league_logo = get_stream_and_league_logo(driver, url, liga)
+
+                now = int(time.time() * 1000)
+
+                hasil.append({
+                    "channelName": f"[{liga}] {home} vs {away}",
+                    "leagueName": liga,
+                    "leagueLogo": league_logo,
+
+                    "team1Name": home,
+                    "team1Logo": team1_logo,
+
+                    "team2Name": away,
+                    "team2Logo": team2_logo,
+
+                    "channelLogo": league_logo,
+
+                    "contentType": "event_pertandingan",
+                    "description": "LIVE",
+                    "playerType": "internal_with_headers",
+                    "referer": "https://bunchatv.net/",
+                    "userAgent": "Mozilla/5.0",
+
+                    "status": "live",
+                    "startTime": now,
+                    "endTime": now + 7200000,
+                    "order": now,
+
+                    "streamUrl": stream_url
+                })
+
+                print(f"[OK] {home} vs {away}")
 
             except Exception as e:
-                print("[!] Gagal memproses item:", e)
+                print("[!] Error proses match:", e)
 
     except Exception as e:
         print("[!] ERROR UTAMA:", e)
@@ -251,20 +187,12 @@ def jalankan_scraper():
     finally:
         driver.quit()
 
-    # Kirim ke Firebase
-    if hasil_akhir:
-        print(f"\n[SUKSES] {len(hasil_akhir)} data berhasil dikumpulkan")
-        kirim_ke_firebase(hasil_akhir)
+    if hasil:
+        kirim_ke_firebase(hasil)
     else:
-        print("\n[!] Tidak ada data untuk dikirim")
-        
+        print("[!] Tidak ada data dikirim")
+
+# ==============================
+
 if __name__ == "__main__":
-
     jalankan_scraper()
-
-
-
-
-
-
-
