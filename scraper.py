@@ -133,12 +133,10 @@ def kirim_ke_firebase(data):
 # MAIN SCRAPER
 # ==============================
 def jalankan_scraper():
-    print("\n===== SCRAPER BUNCHATV STARTING =====\n")
+    print("\n===== START SCRAPER (DIRECT SITE TIME) =====\n")
 
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
     driver = uc.Chrome(options=options, version_main=144)
@@ -146,64 +144,51 @@ def jalankan_scraper():
 
     try:
         driver.get(TARGET_URL)
-        
-        # Tunggu sampai link pertandingan muncul
         WebDriverWait(driver, 20).until(
             EC.presence_of_all_elements_located((By.XPATH, "//a[contains(@href,'truc-tiep')]"))
         )
 
         cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
-        match_list = []
+        initial_matches = []
 
-        # List match sementara
         for card in cards:
             url = card.get_attribute("href")
             teks = card.text.strip()
             if url and len(teks) > 10:
                 imgs = [get_img_src(img) for img in card.find_elements(By.TAG_NAME, "img")]
-                match_list.append({"url": url, "text": teks, "imgs": imgs})
+                initial_matches.append({"url": url, "text": teks, "imgs": imgs})
 
-        print(f"Menemukan {len(match_list)} potensi pertandingan.\n")
-
-        for item in match_list:
+        for item in initial_matches:
             try:
-                # Parsing Teks Card
-                lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
-                clean_lines = []
-                jam_mulai_str = ""
-
-                for l in lines:
-                    # Deteksi Jam (HH:mm)
-                    if re.match(r"^\d{2}:\d{2}$", l):
-                        jam_mulai_str = l
-                        continue
-                    
-                    # Bersihkan Menit Pertandingan & Skor
-                    if re.match(r"^\d+('\+?\d*)?$", l) or (l.isdigit() and len(l) <= 2):
-                        continue
-
-                    clean_lines.append(l)
-
-                if len(clean_lines) < 3: continue
-
-                liga = clean_lines[0]
-                home = clean_lines[1]
-                away = clean_lines[2]
-
-                # Konversi Waktu ke Unix Timestamp (milidetik)
+                # Masuk ke halaman detail untuk ambil jam pasti & stream
+                stream_url, league_logo = get_stream_and_league_logo(driver, item["url"], "")
+                
+                # --- AMBIL JAM LANGSUNG DARI HALAMAN DETAIL ---
+                # Berdasarkan screenshot, waktu ada di elemen teks "Thời gian: 00:30 ngày 21/02"
+                page_text = driver.page_source
+                time_match = re.search(r"(\d{2}:\d{2})\s+ngày\s+(\d{2}/\d{2})", page_text)
+                
                 now_dt = datetime.now()
-                if jam_mulai_str:
-                    # Gabung tanggal hari ini + jam dari web
-                    start_dt = datetime.strptime(f"{now_dt.strftime('%Y-%m-%d')} {jam_mulai_str}", "%Y-%m-%d %H:%M")
+                if time_match:
+                    jam_menit = time_match.group(1) # "00:30"
+                    tgl_bln = time_match.group(2)   # "21/02"
+                    # Format: 00:30 21/02/2026
+                    start_dt = datetime.strptime(f"{jam_menit} {tgl_bln}/{now_dt.year}", "%H:%M %d/%m/%Y")
                     start_ts = int(start_dt.timestamp() * 1000)
                 else:
+                    # Fallback jika gagal regex
                     start_ts = int(time.time() * 1000)
 
-                # Ambil Link Stream (M3U8)
-                stream_url, league_logo = get_stream_and_league_logo(driver, item["url"], liga)
+                # Parsing Nama Tim dari teks card awal
+                lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
+                clean_lines = [l for l in lines if not re.match(r"^\d{2}:\d{2}$", l) and not l.isdigit()]
+                
+                if len(clean_lines) >= 3:
+                    liga, home, away = clean_lines[0], clean_lines[1], clean_lines[2]
+                else:
+                    continue
 
-                # Siapkan Payload JSON (Key sinkron dengan Channel.java Anda)
-                match_data = {
+                hasil.append({
                     "channelName": f"[{liga}] {home} vs {away}",
                     "leagueName": liga,
                     "leagueLogo": league_logo,
@@ -212,22 +197,18 @@ def jalankan_scraper():
                     "team2Name": away,
                     "team2Logo": item["imgs"][1] if len(item["imgs"]) > 1 else "",
                     "contentType": "event_pertandingan",
-                    "description": "LIVE",
-                    "playerType": "internal_with_headers",
-                    "referer": "https://bunchatv.net/",
-                    "userAgent": "Mozilla/5.0",
-                    "status": "live" if start_ts <= (time.time() * 1000) else "upcoming",
+                    "status": "live" if start_ts <= (time.time()*1000) else "upcoming",
                     "startTime": start_ts,
-                    "endTime": start_ts + 7200000, # +2 Jam
-                    "order": start_ts,
-                    "streamUrl": stream_url
-                }
-                
-                hasil.append(match_data)
-                print(f"[OK] {jam_mulai_str or 'Live'} - {home} vs {away}")
+                    "endTime": start_ts + 7200000,
+                    "referer": "https://bunchatv.net/",
+                    "streamUrl": stream_url,
+                    "playerType": "internal_with_headers",
+                    "userAgent": "Mozilla/5.0"
+                })
+                print(f"[OK] {home} vs {away} jam {jam_menit if time_match else 'Live'}")
 
             except Exception as e:
-                print(f"[!] Gagal proses match: {e}")
+                print(f"[!] Error detail match: {e}")
 
     finally:
         driver.quit()
@@ -239,3 +220,4 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
