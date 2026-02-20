@@ -4,7 +4,6 @@ import time
 import re
 import uuid
 import undetected_chromedriver as uc
-from datetime import datetime
 from selenium.webdriver.common.by import By
 
 # ==============================
@@ -14,7 +13,6 @@ from selenium.webdriver.common.by import By
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
 
-# Mapping logo liga (lebih stabil daripada scraping)
 LEAGUE_LOGO_MAP = {
     "Ukrainian Youth Team Championship": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
     "Myanmar Professional League": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
@@ -23,16 +21,10 @@ LEAGUE_LOGO_MAP = {
 }
 
 # ==============================
-# AMBIL STREAM LINK + LOGO LIGA
+# AMBIL STREAM LINK
 # ==============================
 
-
-# ==============================
-# KIRIM KE FIREBASE
-# ==============================
-
-def kirim_ke_firebase(data):
-    if notdef get_stream_and_league_logo(driver, match_url, liga):
+def get_stream_and_league_logo(driver, match_url, liga):
     print("   [>] Membuka halaman match")
 
     league_logo = LEAGUE_LOGO_MAP.get(liga, "")
@@ -41,12 +33,11 @@ def kirim_ke_firebase(data):
         driver.get(match_url)
         time.sleep(6)
 
-        # Hapus popup & ads
         driver.execute_script("""
             document.querySelectorAll('.modal,.popup,.fixed,[id*=ads]').forEach(e=>e.remove());
         """)
 
-        # Jika ada iframe player, masuk ke dalamnya
+        # switch ke iframe jika ada
         iframes = driver.find_elements(By.TAG_NAME, "iframe")
         for frame in iframes:
             src = frame.get_attribute("src") or ""
@@ -54,7 +45,6 @@ def kirim_ke_firebase(data):
                 driver.switch_to.frame(frame)
                 break
 
-        # Paksa play video
         driver.execute_script("""
             var vids = document.querySelectorAll("video");
             vids.forEach(v => {
@@ -63,14 +53,10 @@ def kirim_ke_firebase(data):
             });
         """)
 
-        time.sleep(12)
-
-        # Kembali ke main context
+        time.sleep(10)
         driver.switch_to.default_content()
 
-        # ==============================
-        # 1️⃣ Ambil dari performance log
-        # ==============================
+        # Ambil dari performance log
         try:
             logs = driver.get_log("performance")
             for entry in logs:
@@ -79,25 +65,30 @@ def kirim_ke_firebase(data):
                     m = re.search(r'https://[^\\"]+\.m3u8[^\\"]*', msg)
                     if m:
                         stream = m.group(0).replace("\\/", "/")
-                        print("   [√] Stream ditemukan dari performance log")
+                        print("   [√] Stream ditemukan")
                         return stream, league_logo
         except:
             pass
 
-        # ==============================
-        # 2️⃣ Fallback dari HTML
-        # ==============================
+        # fallback dari HTML
         html = driver.page_source
         m = re.search(r"https://[^\s\"']+\.m3u8[^\s\"']*", html)
         if m:
-            print("   [√] Stream ditemukan dari HTML")
             return m.group(0), league_logo
 
     except Exception as e:
         print("   [!] Error ambil stream:", e)
 
-    print("   [!] Stream tidak ditemukan")
-    return "Not Found", league_logo FIREBASE_URL:
+    return "Not Found", league_logo
+
+
+# ==============================
+# KIRIM KE FIREBASE
+# ==============================
+
+def kirim_ke_firebase(data):
+
+    if not FIREBASE_URL:
         print("[!] FIREBASE_URL tidak ditemukan")
         return
 
@@ -109,7 +100,6 @@ def kirim_ke_firebase(data):
             continue
 
         key = uuid.uuid4().hex
-
         playlist[key] = item
 
     url = f"{FIREBASE_URL}/playlist.json"
@@ -120,11 +110,13 @@ def kirim_ke_firebase(data):
     else:
         print("[!] Gagal kirim:", res.text)
 
+
 # ==============================
 # SCRAPER UTAMA
 # ==============================
 
 def jalankan_scraper():
+
     print("\n========== START SCRAPER ==========\n")
 
     options = uc.ChromeOptions()
@@ -135,8 +127,8 @@ def jalankan_scraper():
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
 
     driver = uc.Chrome(
-    options=options,
-    use_subprocess=True
+        options=options,
+        use_subprocess=True
     )
 
     hasil = []
@@ -215,9 +207,8 @@ def jalankan_scraper():
     else:
         print("[!] Tidak ada data dikirim")
 
+
 # ==============================
 
 if __name__ == "__main__":
     jalankan_scraper()
-
-
