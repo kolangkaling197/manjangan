@@ -127,6 +127,7 @@ def jalankan_scraper():
     
     driver = uc.Chrome(
     options=options,
+    version_main=144,
     use_subprocess=True
     )
     hasil_akhir = []
@@ -244,6 +245,7 @@ def jalankan_scraper():
 if __name__ == "__main__":
 
     jalankan_scraper()
+
 
 
 
