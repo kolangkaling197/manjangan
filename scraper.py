@@ -17,92 +17,73 @@ FIXED_CATEGORY_ID = "EVENT1"
 tz_jkt = timezone(timedelta(hours=7))
 
 def clean_team_name(name):
-    """Pembersihan nama tim agar bersih dari teks sampah, status waktu (HT/FT), dan skor."""
+    """Pembersihan nama tim dari teks sampah dan status waktu."""
     if not name: return "TBA"
-    # Daftar kata sampah yang sering muncul di situs bunchatv
-    trash = [
-        "CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", 
-        "ngy", "Sắp diễn ra", "HT", "FT", "Trực tiếp", "Bóng đá"
-    ]
+    trash = ["CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", "ngy", "Sắp diễn ra", "HT", "FT"]
     for word in trash:
         name = re.sub(rf'\b{word}\b', '', name, flags=re.IGNORECASE)
-    
-    # Hapus angka skor murni (0-9) tapi jaga label seperti U23
     name = re.sub(r'(?<![uU])\b\d+\b(?!\d)', '', name)
-    # Hapus simbol aneh kecuali titik dan kurung
     name = re.sub(r"[^a-zA-Z0-9\s.()]", "", name)
-    
     clean = " ".join(name.split())
     return clean if len(clean) > 1 else "TBA"
 
-def get_live_stream_link_enhanced(driver, match_url, match_name):
-    """Membuka halaman detail, membersihkan iklan, dan menangkap m3u8 melalui logs."""
-    print(f"    [>] PROSES STREAM: {match_name}")
+def get_stream_and_logos_full(driver, match_url, match_name):
+    """Membuka halaman detail untuk SETIAP match guna menangkap data maksimal."""
+    print(f"    [>] DEEP CHECK: {match_name}")
+    data = {"stream": "Not Found", "t1_logo": "", "t2_logo": ""}
     try:
         driver.get(match_url)
-        time.sleep(7) # Tunggu loading awal
+        time.sleep(8) 
 
-        # 1. Bersihkan Iklan Overlay yang menghalangi player
-        driver.execute_script("""
-            var ads = document.querySelectorAll('[id*="ads"], [class*="ads"], [style*="z-index: 9999"], .sh-overlay, .modal');
-            ads.forEach(ad => ad.remove());
-        """)
+        # 1. Bersihkan Iklan Overlay
+        driver.execute_script("document.querySelectorAll('.modal, .popup, .fixed, [id*=\"ads\"]').forEach(el => el.remove());")
 
-        # 2. Pindah ke iframe player jika ada
+        # 2. Ambil Logo HD dari Detail
+        img_logos = driver.find_elements(By.CSS_SELECTOR, "div[class*='team_logo'] img, .team-logo img")
+        if len(img_logos) >= 2:
+            data["t1_logo"] = img_logos[0].get_attribute("src")
+            data["t2_logo"] = img_logos[1].get_attribute("src")
+
+        # 3. Force Interaction untuk pancing m3u8
         iframes = driver.find_elements(By.TAG_NAME, "iframe")
-        for i, frame in enumerate(iframes):
-            src = frame.get_attribute("src") or ""
-            if any(x in src for x in ["bitmovin", "player", "stream", "embed"]):
+        for frame in iframes:
+            if any(x in (frame.get_attribute("src") or "") for x in ["player", "stream", "embed"]):
                 driver.switch_to.frame(frame)
+                try:
+                    video = driver.find_element(By.TAG_NAME, "video")
+                    driver.execute_script("arguments[0].click();", video)
+                except: pass
                 break
-
-        # 3. Klik area video untuk memancing m3u8 keluar di network traffic
-        try:
-            video_el = driver.find_elements(By.XPATH, "//video | //div[@id='player'] | //div[contains(@class, 'play')]")
-            if video_el:
-                driver.execute_script("arguments[0].click();", video_el[0])
-        except: pass
-
-        print("    [>] Menunggu traffic network (15 detik)...")
-        time.sleep(15) # Durasi krusial untuk menangkap trafik network
         
+        time.sleep(10)
         driver.switch_to.default_content()
-        
+
         # 4. Tangkap dari Performance Logs
         logs = driver.get_log('performance')
         for entry in logs:
             msg = entry.get('message', '')
             if '.m3u8' in msg:
-                # Regex untuk mengekstrak URL m3u8 dari pesan log JSON
                 url_match = re.search(r'"url":"(https://.*?\.m3u8.*?)"', msg)
                 if url_match:
-                    stream_url = url_match.group(1).replace('\\/', '/')
-                    if "ads" not in stream_url.lower():
-                        print(f"    [√] LOG FOUND: m3u8 Captured!")
-                        return stream_url
-    except Exception as e:
-        print(f"    [!] Error stream capture: {e}")
-    return "Not Found"
+                    data["stream"] = url_match.group(1).replace('\\/', '/')
+                    break
+    except: pass
+    return data
 
 def jalankan_scraper():
-    print(f"===== START FULL COMPLETED SCRAPER: {TARGET_URL} =====")
+    print(f"===== START FULL CHECK SCRAPER (NO FILTER) =====")
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    # WAJIB: Aktifkan logging performa agar trafik network tercatat
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-    
     driver = uc.Chrome(options=options, version_main=144)
     hasil = []
 
     try:
         driver.get(TARGET_URL)
-        print("[*] Menunggu halaman utama stabil...")
         time.sleep(15)
 
-        # Deep Scroll untuk memicu semua 177+ match muncul
-        for _ in range(12):
+        # Scroll maksimal untuk memuat semua 177+ jadwal
+        for _ in range(15):
             driver.execute_script("window.scrollBy(0, 1000);")
             time.sleep(1)
 
@@ -112,84 +93,60 @@ def jalankan_scraper():
 
         for card in cards:
             url = card.get_attribute("href")
-            teks = card.text.strip()
-            if url and url not in seen_urls and len(teks) > 10:
-                imgs = [img.get_attribute("src") or img.get_attribute("data-src") for img in card.find_elements(By.TAG_NAME, "img")]
-                raw_list.append({"url": url, "text": teks, "imgs": imgs})
+            if url and url not in seen_urls and len(card.text.strip()) > 10:
+                raw_list.append({"url": url, "text": card.text.strip()})
                 seen_urls.add(url)
 
-        print(f"[*] Berhasil menarik {len(raw_list)} daftar pertandingan.")
+        print(f"[*] Total {len(raw_list)} match ditemukan. Memeriksa satu per satu...")
 
         for item in raw_list:
             try:
-                # Deteksi Status "Live" atau "Upcoming" dari teks kartu
-                is_live_label = "Live" in item["text"]
                 lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
-                
-                # Filter baris untuk membersihkan teks sampah (menit, HT, FT, skor)
                 clean_lines = []
                 for l in lines:
-                    if l.upper() in ["HT", "FT", "LIVE"] or re.match(r"^\d+('\+?\d*)?$", l):
-                        continue
-                    if l.isdigit() and len(l) <= 2:
-                        continue
+                    if l.upper() in ["HT", "FT", "LIVE"] or re.match(r"^\d+('\+?\d*)?$", l): continue
+                    if l.isdigit() and len(l) <= 2: continue
                     clean_lines.append(l)
 
                 if len(clean_lines) < 3: continue
-                liga, home_raw, away_raw = clean_lines[0], clean_lines[1], clean_lines[2]
+                liga, home, away = clean_lines[0], clean_team_name(clean_lines[1]), clean_team_name(clean_lines[2])
+
+                # DEEP CHECK KE SEMUA LINK
+                detail = get_stream_and_logos_full(driver, item["url"], f"{home} vs {away}")
                 
-                home = clean_team_name(home_raw)
-                away = clean_team_name(away_raw)
-                stream_url = "Not Found"
-                status = "upcoming"
-
-                # LOGIKA HYBRID: Hanya buka detail jika LIVE untuk menangkap stream
-                if is_live_label:
-                    stream_url = get_live_stream_link_enhanced(driver, item["url"], f"{home} vs {away}")
-                    # Jika link ketemu, status LIVE. Jika tidak, tetap UPCOMING agar user tidak kecewa
-                    status = "live" if stream_url != "Not Found" else "upcoming"
-                    driver.get(TARGET_URL) # Kembali ke menu utama
-                    time.sleep(3)
-                else:
-                    status = "upcoming"
-
-                # Deteksi Jam pertandingan (Format: HH:mm DD/MM)
+                # Jam Pertandingan
                 jam_match = re.search(r"(\d{2}:\d{2})\s+(\d{2}/\d{2})", item["text"])
-                if jam_match:
-                    dt_str = f"{jam_match.group(1)} {jam_match.group(2)}/2026"
-                    start_ts = int(datetime.strptime(dt_str, "%H:%M %d/%m/%Y").replace(tzinfo=tz_jkt).timestamp() * 1000)
-                else:
-                    start_ts = int(time.time() * 1000)
+                start_ts = int(datetime.strptime(f"{jam_match.group(1)} {jam_match.group(2)}/2026", "%H:%M %d/%m/%Y").replace(tzinfo=tz_jkt).timestamp() * 1000) if jam_match else int(time.time() * 1000)
+
+                # Penentuan Status berdasarkan hasil temuan stream
+                status = "live" if detail["stream"] != "Not Found" else "upcoming"
 
                 hasil.append({
                     "channelName": f"[{liga}] {home} vs {away}",
-                    "team1Name": home, "team1Logo": item["imgs"][0] if len(item["imgs"]) > 0 else "",
-                    "team2Name": away, "team2Logo": item["imgs"][1] if len(item["imgs"]) > 1 else "",
+                    "team1Name": home, "team1Logo": detail["t1_logo"] or "https://via.placeholder.com/150",
+                    "team2Name": away, "team2Logo": detail["t2_logo"] or "https://via.placeholder.com/150",
                     "status": status,
                     "startTime": start_ts,
                     "endTime": start_ts + 7200000,
-                    "streamUrl": stream_url,
+                    "streamUrl": detail["stream"],
                     "contentType": "event_pertandingan",
                     "playerType": "internal_with_headers",
                     "referer": "https://bunchatv.net/"
                 })
                 print(f"    [{status.upper()}] {home} vs {away}")
-            except Exception as e:
-                continue
+                
+                driver.get(TARGET_URL)
+                time.sleep(3)
+            except: continue
 
     finally:
         driver.quit()
 
     if hasil:
-        # Kirim ke Firebase menggunakan metode PUT (overwrite kategori EVENT1)
+        # Update Firebase
         fb_url = f"{FIREBASE_URL}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}"
-        payload = {
-            "category_name": "EVENT1",
-            "order": 1,
-            "channels": {uuid.uuid4().hex: x for x in hasil}
-        }
-        requests.put(fb_url, json=payload, timeout=30)
-        print(f"[√] BERHASIL! {len(hasil)} match terdaftar di Firebase.")
+        requests.put(fb_url, json={"category_name": "EVENT1", "order": 15, "channels": {uuid.uuid4().hex: x for x in hasil}}, timeout=30)
+        print(f"[√] SELESAI! {len(hasil)} match diproses.")
 
 if __name__ == "__main__":
     jalankan_scraper()
