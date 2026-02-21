@@ -8,7 +8,6 @@ from datetime import datetime, timezone, timedelta
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 # ==============================
@@ -49,15 +48,9 @@ def clean_team_name(name):
     if not name:
         return ""
 
-    # hapus skor 2-1 atau 3 : 0
     name = re.sub(r"\b\d+\s*[-:]\s*\d+\b", "", name)
-
-    # hapus menit 45' 90+2'
     name = re.sub(r"\b\d+\+?\d*'\b", "", name)
-
-    # hapus angka berdiri sendiri kecuali setelah huruf U
     name = re.sub(r"(?<!U)\b\d+\b", "", name)
-
     name = re.sub(r"\s+", " ", name)
 
     return name.strip()
@@ -125,9 +118,6 @@ def get_stream_from_detail(driver, url):
 def jalankan_scraper():
     print(f"===== SCRAP MAIN PAGE: {TARGET_URL} =====")
 
-    caps = DesiredCapabilities.CHROME
-    caps["goog:loggingPrefs"] = {"performance": "ALL"}
-
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
@@ -135,7 +125,10 @@ def jalankan_scraper():
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
 
-    driver = webdriver.Chrome(options=options, desired_capabilities=caps)
+    # FIX SELENIUM 4+
+    options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+
+    driver = webdriver.Chrome(options=options)
 
     hasil = []
     seen_matches = set()
@@ -144,7 +137,6 @@ def jalankan_scraper():
         driver.get(TARGET_URL)
         time.sleep(6)
 
-        # scroll supaya semua schedule load
         for _ in range(6):
             driver.execute_script("window.scrollBy(0, 2500);")
             time.sleep(2)
@@ -160,7 +152,6 @@ def jalankan_scraper():
 
                 lines = [l.strip() for l in teks.split("\n") if l.strip()]
 
-                # filter liga
                 nama_liga = None
                 for line in lines:
                     if filter_liga_populer(line):
@@ -170,7 +161,6 @@ def jalankan_scraper():
                 if not nama_liga:
                     continue
 
-                # parse jam
                 time_match = None
                 for l in lines:
                     m = re.search(r"\d{2}:\d{2}", l)
@@ -187,7 +177,6 @@ def jalankan_scraper():
                 else:
                     start_ts = int(datetime.now(tz_jkt).timestamp() * 1000)
 
-                # parse tim
                 team_lines = []
 
                 for l in lines:
@@ -197,7 +186,6 @@ def jalankan_scraper():
                         continue
 
                     cleaned = clean_team_name(l)
-
                     if cleaned and len(cleaned) > 2:
                         team_lines.append(cleaned)
 
@@ -252,10 +240,6 @@ def jalankan_scraper():
     else:
         print("Tidak ada match valid.")
 
-
-# ==============================
-# MAIN
-# ==============================
 
 if __name__ == "__main__":
     jalankan_scraper()
