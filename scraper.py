@@ -4,102 +4,49 @@ import time
 import re
 import uuid
 from datetime import datetime, timezone, timedelta
-import undetected_chromedriver as uc
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+
 
 # ==============================
 # KONFIGURASI
 # ==============================
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET")
+
 TARGET_URL = "https://bunchatv.net/"
-FIXED_CATEGORY_ID = "EVENT1" 
+FIXED_CATEGORY_ID = "EVENT1"
+
 tz_jkt = timezone(timedelta(hours=7))
 
 # White-list Liga Kasta Tinggi
 HIGH_LEAGUE_KEYWORDS = [
-    "Premier League", "LaLiga", "Serie A", "Bundesliga", "Ligue 1", 
-    "Liga Indonesia", "BRI Liga 1", "Saudi Pro League", "Champions League",
-    "Europa League", "NBA", "Liga MX", "A-League", "J1 League", "V-League",
-    "World Cup", "AFC Champions League", "Eredivisie", "K-League"
+    "Premier League", "LaLiga", "Serie A", "Bundesliga", "Ligue 1",
+    "Liga Indonesia", "BRI Liga 1", "Saudi Pro League",
+    "Champions League", "Europa League", "NBA",
+    "Liga MX", "A-League", "J1 League",
+    "World Cup", "AFC Champions League",
+    "Eredivisie", "K-League"
 ]
+
+
+# ==============================
+# UTIL
+# ==============================
 
 def get_img_src(img):
     return img.get_attribute("src") or img.get_attribute("data-src") or ""
 
+
 def filter_liga_populer(nama_liga):
-    """Memastikan hanya liga besar yang masuk ke database"""
     return any(k.lower() in nama_liga.lower() for k in HIGH_LEAGUE_KEYWORDS)
 
-# ==============================
-# FUNGSI KIRIM KE FIREBASE
-# ==============================
-def kirim_ke_firebase(data):
-    """Menghapus data lama dan mengganti dengan data baru termasuk parameter order"""
-    if not FIREBASE_URL or not FIREBASE_SECRET:
-        print("[!] ERROR: Environment Secrets Firebase tidak ditemukan.")
-        return
-
-    base_url = FIREBASE_URL.rstrip('/')
-    url_fb = f"{base_url}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}"
-    
-    # Payload dengan penambahan field order
-    payload = {
-        "category_name": "EVENT1",
-        "order": 15,
-        "channels": {uuid.uuid4().hex: x for x in data}
-    }
-
-    try:
-        # Gunakan PUT untuk me-reset data agar tidak duplikat
-        res = requests.put(url_fb, json=payload, timeout=40)
-        if res.status_code == 200:
-            print(f"[√] BERHASIL! {len(data)} match diperbarui di Firebase dengan Order: 1.")
-        else:
-            print(f"[!] GAGAL FIREBASE: {res.status_code} - {res.text}")
-    except Exception as e:
-        print(f"[!] ERROR KONEKSI FIREBASE: {e}")
-
-# ==============================
-# LOGIKA DETAIL MATCH
-# ==============================
-def get_stream_details(driver, url):
-    stream_url = "Not Found"
-    league_logo = ""
-    try:
-        driver.get(url)
-        time.sleep(8) 
-        
-        logos = driver.find_elements(By.TAG_NAME, "img")
-        for img in logos:
-            src = get_img_src(img)
-            alt = (img.get_attribute("alt") or "").lower()
-            if src and ("logo" in alt or "league" in src):
-                league_logo = src
-                break
-
-        try:
-            logs = driver.get_log("performance")
-            for entry in logs:
-                msg = entry.get("message", "")
-                if ".m3u8" in msg:
-                    m = re.search(r'https://[^\\"]+\.m3u8[^\\"]*', msg)
-                    if m: 
-                        stream_url = m.group(0).replace("\\/", "/")
-                        break
-        except: pass
-    except: pass
-    return stream_url, league_logo
-
-# ==============================
-# MAIN JALANKAN SCRAPER
-# ==============================
 
 def clean_team_name(name):
     """
-    Bersihkan skor & menit tanpa merusak U17/U18
+    Hapus skor & menit TANPA merusak U17 / U18
     """
     if not name:
         return ""
@@ -110,8 +57,7 @@ def clean_team_name(name):
     # Hapus menit 45' atau 90+2'
     name = re.sub(r"\b\d+\+?\d*'\b", "", name)
 
-    # Hapus angka berdiri sendiri
-    # KECUALI angka setelah huruf U
+    # Hapus angka berdiri sendiri kecuali setelah huruf U
     name = re.sub(r"(?<!U)\b\d+\b", "", name)
 
     # Rapikan spasi
@@ -120,14 +66,50 @@ def clean_team_name(name):
     return name.strip()
 
 
+# ==============================
+# FIREBASE
+# ==============================
+
+def kirim_ke_firebase(data):
+    if not FIREBASE_URL or not FIREBASE_SECRET:
+        print("Firebase env tidak ditemukan.")
+        return
+
+    base_url = FIREBASE_URL.rstrip("/")
+    url_fb = f"{base_url}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}"
+
+    payload = {
+        "category_name": "EVENT1",
+        "order": 15,
+        "lastUpdated": int(datetime.now(tz_jkt).timestamp() * 1000),
+        "channels": {uuid.uuid4().hex: x for x in data}
+    }
+
+    try:
+        res = requests.put(url_fb, json=payload, timeout=40)
+        if res.status_code == 200:
+            print(f"Berhasil update {len(data)} match.")
+        else:
+            print(f"Gagal Firebase: {res.status_code} {res.text}")
+    except Exception as e:
+        print(f"Error koneksi Firebase: {e}")
+
+
+# ==============================
+# SCRAPER MAIN PAGE
+# ==============================
+
 def jalankan_scraper():
     print(f"===== SCRAP MAIN PAGE: {TARGET_URL} =====")
 
-    options = uc.ChromeOptions()
+    options = Options()
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
 
-    driver = uc.Chrome(options=options)
+    driver = webdriver.Chrome(options=options)
 
     hasil = []
     seen_matches = set()
@@ -142,7 +124,6 @@ def jalankan_scraper():
             time.sleep(2)
 
         cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
-
         print(f"Total card ditemukan: {len(cards)}")
 
         for card in cards:
@@ -230,7 +211,7 @@ def jalankan_scraper():
 
                 print(f"[{status_text.upper()}] {home} vs {away}")
 
-            except:
+            except Exception:
                 continue
 
     finally:
@@ -240,7 +221,11 @@ def jalankan_scraper():
         kirim_ke_firebase(hasil)
     else:
         print("Tidak ada match valid.")
-        
+
+
+# ==============================
+# MAIN
+# ==============================
+
 if __name__ == "__main__":
     jalankan_scraper()
-
