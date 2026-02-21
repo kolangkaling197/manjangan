@@ -17,53 +17,61 @@ FIXED_CATEGORY_ID = "EVENT1"
 tz_jkt = timezone(timedelta(hours=7))
 
 def clean_team_name(name):
-    """Pembersihan nama tim agar bersih dari teks sampah."""
+    """Pembersihan nama tim dari skor dan teks sampah."""
     if not name: return "TBA"
-    trash = ["Trực tiếp", "Bóng đá", "Xem", "Live", "Sắp diễn ra", "ngy"]
+    trash = ["CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", "ngy", "Sắp diễn ra"]
     for word in trash:
         name = re.sub(rf'\b{word}\b', '', name, flags=re.IGNORECASE)
     name = re.sub(r'(?<![uU])\b\d+\b(?!\d)', '', name)
     name = re.sub(r"[^a-zA-Z0-9\s.()]", "", name)
     return " ".join(name.split())
 
-def get_stream_and_league_logo(driver, match_url, liga):
-    """Ambil stream link dengan durasi tunggu dan paksa interaksi."""
-    stream_url = "Not Found"
-    league_logo = "https://cdn-icons-png.flaticon.com/512/53/53283.png"
+def get_live_stream_link_enhanced(driver, match_url, match_name):
+    """Membuka halaman detail, membersihkan iklan, dan menangkap m3u8."""
+    print(f"   [>] PROSES STREAM: {match_name}")
     try:
         driver.get(match_url)
-        time.sleep(10) # Menambah waktu tunggu agar player termuat sempurna
-        
-        # Simulasi klik area player untuk memancing m3u8 muncul di log
+        time.sleep(7)
+
+        # 1. Bersihkan Iklan Overlay
+        driver.execute_script("""
+            var ads = document.querySelectorAll('[id*="ads"], [class*="ads"], [style*="z-index: 9999"], .sh-overlay, .modal');
+            ads.forEach(ad => ad.remove());
+        """)
+
+        # 2. Pindah ke iframe player jika ada
+        iframes = driver.find_elements(By.TAG_NAME, "iframe")
+        for frame in iframes:
+            src = frame.get_attribute("src") or ""
+            if any(x in src for x in ["bitmovin", "player", "stream", "embed"]):
+                driver.switch_to.frame(frame)
+                break
+
+        # 3. Klik area video untuk memancing m3u8
         try:
-            player_element = driver.find_element(By.CSS_SELECTOR, "div#player, iframe, video")
-            driver.execute_script("arguments[0].click();", player_element)
-            time.sleep(5)
+            video_el = driver.find_elements(By.XPATH, "//video | //div[@id='player'] | //div[contains(@class, 'play')]")
+            if video_el:
+                driver.execute_script("arguments[0].click();", video_el[0])
         except: pass
 
-        # Ambil m3u8 dari performance logs
-        logs = driver.get_log("performance")
-        for entry in logs:
-            msg = entry.get("message", "")
-            if ".m3u8" in msg:
-                m = re.search(r'https://[^\\"]+\.m3u8[^\\"]*', msg)
-                if m: 
-                    stream_url = m.group(0).replace("\\/", "/")
-                    break
+        time.sleep(10)
+        driver.switch_to.default_content()
         
-        # Cari logo liga
-        imgs = driver.find_elements(By.TAG_NAME, "img")
-        for img in imgs:
-            alt = (img.get_attribute("alt") or "").lower()
-            src = img.get_attribute("src") or img.get_attribute("data-src")
-            if liga.lower() in alt and src:
-                league_logo = src
-                break
+        # 4. Tangkap dari Performance Logs
+        logs = driver.get_log('performance')
+        for entry in logs:
+            msg = entry.get('message', '')
+            if '.m3u8' in msg:
+                url_match = re.search(r'"url":"(https://.*?\.m3u8.*?)"', msg)
+                if url_match:
+                    stream_url = url_match.group(1).replace('\\/', '/')
+                    if "ads" not in stream_url.lower():
+                        return stream_url
     except: pass
-    return stream_url, league_logo
+    return "Not Found"
 
 def jalankan_scraper():
-    print(f"===== START SCRAPER: {TARGET_URL} =====")
+    print(f"===== START HYBRID SCRAPER: {TARGET_URL} =====")
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
@@ -74,13 +82,13 @@ def jalankan_scraper():
         driver.get(TARGET_URL)
         time.sleep(10)
 
-        # Scroll untuk memicu Lazy Load
+        # Deep Scroll untuk memicu Lazy Load
         for _ in range(12):
             driver.execute_script("window.scrollBy(0, 1000);")
             time.sleep(1)
 
         cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
-        match_list = []
+        raw_list = []
         seen_urls = set()
 
         for card in cards:
@@ -88,16 +96,15 @@ def jalankan_scraper():
             teks = card.text.strip()
             if url and url not in seen_urls and len(teks) > 10:
                 imgs = [img.get_attribute("src") or img.get_attribute("data-src") for img in card.find_elements(By.TAG_NAME, "img")]
-                match_list.append({"url": url, "text": teks, "imgs": imgs})
+                raw_list.append({"url": url, "text": teks, "imgs": imgs})
                 seen_urls.add(url)
 
-        for item in match_list:
+        for item in raw_list:
             try:
-                # 1. CEK LABEL LIVE
                 is_live_label = "Live" in item["text"]
-                
-                # 2. PARSING NAMA TIM
                 lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
+                
+                # Filter menit/skor untuk mendapatkan nama tim
                 clean_lines = []
                 for l in lines:
                     if re.match(r"^\d+('\+?\d*)?$", l): continue 
@@ -105,39 +112,31 @@ def jalankan_scraper():
                     clean_lines.append(l)
 
                 if len(clean_lines) < 3: continue
-                liga, home, away = clean_lines[0], clean_lines[1], clean_lines[2]
+                liga, home_raw, away_raw = clean_lines[0], clean_lines[1], clean_lines[2]
                 
-                # 3. PROSES STREAM (WAJIB JIKA LIVE)
+                home = clean_team_name(home_raw)
+                away = clean_team_name(away_raw)
                 stream_url = "Not Found"
-                l_logo = "https://cdn-icons-png.flaticon.com/512/53/53283.png"
-                status_final = "upcoming"
+                status = "upcoming"
 
+                # LOGIKA HYBRID: Hanya buka detail jika LIVE
                 if is_live_label:
-                    # Ambil link stream secara agresif
-                    stream_url, l_logo = get_stream_and_league_logo(driver, item["url"], liga)
-                    
-                    # LOGIKA VALIDASI: Hanya set LIVE jika link ditemukan
-                    if stream_url != "Not Found":
-                        status_final = "live"
-                    else:
-                        # Jika label LIVE tapi link TIDAK ADA, jadikan UPCOMING agar user tidak zonk
-                        status_final = "upcoming"
-                    
-                    driver.get(TARGET_URL)
+                    stream_url = get_live_stream_link_enhanced(driver, item["url"], f"{home} vs {away}")
+                    status = "live" if stream_url != "Not Found" else "upcoming"
+                    driver.get(TARGET_URL) # Kembali ke menu utama
                     time.sleep(3)
                 else:
-                    status_final = "upcoming"
+                    status = "upcoming"
 
-                # 4. JAM PERTANDINGAN
+                # Deteksi Jam (Hanya untuk Upcoming)
                 jam_match = re.search(r"(\d{2}:\d{2})\s+(\d{2}/\d{2})", item["text"])
                 start_ts = int(datetime.strptime(f"{jam_match.group(1)} {jam_match.group(2)}/2026", "%H:%M %d/%m/%Y").replace(tzinfo=tz_jkt).timestamp() * 1000) if jam_match else int(time.time() * 1000)
 
                 hasil.append({
-                    "channelName": f"[{liga}] {clean_team_name(home)} vs {clean_team_name(away)}",
-                    "team1Name": clean_team_name(home), "team1Logo": item["imgs"][0] if len(item["imgs"]) > 0 else "",
-                    "team2Name": clean_team_name(away), "team2Logo": item["imgs"][1] if len(item["imgs"]) > 1 else "",
-                    "leagueLogo": l_logo,
-                    "status": status_final,
+                    "channelName": f"[{liga}] {home} vs {away}",
+                    "team1Name": home, "team1Logo": item["imgs"][0] if len(item["imgs"]) > 0 else "",
+                    "team2Name": away, "team2Logo": item["imgs"][1] if len(item["imgs"]) > 1 else "",
+                    "status": status,
                     "startTime": start_ts,
                     "endTime": start_ts + 7200000,
                     "streamUrl": stream_url,
@@ -145,18 +144,18 @@ def jalankan_scraper():
                     "playerType": "internal_with_headers",
                     "referer": "https://bunchatv.net/"
                 })
-                print(f"   [{status_final.upper()}] {home} vs {away} | Stream: {'OK' if stream_url != 'Not Found' else 'MISSING'}")
+                print(f"   [{status.upper()}] {home} vs {away}")
             except: continue
 
     finally:
         driver.quit()
 
     if hasil:
-        # Kirim ke Firebase sesuai permintaan Anda
+        # Kirim ke Firebase sesuai instruksi Anda
         fb_url = f"{FIREBASE_URL}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}"
         payload = {
             "category_name": "EVENT1",
-            "order": 1,
+            "order": 15,
             "channels": {uuid.uuid4().hex: x for x in hasil}
         }
         requests.put(fb_url, json=payload, timeout=30)
