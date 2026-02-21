@@ -6,96 +6,88 @@ import uuid
 from datetime import datetime, timezone, timedelta
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 # ==============================
 # KONFIGURASI
 # ==============================
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET")
-TARGET_URL = "https://bunchatv.net/"
+TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
 FIXED_CATEGORY_ID = "EVENT1" 
 tz_jkt = timezone(timedelta(hours=7))
 
+# Filter Liga Kasta Tinggi
 HIGH_LEAGUE_KEYWORDS = [
     "Premier League", "LaLiga", "Serie A", "Bundesliga", "Ligue 1", 
-    "Liga Indonesia", "BRI Liga 1", "Saudi Pro League", "Champions League",
-    "Europa League", "NBA", "V-League", "K-League", "J1 League", "A-League"
+    "Champions League", "Europa League", "BRI Liga 1", "Liga Indonesia", 
+    "Saudi Pro League", "World Cup", "NBA", "J1 League", "K-League", "V-League",
+    "A-League", "Eredivisie", "U23", "U20", "U17"
 ]
 
+TRASH_WORDS = ["Trực tiếp", "Bóng đá", "Xem", "Live", "Bình luận", "Hot", "Full"]
+
 def clean_team_name(name):
-    """Membersihkan nama tim dari skor, 'vs', dan karakter sampah"""
-    if not name: return "TBA"
-    # 1. Hapus kata 'vs' (case insensitive)
+    """Membersihkan nama tim dari skor, vs, dan teks sampah"""
+    if not name or name.strip() in ["'", "-", "vs"]: return "TBA"
+    for word in TRASH_WORDS:
+        name = re.sub(rf'\b{word}\b', '', name, flags=re.IGNORECASE)
     name = re.sub(r'\bvs\b', '', name, flags=re.IGNORECASE)
-    # 2. Hapus angka skor (misal: 'Team A 1' atau '2 Team B') tapi jaga label usia (U17, U23, dll)
-    # Regex ini menghapus angka yang berdiri sendiri atau di ujung, tapi tidak angka yang menempel di huruf 'U'
-    name = re.sub(r'(?<![uU])\b\d+\b(?!\d)', '', name)
-    # 3. Hapus simbol sisa seperti '-', '(', ')'
-    name = name.replace('-', '').replace('(', '').replace(')', '')
-    # 4. Hapus spasi ganda
+    name = re.sub(r'(?<![uU])\b\d+\b(?!\d)', '', name) # Jaga U17/U23
+    name = re.sub(r"[^a-zA-Z0-9\s.()]", "", name)
     name = " ".join(name.split())
-    return name if name else "TBA"
+    return name if len(name) > 1 else "TBA"
 
 def get_img_src(img):
     return img.get_attribute("src") or img.get_attribute("data-src") or ""
 
 def get_match_details(driver, url):
-    """Masuk ke detail untuk ambil JAM, m3u8, dan logo liga"""
-    data = {"stream_url": "Not Found", "league_logo": "", "start_ts": None}
+    """Ambil Jam, Stream, Logo Liga, dan Logo Tim dari halaman detail"""
+    data = {"stream_url": "Not Found", "league_logo": "", "t1_logo": "", "t2_logo": "", "start_ts": None}
     try:
         driver.get(url)
-        time.sleep(7) 
-        
-        # 1. Ambil Jam & Tanggal (Sangat Penting untuk Status Live/Upcoming)
-        # Mencari pola jam (00:00) dan tanggal (00/00) di seluruh halaman
+        time.sleep(7)
         page_text = driver.page_source
         time_match = re.search(r"(\d{2}:\d{2}).*?(\d{2}/\d{2})", page_text)
         if time_match:
-            try:
-                dt_str = f"{time_match.group(1)} {time_match.group(2)}/2026"
-                dt_naive = datetime.strptime(dt_str, "%H:%M %d/%m/%Y")
-                dt_aware = dt_naive.replace(tzinfo=tz_jkt)
-                data["start_ts"] = int(dt_aware.timestamp() * 1000)
-            except: pass
+            dt_str = f"{time_match.group(1)} {time_match.group(2)}/2026"
+            dt_naive = datetime.strptime(dt_str, "%H:%M %d/%m/%Y")
+            data["start_ts"] = int(dt_naive.replace(tzinfo=tz_jkt).timestamp() * 1000)
 
-        # 2. Ambil m3u8 dari log performa
-        try:
-            logs = driver.get_log("performance")
-            for entry in logs:
-                msg = entry.get("message", "")
-                if ".m3u8" in msg:
-                    m = re.search(r'https://[^\\"]+\.m3u8[^\\"]*', msg)
-                    if m: 
-                        data["stream_url"] = m.group(0).replace("\\/", "/")
-                        break
-        except: pass
+        # Ambil Stream m3u8
+        logs = driver.get_log("performance")
+        for entry in logs:
+            msg = entry.get("message", "")
+            if ".m3u8" in msg:
+                m = re.search(r'https://[^\\"]+\.m3u8[^\\"]*', msg)
+                if m: data["stream_url"] = m.group(0).replace("\\/", "/"); break
 
-        # 3. Ambil Logo Liga
-        logos = driver.find_elements(By.TAG_NAME, "img")
-        for img in logos:
-            src = get_img_src(img)
-            alt = (img.get_attribute("alt") or "").lower()
-            if src and ("logo" in alt or "league" in src):
-                data["league_logo"] = src
-                break
+        # Scrape Gambar (Logo Liga & Tim)
+        imgs = [get_img_src(img) for img in driver.find_elements(By.TAG_NAME, "img") 
+                if "logo" in get_img_src(img).lower() or "cdn" in get_img_src(img).lower()]
+        if len(imgs) >= 3:
+            data["league_logo"], data["t1_logo"], data["t2_logo"] = imgs[0], imgs[1], imgs[2]
     except: pass
     return data
 
 def jalankan_scraper():
-    print(f"===== START SCRAPER: {TARGET_URL} =====")
+    print(f"===== FOCUS MODE: TAB TẤT CẢ =====")
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-    
     driver = uc.Chrome(options=options, version_main=144)
     hasil = []
 
     try:
         driver.get(TARGET_URL)
-        time.sleep(7)
-        driver.execute_script("window.scrollTo(0, 2000);")
-        time.sleep(3)
+        time.sleep(10)
+
+        # Pastikan kita di tab 'Tất cả' (Biasanya default, tapi kita scroll untuk load semua)
+        print("Melakukan Deep Scroll untuk memicu Lazy Load...")
+        for _ in range(8): # Scroll lebih banyak agar semua match muncul
+            driver.execute_script("window.scrollBy(0, 1000);")
+            time.sleep(2)
 
         cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
         raw_matches = []
@@ -107,62 +99,49 @@ def jalankan_scraper():
                 raw_matches.append({"url": url, "text": card.text.strip()})
                 seen_urls.add(url)
 
-        print(f"Ditemukan {len(raw_matches)} match. Menganalisis waktu & nama...")
+        print(f"Total {len(raw_matches)} match ditemukan. Memfilter liga besar...")
 
         for item in raw_matches:
             try:
-                # Ambil info detail (Waktu adalah Prioritas)
+                # Filter Liga
+                if not any(k.lower() in item["text"].lower() for k in HIGH_LEAGUE_KEYWORDS):
+                    continue
+
                 detail = get_match_details(driver, item["url"])
-                if not detail["start_ts"]: continue # Skip jika jam tidak ketemu
+                if not detail["start_ts"]: continue
 
-                # Parsing Teks Card untuk Nama Tim
                 lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
+                liga = lines[0] if lines else "Match"
+                clean_lines = [l for l in lines if l != liga and ":" not in l and "/" not in l]
                 
-                # Filter liga
-                nama_liga = "Match"
-                for line in lines:
-                    if any(k.lower() in line.lower() for k in HIGH_LEAGUE_KEYWORDS):
-                        nama_liga = line
-                        break
-                
-                # Bersihkan Nama Tim
-                clean_lines = [l for l in lines if l != nama_liga and ":" not in l and "/" not in l]
-                if len(clean_lines) >= 2:
-                    home = clean_team_name(clean_lines[0])
-                    away = clean_team_name(clean_lines[1])
-                else:
-                    # Cek jika formatnya satu baris dengan 'vs'
-                    parts = re.split(r'\bvs\b', clean_lines[0], flags=re.IGNORECASE) if clean_lines else []
-                    home = clean_team_name(parts[0]) if len(parts) > 0 else "Team A"
-                    away = clean_team_name(parts[1]) if len(parts) > 1 else "Team B"
+                home = clean_team_name(clean_lines[0]) if len(clean_lines) >= 1 else "Team A"
+                away = clean_team_name(clean_lines[1]) if len(clean_lines) >= 2 else "Team B"
 
-                # Tentukan Status Berdasarkan Waktu Sekarang
                 now_ts = int(datetime.now(tz_jkt).timestamp() * 1000)
-                is_live = (detail["start_ts"] <= now_ts) or (detail["stream_url"] != "Not Found")
-                status_text = "live" if is_live else "upcoming"
+                status = "live" if (detail["start_ts"] <= now_ts) or (detail["stream_url"] != "Not Found") else "upcoming"
 
                 hasil.append({
-                    "channelName": f"[{nama_liga}] {home} vs {away}",
-                    "team1Name": home, "team2Name": away,
+                    "channelName": f"[{liga}] {home} vs {away}",
+                    "team1Name": home, "team1Logo": detail["t1_logo"],
+                    "team2Name": away, "team2Logo": detail["t2_logo"],
                     "leagueLogo": detail["league_logo"],
                     "startTime": detail["start_ts"],
                     "endTime": detail["start_ts"] + 7200000,
-                    "status": status_text,
+                    "status": status,
                     "streamUrl": detail["stream_url"],
                     "contentType": "event_pertandingan",
                     "playerType": "internal_with_headers",
                     "referer": "https://bunchatv.net/"
                 })
-                print(f"   [{status_text.upper()}] {home} vs {away} | Jam: {datetime.fromtimestamp(detail['start_ts']/1000, tz_jkt).strftime('%H:%M')}")
+                print(f"   [{status.upper()}] {home} vs {away} (Logo OK)")
             except: continue
-    finally:
-        driver.quit()
+
+    finally: driver.quit()
 
     if hasil:
-        # Kirim ke Firebase dengan Order: 1
         payload = {"category_name": "EVENT1", "order": 15, "channels": {uuid.uuid4().hex: x for x in hasil}}
         requests.put(f"{FIREBASE_URL}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}", json=payload)
-        print(f"[√] BERHASIL! {len(hasil)} match tayang.")
+        print(f"[√] BERHASIL! {len(hasil)} match dari tab 'Tất cả' tayang.")
 
 if __name__ == "__main__":
     jalankan_scraper()
