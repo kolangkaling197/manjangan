@@ -17,22 +17,30 @@ FIXED_CATEGORY_ID = "EVENT1"
 tz_jkt = timezone(timedelta(hours=7))
 
 def clean_team_name(name):
-    """Pembersihan nama tim dari skor dan teks sampah."""
+    """Pembersihan nama tim agar bersih dari teks sampah, status waktu (HT/FT), dan skor."""
     if not name: return "TBA"
-    trash = ["CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", "ngy", "Sắp diễn ra"]
+    # Daftar kata sampah yang sering muncul di situs bunchatv
+    trash = [
+        "CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", 
+        "ngy", "Sắp diễn ra", "HT", "FT", "Trực tiếp", "Bóng đá"
+    ]
     for word in trash:
         name = re.sub(rf'\b{word}\b', '', name, flags=re.IGNORECASE)
-    # Hapus angka skor tapi jaga label U23/U17
+    
+    # Hapus angka skor murni (0-9) tapi jaga label seperti U23
     name = re.sub(r'(?<![uU])\b\d+\b(?!\d)', '', name)
+    # Hapus simbol aneh kecuali titik dan kurung
     name = re.sub(r"[^a-zA-Z0-9\s.()]", "", name)
-    return " ".join(name.split())
+    
+    clean = " ".join(name.split())
+    return clean if len(clean) > 1 else "TBA"
 
 def get_live_stream_link_enhanced(driver, match_url, match_name):
     """Membuka halaman detail, membersihkan iklan, dan menangkap m3u8 melalui logs."""
     print(f"    [>] PROSES STREAM: {match_name}")
     try:
         driver.get(match_url)
-        time.sleep(7)
+        time.sleep(7) # Tunggu loading awal
 
         # 1. Bersihkan Iklan Overlay yang menghalangi player
         driver.execute_script("""
@@ -46,7 +54,6 @@ def get_live_stream_link_enhanced(driver, match_url, match_name):
             src = frame.get_attribute("src") or ""
             if any(x in src for x in ["bitmovin", "player", "stream", "embed"]):
                 driver.switch_to.frame(frame)
-                print(f"    [>] Berpindah ke iframe #{i}")
                 break
 
         # 3. Klik area video untuk memancing m3u8 keluar di network traffic
@@ -57,7 +64,7 @@ def get_live_stream_link_enhanced(driver, match_url, match_name):
         except: pass
 
         print("    [>] Menunggu traffic network (15 detik)...")
-        time.sleep(15)
+        time.sleep(15) # Durasi krusial untuk menangkap trafik network
         
         driver.switch_to.default_content()
         
@@ -66,7 +73,7 @@ def get_live_stream_link_enhanced(driver, match_url, match_name):
         for entry in logs:
             msg = entry.get('message', '')
             if '.m3u8' in msg:
-                # Regex untuk mengekstrak URL m3u8 dari pesan log json
+                # Regex untuk mengekstrak URL m3u8 dari pesan log JSON
                 url_match = re.search(r'"url":"(https://.*?\.m3u8.*?)"', msg)
                 if url_match:
                     stream_url = url_match.group(1).replace('\\/', '/')
@@ -78,11 +85,12 @@ def get_live_stream_link_enhanced(driver, match_url, match_name):
     return "Not Found"
 
 def jalankan_scraper():
-    print(f"===== START HYBRID SCRAPER: {TARGET_URL} =====")
+    print(f"===== START FULL COMPLETED SCRAPER: {TARGET_URL} =====")
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    # WAJIB: Aktifkan logging performa agar trafik network tercatat
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
     
     driver = uc.Chrome(options=options, version_main=144)
@@ -93,7 +101,7 @@ def jalankan_scraper():
         print("[*] Menunggu halaman utama stabil...")
         time.sleep(15)
 
-        # Deep Scroll untuk memicu Lazy Load konten di halaman utama
+        # Deep Scroll untuk memicu semua 177+ match muncul
         for _ in range(12):
             driver.execute_script("window.scrollBy(0, 1000);")
             time.sleep(1)
@@ -106,7 +114,6 @@ def jalankan_scraper():
             url = card.get_attribute("href")
             teks = card.text.strip()
             if url and url not in seen_urls and len(teks) > 10:
-                # Mengambil logo tim dari kartu di halaman utama sebagai fallback
                 imgs = [img.get_attribute("src") or img.get_attribute("data-src") for img in card.find_elements(By.TAG_NAME, "img")]
                 raw_list.append({"url": url, "text": teks, "imgs": imgs})
                 seen_urls.add(url)
@@ -115,15 +122,17 @@ def jalankan_scraper():
 
         for item in raw_list:
             try:
-                # Cek apakah pertandingan sedang Live berdasarkan label teks
+                # Deteksi Status "Live" atau "Upcoming" dari teks kartu
                 is_live_label = "Live" in item["text"]
                 lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
                 
-                # Filter menit/skor untuk mendapatkan nama liga dan tim secara bersih
+                # Filter baris untuk membersihkan teks sampah (menit, HT, FT, skor)
                 clean_lines = []
                 for l in lines:
-                    if re.match(r"^\d+('\+?\d*)?$", l): continue 
-                    if l.isdigit() and len(l) <= 2: continue 
+                    if l.upper() in ["HT", "FT", "LIVE"] or re.match(r"^\d+('\+?\d*)?$", l):
+                        continue
+                    if l.isdigit() and len(l) <= 2:
+                        continue
                     clean_lines.append(l)
 
                 if len(clean_lines) < 3: continue
@@ -137,13 +146,14 @@ def jalankan_scraper():
                 # LOGIKA HYBRID: Hanya buka detail jika LIVE untuk menangkap stream
                 if is_live_label:
                     stream_url = get_live_stream_link_enhanced(driver, item["url"], f"{home} vs {away}")
+                    # Jika link ketemu, status LIVE. Jika tidak, tetap UPCOMING agar user tidak kecewa
                     status = "live" if stream_url != "Not Found" else "upcoming"
-                    driver.get(TARGET_URL) # Kembali ke menu utama untuk memproses item selanjutnya
+                    driver.get(TARGET_URL) # Kembali ke menu utama
                     time.sleep(3)
                 else:
                     status = "upcoming"
 
-                # Deteksi Jam pertandingan dari teks kartu (Format: HH:mm DD/MM)
+                # Deteksi Jam pertandingan (Format: HH:mm DD/MM)
                 jam_match = re.search(r"(\d{2}:\d{2})\s+(\d{2}/\d{2})", item["text"])
                 if jam_match:
                     dt_str = f"{jam_match.group(1)} {jam_match.group(2)}/2026"
@@ -165,7 +175,6 @@ def jalankan_scraper():
                 })
                 print(f"    [{status.upper()}] {home} vs {away}")
             except Exception as e:
-                print(f"    [!] Gagal memproses {item['url']}: {e}")
                 continue
 
     finally:
