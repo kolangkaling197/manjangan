@@ -1,18 +1,20 @@
 import os
-import requests
-import time
 import re
+import time
 import uuid
+import requests
 from datetime import datetime, timezone, timedelta
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 # ==============================
 # KONFIGURASI
 # ==============================
+
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET")
 
@@ -21,7 +23,6 @@ FIXED_CATEGORY_ID = "EVENT1"
 
 tz_jkt = timezone(timedelta(hours=7))
 
-# White-list Liga Kasta Tinggi
 HIGH_LEAGUE_KEYWORDS = [
     "Premier League", "LaLiga", "Serie A", "Bundesliga", "Ligue 1",
     "Liga Indonesia", "BRI Liga 1", "Saudi Pro League",
@@ -45,22 +46,18 @@ def filter_liga_populer(nama_liga):
 
 
 def clean_team_name(name):
-    """
-    Hapus skor & menit TANPA merusak U17 / U18
-    """
     if not name:
         return ""
 
-    # Hapus skor 2-1 atau 3 : 0
+    # hapus skor 2-1 atau 3 : 0
     name = re.sub(r"\b\d+\s*[-:]\s*\d+\b", "", name)
 
-    # Hapus menit 45' atau 90+2'
+    # hapus menit 45' 90+2'
     name = re.sub(r"\b\d+\+?\d*'\b", "", name)
 
-    # Hapus angka berdiri sendiri kecuali setelah huruf U
+    # hapus angka berdiri sendiri kecuali setelah huruf U
     name = re.sub(r"(?<!U)\b\d+\b", "", name)
 
-    # Rapikan spasi
     name = re.sub(r"\s+", " ", name)
 
     return name.strip()
@@ -96,11 +93,40 @@ def kirim_ke_firebase(data):
 
 
 # ==============================
-# SCRAPER MAIN PAGE
+# STREAM CAPTURE
+# ==============================
+
+def get_stream_from_detail(driver, url):
+    stream_url = ""
+
+    try:
+        driver.get(url)
+        time.sleep(6)
+
+        logs = driver.get_log("performance")
+
+        for entry in logs:
+            message = entry.get("message", "")
+            if ".m3u8" in message:
+                match = re.search(r'https://[^\\"]+\.m3u8[^\\"]*', message)
+                if match:
+                    stream_url = match.group(0).replace("\\/", "/")
+                    break
+    except Exception:
+        pass
+
+    return stream_url
+
+
+# ==============================
+# SCRAPER
 # ==============================
 
 def jalankan_scraper():
     print(f"===== SCRAP MAIN PAGE: {TARGET_URL} =====")
+
+    caps = DesiredCapabilities.CHROME
+    caps["goog:loggingPrefs"] = {"performance": "ALL"}
 
     options = Options()
     options.add_argument("--headless=new")
@@ -109,7 +135,7 @@ def jalankan_scraper():
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
 
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=options, desired_capabilities=caps)
 
     hasil = []
     seen_matches = set()
@@ -118,7 +144,7 @@ def jalankan_scraper():
         driver.get(TARGET_URL)
         time.sleep(6)
 
-        # Scroll supaya semua schedule load
+        # scroll supaya semua schedule load
         for _ in range(6):
             driver.execute_script("window.scrollBy(0, 2500);")
             time.sleep(2)
@@ -134,7 +160,7 @@ def jalankan_scraper():
 
                 lines = [l.strip() for l in teks.split("\n") if l.strip()]
 
-                # ===== FILTER LIGA =====
+                # filter liga
                 nama_liga = None
                 for line in lines:
                     if filter_liga_populer(line):
@@ -144,7 +170,7 @@ def jalankan_scraper():
                 if not nama_liga:
                     continue
 
-                # ===== PARSE JAM =====
+                # parse jam
                 time_match = None
                 for l in lines:
                     m = re.search(r"\d{2}:\d{2}", l)
@@ -161,7 +187,7 @@ def jalankan_scraper():
                 else:
                     start_ts = int(datetime.now(tz_jkt).timestamp() * 1000)
 
-                # ===== PARSE TIM =====
+                # parse tim
                 team_lines = []
 
                 for l in lines:
@@ -181,15 +207,19 @@ def jalankan_scraper():
                 home = team_lines[0]
                 away = team_lines[1]
 
-                # ===== ANTI DUPLIKAT =====
                 key = f"{home.lower()}_{away.lower()}_{start_ts}"
                 if key in seen_matches:
                     continue
                 seen_matches.add(key)
 
-                # ===== STATUS =====
                 now_ts = int(datetime.now(tz_jkt).timestamp() * 1000)
                 status_text = "live" if start_ts <= now_ts else "upcoming"
+
+                stream_url = "Not Available"
+
+                if status_text == "live":
+                    detail_url = card.get_attribute("href")
+                    stream_url = get_stream_from_detail(driver, detail_url)
 
                 imgs = [get_img_src(i) for i in card.find_elements(By.TAG_NAME, "img")]
 
@@ -203,7 +233,7 @@ def jalankan_scraper():
                     "startTime": start_ts,
                     "endTime": start_ts + 7200000,
                     "status": status_text,
-                    "streamUrl": "Not Available",
+                    "streamUrl": stream_url,
                     "contentType": "event_pertandingan",
                     "playerType": "internal_with_headers",
                     "referer": TARGET_URL
