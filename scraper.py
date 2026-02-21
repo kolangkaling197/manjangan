@@ -16,134 +16,159 @@ TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
 FIXED_CATEGORY_ID = "EVENT1" 
 tz_jkt = timezone(timedelta(hours=7))
 
-# Keywords sampah diperketat
-TRASH_WORDS = ["Trực tiếp", "Bóng đá", "Xem", "Live", "Hot", "Full", "Bình luận", "ngy", "Japanese", "Australia", "Premier", "League"]
+# Keywords sampah untuk pembersihan nama tim
+TRASH_WORDS = ["Trực tiếp", "Bóng đá", "Xem", "Live", "Hot", "Full", "Bình luận", "ngy", "Sắp diễn ra"]
 
 def clean_team_name(name):
-    """Pembersihan nama tim agar tidak ada teks liga atau sampah lainnya."""
+    """Membersihkan nama tim dari skor, kata sampah, dan simbol"""
     if not name: return "TBA"
     for word in TRASH_WORDS:
         name = re.sub(rf'\b{word}\b', '', name, flags=re.IGNORECASE)
+    # Hapus angka skor tapi jaga label U23/U17
     name = re.sub(r'(?<![uU])\b\d+\b(?!\d)', '', name)
     name = re.sub(r"[^a-zA-Z0-9\s.()]", "", name)
     name = " ".join(name.split())
     return name if len(name) > 1 else "TBA"
 
-def get_match_details(driver, url):
-    """Fungsi mendalam untuk ambil Jam, Logo, dan Nama Tim dari elemen scoreboard detail."""
-    data = {"stream": "Not Found", "l_logo": "", "t1_logo": "", "t2_logo": "", "ts": None, "t1_name": "", "t2_name": "", "liga": "Match"}
+def get_live_stream_only(driver, url):
+    """Hanya digunakan untuk pertandingan LIVE: ambil m3u8 dan logo detail"""
+    data = {"stream": "Not Found", "t1_logo": "", "t2_logo": ""}
     try:
         driver.get(url)
-        time.sleep(8) # Waktu tunggu lebih lama untuk detail
+        time.sleep(8) # Waktu tunggu menangkap traffic network
         
-        # 1. AMBIL NAMA TIM DARI SCOREBOARD (Anti-TBA)
-        try:
-            # Mencari elemen nama tim yang biasanya ada di samping logo besar
-            team_elements = driver.find_elements(By.CSS_SELECTOR, "h2, .team-name, .name")
-            if len(team_elements) >= 2:
-                data["t1_name"] = team_elements[0].text.strip()
-                data["t2_name"] = team_elements[1].text.strip()
-        except: pass
-
-        # 2. AMBIL WAKTU
-        time_match = re.search(r"(\d{2}:\d{2}).*?(\d{2}/\d{2})", driver.page_source)
-        if time_match:
-            dt_str = f"{time_match.group(1)} {time_match.group(2)}/2026"
-            data["ts"] = int(datetime.strptime(dt_str, "%H:%M %d/%m/%Y").replace(tzinfo=tz_jkt).timestamp() * 1000)
-
-        # 3. AMBIL LOGO (Logo 1, Logo 2, Logo Liga)
-        imgs = [i.get_attribute("src") or i.get_attribute("data-src") for i in driver.find_elements(By.TAG_NAME, "img") if i.get_attribute("src")]
-        match_logos = [src for src in imgs if any(x in src.lower() for x in ["logo", "cdn", "team", "flag", "attachment"])]
-        if len(match_logos) >= 3:
-            data["l_logo"], data["t1_logo"], data["t2_logo"] = match_logos[0], match_logos[1], match_logos[2]
-
-        # 4. AMBIL STREAM
+        # Ambil m3u8 dari performance logs
         logs = driver.get_log("performance")
         for entry in logs:
-            if ".m3u8" in entry.get("message", ""):
-                m = re.search(r'https://[^\\"]+\.m3u8[^\\"]*', entry.get("message", ""))
-                if m: data["stream"] = m.group(0).replace("\\/", "/"); break
+            msg = entry.get("message", "")
+            if ".m3u8" in msg:
+                m = re.search(r'https://[^\\"]+\.m3u8[^\\"]*', msg)
+                if m: 
+                    data["stream"] = m.group(0).replace("\\/", "/")
+                    break
+
+        # Ambil Logo HD dari elemen scoreboard detail
+        img_logos = driver.find_elements(By.CSS_SELECTOR, "div[class*='team_logo'] img, .team-logo img")
+        if len(img_logos) >= 2:
+            data["t1_logo"] = img_logos[0].get_attribute("src")
+            data["t2_logo"] = img_logos[1].get_attribute("src")
     except: pass
     return data
 
 def jalankan_scraper():
-    print(f"===== START SCRAPER: {TARGET_URL} =====")
+    print(f"===== START HYBRID SCRAPER: {TARGET_URL} =====")
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
     options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
+    
     driver = uc.Chrome(options=options, version_main=144)
     hasil = []
 
     try:
         driver.get(TARGET_URL)
+        print("[*] Menunggu halaman utama...")
         time.sleep(10)
 
-        # SCROLL SANGAT DALAM (15x)
-        for _ in range(15):
+        # Deep Scroll untuk memicu semua match muncul di tab 'Tất cả'
+        print("[*] Scrolling untuk memicu Lazy Load...")
+        for _ in range(12):
             driver.execute_script("window.scrollBy(0, 1000);")
             time.sleep(1)
 
-        cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
-        raw_list = []
-        seen_urls = set()
+        # Ambil elemen kartu pertandingan menggunakan selector yang stabil
+        match_cards = driver.find_elements(By.XPATH, "//a[contains(@href, 'truc-tiep')]") 
+        print(f"[*] Ditemukan {len(match_cards)} potensi pertandingan.")
 
-        for card in cards:
-            url = card.get_attribute("href")
-            if url and url not in seen_urls:
-                # Simpan teks kartu sebagai cadangan
-                raw_list.append({"url": url, "text": card.text.strip()})
-                seen_urls.add(url)
-
-        print(f"Ditemukan {len(raw_list)} match. Memproses semua...")
-
-        for item in raw_list:
+        # Simpan URL agar tidak memproses ganda saat navigasi back-forth
+        card_data_list = []
+        for card in match_cards:
             try:
-                detail = get_match_details(driver, item["url"])
-                if not detail["ts"]: continue
+                txt = card.text.strip()
+                href = card.get_attribute("href")
+                imgs = [i.get_attribute("src") for i in card.find_elements(By.TAG_NAME, "img")]
+                if href and len(txt) > 10:
+                    card_data_list.append({"url": href, "text": txt, "imgs": imgs})
+            except: continue
 
-                # Gunakan nama dari detail, jika kosong baru gunakan teks kartu
-                home = clean_team_name(detail["t1_name"]) if detail["t1_name"] else "Team A"
-                away = clean_team_name(detail["t2_name"]) if detail["t2_name"] else "Team B"
+        for item in card_data_list:
+            try:
+                is_live_label = "Live" in item["text"]
                 
-                # Jika detail masih TBA, pecah dari teks kartu (Fallback terakhir)
-                if home == "Team A" or away == "Team B":
-                    parts = item["text"].split("\n")
-                    if len(parts) >= 3:
-                        home = clean_team_name(parts[1])
-                        away = clean_team_name(parts[2])
-
-                # LOGIKA STATUS: Jika status LIVE tapi link m3u8 TIDAK ADA, paksa jadi UPCOMING
-                now_ts = int(datetime.now(tz_jkt).timestamp() * 1000)
-                if detail["stream"] == "Not Found" and detail["ts"] > (now_ts - 3600000):
-                    status_text = "upcoming"
-                elif detail["ts"] > (now_ts + 600000):
-                    status_text = "upcoming"
+                # Parsing data dasar dari teks kartu
+                lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
+                if len(lines) < 3: continue
+                
+                liga = lines[0]
+                home_raw = lines[1]
+                away_raw = lines[2]
+                
+                # Deteksi Jam Pertandingan dari kartu
+                jam_match = re.search(r"(\d{2}:\d{2})\s+(\d{2}/\d{2})", item["text"])
+                if jam_match:
+                    dt_str = f"{jam_match.group(1)} {jam_match.group(2)}/2026"
+                    start_ts = int(datetime.strptime(dt_str, "%H:%M %d/%m/%Y").replace(tzinfo=tz_jkt).timestamp() * 1000)
                 else:
-                    status_text = "live"
+                    start_ts = int(datetime.now(tz_jkt).timestamp() * 1000)
+
+                # Logo default dari halaman utama
+                t1_logo = item["imgs"][0] if len(item["imgs"]) > 0 else ""
+                t2_logo = item["imgs"][1] if len(item["imgs"]) > 1 else ""
+
+                stream_url = "Not Found"
+                status_final = "upcoming"
+
+                # LOGIKA HYBRID:
+                if is_live_label:
+                    # HANYA BUKA DETAIL JIKA LIVE untuk ambil m3u8
+                    detail = get_live_stream_only(driver, item["url"])
+                    stream_url = detail["stream"]
+                    status_final = "live" if stream_url != "Not Found" else "upcoming"
+                    # Update logo jika di detail ada yang lebih valid
+                    if detail["t1_logo"]: t1_logo = detail["t1_logo"]
+                    if detail["t2_logo"]: t2_logo = detail["t2_logo"]
+                    # Kembali ke halaman utama setelah dari detail
+                    driver.get(TARGET_URL)
+                    time.sleep(3)
+                else:
+                    # JIKA UPCOMING (Sắp diễn ra): Langsung pakai data kartu (Cepat & Anti-TBA)
+                    status_final = "upcoming"
+
+                home = clean_team_name(home_raw)
+                away = clean_team_name(away_raw)
 
                 hasil.append({
-                    "channelName": f"{home} vs {away}",
-                    "team1Name": home, "team1Logo": detail["t1_logo"],
-                    "team2Name": away, "team2Logo": detail["t2_logo"],
-                    "leagueLogo": detail["l_logo"],
-                    "startTime": detail["ts"],
-                    "endTime": detail["ts"] + 7200000,
-                    "status": status_text,
-                    "streamUrl": detail["stream"],
+                    "channelName": f"[{liga}] {home} vs {away}",
+                    "team1Name": home, "team1Logo": t1_logo,
+                    "team2Name": away, "team2Logo": t2_logo,
+                    "startTime": start_ts,
+                    "endTime": start_ts + 7200000,
+                    "status": status_final,
+                    "streamUrl": stream_url,
                     "contentType": "event_pertandingan",
                     "playerType": "internal_with_headers",
                     "referer": "https://bunchatv.net/"
                 })
-                print(f"   [{status_text.upper()}] {home} vs {away}")
-            except: continue
+                print(f"   [{status_final.upper()}] {home} vs {away}")
+
+            except Exception as e:
+                print(f"   [!] Gagal item: {e}")
+                continue
 
     finally:
         driver.quit()
 
     if hasil:
-        payload = {"category_name": "EVENT1", "order": 15, "channels": {uuid.uuid4().hex: x for x in hasil}}
-        requests.put(f"{FIREBASE_URL}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}", json=payload)
-        print(f"[√] BERHASIL! {len(hasil)} match terdaftar.")
+        # Kirim ke Firebase (PUT untuk overwrite data lama)
+        fb_url = f"{FIREBASE_URL}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}"
+        payload = {
+            "category_name": "EVENT1",
+            "order": 15,
+            "channels": {uuid.uuid4().hex: x for x in hasil}
+        }
+        requests.put(fb_url, json=payload, timeout=30)
+        print(f"[√] BERHASIL! {len(hasil)} match (Live & Soon) terdaftar di Firebase.")
 
 if __name__ == "__main__":
     jalankan_scraper()
