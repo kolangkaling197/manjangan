@@ -96,101 +96,151 @@ def get_stream_details(driver, url):
 # ==============================
 # MAIN JALANKAN SCRAPER
 # ==============================
+
+def clean_team_name(name):
+    """
+    Bersihkan skor & menit tanpa merusak U17/U18
+    """
+    if not name:
+        return ""
+
+    # Hapus skor 2-1 atau 3 : 0
+    name = re.sub(r"\b\d+\s*[-:]\s*\d+\b", "", name)
+
+    # Hapus menit 45' atau 90+2'
+    name = re.sub(r"\b\d+\+?\d*'\b", "", name)
+
+    # Hapus angka berdiri sendiri
+    # KECUALI angka setelah huruf U
+    name = re.sub(r"(?<!U)\b\d+\b", "", name)
+
+    # Rapikan spasi
+    name = re.sub(r"\s+", " ", name)
+
+    return name.strip()
+
+
 def jalankan_scraper():
-    print(f"===== START SCRAPER: {TARGET_URL} =====")
+    print(f"===== SCRAP MAIN PAGE: {TARGET_URL} =====")
+
     options = uc.ChromeOptions()
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
-    options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-    
-    driver = uc.Chrome(options=options, version_main=144)
+
+    driver = uc.Chrome(options=options)
+
     hasil = []
+    seen_matches = set()
 
     try:
         driver.get(TARGET_URL)
-        time.sleep(7)
+        time.sleep(6)
 
-        # Scroll dalam untuk memicu lazy load jadwal (Schedule/Soon)
-        for _ in range(4):
-            driver.execute_script("window.scrollBy(0, 1500);")
+        # Scroll supaya semua schedule load
+        for _ in range(6):
+            driver.execute_script("window.scrollBy(0, 2500);")
             time.sleep(2)
 
         cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
-        raw_matches = []
-        seen_urls = set()
+
+        print(f"Total card ditemukan: {len(cards)}")
 
         for card in cards:
-            url = card.get_attribute("href")
-            if url and url not in seen_urls:
-                teks = card.text.strip()
-                if len(teks) > 5:
-                    imgs = [get_img_src(i) for i in card.find_elements(By.TAG_NAME, "img")]
-                    raw_matches.append({"url": url, "text": teks, "imgs": imgs})
-                    seen_urls.add(url)
-
-        print(f"Ditemukan {len(raw_matches)} potensi match. Memproses detail...")
-
-        for item in raw_matches:
             try:
-                # 1. Parsing Teks & Filter Liga Populer
-                lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
-                
-                nama_liga = "Live Match"
+                teks = card.text.strip()
+                if not teks:
+                    continue
+
+                lines = [l.strip() for l in teks.split("\n") if l.strip()]
+
+                # ===== FILTER LIGA =====
+                nama_liga = None
                 for line in lines:
                     if filter_liga_populer(line):
                         nama_liga = line
                         break
-                
-                # Jika liga tidak masuk daftar kasta tinggi, lewati
-                if nama_liga == "Live Match" and len(raw_matches) > 15:
+
+                if not nama_liga:
                     continue
 
-                # 2. Ambil Jam & Stream dari halaman detail
-                stream_url, league_logo = get_stream_details(driver, item["url"])
-                page_text = driver.page_source
-                time_search = re.search(r"(\d{2}:\d{2}).*?(\d{2}/\d{2})", page_text)
-                
-                if time_search:
-                    dt_str = f"{time_search.group(1)} {time_search.group(2)}/2026"
+                # ===== PARSE JAM =====
+                time_match = None
+                for l in lines:
+                    m = re.search(r"\d{2}:\d{2}", l)
+                    if m:
+                        time_match = m.group()
+                        break
+
+                if time_match:
+                    now = datetime.now(tz_jkt)
+                    dt_str = f"{time_match} {now.day}/{now.month}/{now.year}"
                     dt_naive = datetime.strptime(dt_str, "%H:%M %d/%m/%Y")
-                    dt_aware = dt_naive.replace(tzinfo=tz_jkt) # Fix GMT+7
+                    dt_aware = dt_naive.replace(tzinfo=tz_jkt)
                     start_ts = int(dt_aware.timestamp() * 1000)
                 else:
                     start_ts = int(datetime.now(tz_jkt).timestamp() * 1000)
 
-                # 3. Cleaning Nama Tim
-                clean = [l for l in lines if l != nama_liga and ":" not in l and "/" not in l and "'" not in l and not l.isdigit()]
-                home = re.sub(r"^\d+\s+|\s+\d+$", "", clean[0]) if len(clean) >= 1 else "Team A"
-                away = re.sub(r"^\d+\s+|\s+\d+$", "", clean[1]) if len(clean) >= 2 else "Team B"
+                # ===== PARSE TIM =====
+                team_lines = []
 
-                # 4. Logika Status (Live / Upcoming/Soon)
+                for l in lines:
+                    if l == nama_liga:
+                        continue
+                    if ":" in l and re.search(r"\d{2}:\d{2}", l):
+                        continue
+
+                    cleaned = clean_team_name(l)
+
+                    if cleaned and len(cleaned) > 2:
+                        team_lines.append(cleaned)
+
+                if len(team_lines) < 2:
+                    continue
+
+                home = team_lines[0]
+                away = team_lines[1]
+
+                # ===== ANTI DUPLIKAT =====
+                key = f"{home.lower()}_{away.lower()}_{start_ts}"
+                if key in seen_matches:
+                    continue
+                seen_matches.add(key)
+
+                # ===== STATUS =====
                 now_ts = int(datetime.now(tz_jkt).timestamp() * 1000)
-                is_live = (start_ts <= now_ts) or (stream_url != "Not Found")
-                status_text = "live" if is_live else "upcoming"
+                status_text = "live" if start_ts <= now_ts else "upcoming"
+
+                imgs = [get_img_src(i) for i in card.find_elements(By.TAG_NAME, "img")]
 
                 hasil.append({
                     "channelName": f"[{nama_liga}] {home} vs {away}",
-                    "team1Name": home, "team2Name": away,
-                    "team1Logo": item["imgs"][0] if len(item["imgs"]) > 0 else "",
-                    "team2Logo": item["imgs"][1] if len(item["imgs"]) > 1 else "",
-                    "leagueLogo": league_logo,
+                    "team1Name": home,
+                    "team2Name": away,
+                    "team1Logo": imgs[0] if len(imgs) > 0 else "",
+                    "team2Logo": imgs[1] if len(imgs) > 1 else "",
+                    "leagueLogo": "",
                     "startTime": start_ts,
                     "endTime": start_ts + 7200000,
-                    "status": status_text, # Status 'upcoming' tampil sebagai Soon
-                    "streamUrl": stream_url,
+                    "status": status_text,
+                    "streamUrl": "Not Available",
                     "contentType": "event_pertandingan",
                     "playerType": "internal_with_headers",
-                    "referer": "https://bunchatv.net/"
+                    "referer": TARGET_URL
                 })
-                print(f"   [{status_text.upper()}] {home} vs {away}")
-            except: continue
+
+                print(f"[{status_text.upper()}] {home} vs {away}")
+
+            except:
+                continue
+
     finally:
         driver.quit()
 
     if hasil:
-        kirim_ke_firebase(hasil) # Memastikan pengiriman data di akhir
+        kirim_ke_firebase(hasil)
     else:
-        print("[!] Tidak ada data yang lolos filter.")
-
+        print("Tidak ada match valid.")
+        
 if __name__ == "__main__":
     jalankan_scraper()
+
