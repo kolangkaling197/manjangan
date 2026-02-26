@@ -15,7 +15,7 @@ from selenium.webdriver.support import expected_conditions as EC
 # --- 1. KONFIGURASI ---
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET")
-TARGET_URL = "https://bunchatv.net/truc-tiep"
+TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
 FIXED_CATEGORY_ID = "AJ_JKS" 
 tz_jkt = timezone(timedelta(hours=7))
 
@@ -245,6 +245,7 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
 
 
