@@ -96,24 +96,26 @@ def jalankan_scraper():
 
     hasil = []
 
-    try:
+     try:
         driver.get(TARGET_URL)
-        wait = WebDriverWait(driver, 20)
-        
-        # Klik Tất cả
-        tat_ca = wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//*[contains(text(),'Tất cả')]"))
-        )
-        driver.execute_script("arguments[0].click();", tat_ca)
-        time.sleep(5)
-        
-        # Scroll supaya semua render
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(3)
-        
-        # Ambil card pertandingan saja
-        cards = driver.find_elements(By.XPATH, "//a[count(.//img) >= 2]")
-        print("TOTAL MATCH CARD:", len(cards))
+        logging.info(f"Membuka: {TARGET_URL}")
+        time.sleep(10)
+
+        cards = driver.find_elements(By.XPATH, "//section//a[@href]")
+        temp_list = []
+        seen_urls = set()
+
+        # Ambil data kasar
+        for card in cards:
+            url = card.get_attribute("href")
+            teks = card.text.strip()
+            if url and url not in seen_urls and len(teks) > 10:
+                imgs = [img.get_attribute("src") for img in card.find_elements(By.TAG_NAME, "img")]
+                temp_list.append({"teks": teks, "url": url, "imgs": imgs})
+                seen_urls.add(url)
+
+        logging.info(f"Ditemukan {len(temp_list)} card pertandingan.")
+
 
         for item in temp_list:
             try:
