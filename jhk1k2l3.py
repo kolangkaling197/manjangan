@@ -228,7 +228,6 @@ def extract_m3u8_from_logs(driver, timeout=30):
         time.sleep(0.5)
     
     return None
-
 def get_live_stream_link(driver):
     max_attempts = 3
     stream_url = "Not Found"
@@ -237,118 +236,173 @@ def get_live_stream_link(driver):
         try:
             logging.info(f"    [ATTEMPT {attempt}] Mencari link m3u8...")
             
-            # Reset ke main content
             driver.switch_to.default_content()
             
-            # 🎯 TUNGGU PAGE LOAD LEBIH LAMA (UPDATE!)
-            time.sleep(5)  # Tunggu initial load
+            # 🎯 TUNGGU LEBIH LAMA UNTUK SEMUA IFRAME LOAD
+            time.sleep(8)  # Naikkan dari 5 ke 8 detik
             
             # Clear overlays
             driver.execute_script("""
-                document.querySelectorAll('.modal, .popup, .sh-overlay, [class*="ads"], [id*="ads"], iframe[src*="ads"]').forEach(el => {
+                document.querySelectorAll('.modal, .popup, .sh-overlay, [class*="ads"], [id*="ads"]').forEach(el => {
                     el.style.display = 'none';
                     el.remove();
                 });
             """)
             
-            # 🎯 SCROLL PELAN-PELAN UNTUK TRIGGER LAZY LOAD (UPDATE!)
-            for scroll in [300, 600, 900]:
-                driver.execute_script(f"window.scrollTo(0, {scroll});")
-                time.sleep(2)
+            # 🎯 SCROLL UNTUK TRIGGER PLAYER LOAD
+            driver.execute_script("window.scrollTo(0, 500);")
+            time.sleep(3)
             
-            # 🎯 TUNGGU IFRAME DENGAN DELAY YANG LEBIH LAMA (UPDATE!)
+            # 🎯 TUNGGU IFRAME SAMPAI 20 DETIK
             try:
-                # Tunggu sampai 20 detik
                 WebDriverWait(driver, 20).until(
-                    EC.presence_of_element_located((By.TAG_NAME, "iframe"))
+                    lambda d: len(d.find_elements(By.TAG_NAME, "iframe")) >= 2  # Tunggu minimal 2 iframe
                 )
-                logging.info(f"    ✅ Iframe detected!")
+                logging.info(f"    ✅ Multiple iframes detected!")
             except TimeoutException:
-                logging.warning(f"    ⚠️ Timeout waiting for iframe")
-                
-                # 🎯 SAVE DEBUG (TAMBAHAN BARU!)
-                save_debug_screenshot(driver, f"no_iframe_attempt_{attempt}")
-                
-                if attempt < max_attempts:
-                    driver.refresh()
-                    time.sleep(8)
-                    continue
-                else:
-                    return "Not Found"
+                logging.warning(f"    ⚠️ Hanya 1 iframe (mungkin hanya chat box)")
 
-            # Cari iframe
+            # 🎯 AMBIL SEMUA IFRAME
             iframes = driver.find_elements(By.TAG_NAME, "iframe")
-            logging.info(f"    Ditemukan {len(iframes)} iframe")
+            logging.info(f"    Total iframe ditemukan: {len(iframes)}")
             
-            # 🎯 PRINT SEMUA IFRAME SRC UNTUK DEBUG (TAMBAHAN BARU!)
+            # 🎯 PRINT SEMUA UNTUK DEBUG
             for idx, iframe in enumerate(iframes):
                 src = iframe.get_attribute("src") or "no-src"
-                logging.info(f"      Iframe {idx}: {src[:80]}...")
+                logging.info(f"      Iframe {idx}: {src[:100]}...")
             
-            # Pilih iframe
+            # 🎯 CARI IFRAME PLAYER (BUKAN CHAT BOX!)
             target_iframe = None
-            priority_keywords = ['player', 'stream', 'embed', 'bitmovin', 'cdn', 'video', 'live']
+            
+            # Priority 1: Iframe dengan keyword player/video/stream (BUKAN cbox/chat)
+            player_keywords = ['player', 'stream', 'embed', 'bitmovin', 'cdn', 'video', 'live', 'm3u8', 'hls']
+            exclude_keywords = ['cbox', 'chat', 'comment', 'disqus', 'facebook']  # 🎯 EXCLUDE CHAT
             
             for iframe in iframes:
                 src = iframe.get_attribute("src") or ""
-                if any(kw in src.lower() for kw in priority_keywords):
+                src_lower = src.lower()
+                
+                # Cek apakah mengandung player keyword DAN TIDAK mengandung chat keyword
+                is_player = any(kw in src_lower for kw in player_keywords)
+                is_chat = any(kw in src_lower for kw in exclude_keywords)
+                
+                if is_player and not is_chat:
                     target_iframe = iframe
-                    logging.info(f"    [PRIORITY] Selected: {src[:60]}...")
+                    logging.info(f"    [✅ PLAYER FOUND] Iframe: {src[:80]}...")
                     break
             
-            # Fallback ke iframe pertama yang visible
+            # 🎯 JIKA TIDAK KETEMU, COBA CARI IFRAME YANG TIDAK ADA SRC (about:blank) - MUNGKIN PLAYER DINAMIS
             if not target_iframe:
                 for iframe in iframes:
-                    try:
-                        if iframe.is_displayed():
-                            target_iframe = iframe
-                            logging.info("    [FALLBACK] Using first visible iframe")
-                            break
-                    except:
-                        continue
+                    src = iframe.get_attribute("src") or ""
+                    # Iframe dengan src kosong atau about:blank bisa jadi player yang di-inject JS
+                    if not src or src == "about:blank" or "javascript" in src:
+                        # Cek apakah iframe ini punya konten video
+                        try:
+                            driver.switch_to.frame(iframe)
+                            has_video = driver.execute_script("return document.querySelector('video') !== null")
+                            driver.switch_to.default_content()
+                            
+                            if has_video:
+                                target_iframe = iframe
+                                logging.info(f"    [✅ PLAYER FOUND] Dynamic iframe with video element")
+                                break
+                        except:
+                            driver.switch_to.default_content()
+                            continue
             
-            if target_iframe:
-                # Switch ke iframe
-                driver.switch_to.frame(target_iframe)
+            # 🎯 JIKA MASIH TIDAK KETEMU, COBA IFRAME KEDUA (BUKAN YANG PERTAMA)
+            if not target_iframe and len(iframes) >= 2:
+                # Asumsikan iframe pertama adalah chat, kedua adalah player
+                target_iframe = iframes[1]
+                logging.info(f"    [⚠️ GUESS] Using second iframe (assuming first is chat)")
+            
+            if not target_iframe:
+                logging.warning(f"    ❌ No player iframe found!")
+                save_debug_screenshot(driver, f"no_player_attempt_{attempt}")
                 
-                # 🎯 TUNGGU IFRAME LOAD (TAMBAHAN BARU!)
+                if attempt < max_attempts:
+                    driver.refresh()
+                    time.sleep(10)
+                    continue
+                else:
+                    return "Not Found"
+            
+            # 🎯 SWITCH KE IFRAME PLAYER
+            driver.switch_to.frame(target_iframe)
+            logging.info(f"    Switched to player iframe")
+            
+            # 🎯 TUNGGU VIDEO ELEMENT
+            try:
+                WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.TAG_NAME, "video"))
+                )
+                logging.info(f"    ✅ Video element found!")
+            except TimeoutException:
+                logging.warning(f"    ⚠️ No video element in iframe")
+            
+            # 🎯 TUNGGU LAGI UNTUK NETWORK STABILIZE
+            time.sleep(8)  # Naikkan dari 5 ke 8
+            
+            # 🎯 TRIGGER PLAY
+            driver.execute_script("""
+                // Coba play video
+                var videos = document.querySelectorAll('video');
+                videos.forEach(function(v) {
+                    v.play().catch(e => console.log('Autoplay blocked:', e));
+                    v.muted = true;
+                });
+                
+                // Coba click play button
+                var playBtn = document.querySelector('button[class*="play"], .play-button, [data-testid*="play"]');
+                if (playBtn) playBtn.click();
+            """)
+            
+            # 🎯 POLLING LOGS UNTUK M3U8
+            logging.info("    [POLLING] Monitoring network logs for m3u8...")
+            stream_url = extract_m3u8_from_logs(driver, timeout=30)  # Naikkan timeout
+            
+            if stream_url:
+                logging.info(f"    [SUCCESS] Found: {stream_url[:60]}...")
+                return stream_url
+            
+            # 🎯 JIKA GAGAL, COBA CEK IFRAME NESTED (IFRAME DI DALAM IFRAME)
+            logging.info("    Checking for nested iframes...")
+            nested_iframes = driver.find_elements(By.TAG_NAME, "iframe")
+            
+            if len(nested_iframes) > 0:
+                logging.info(f"    Found {len(nested_iframes)} nested iframes, trying first one...")
+                driver.switch_to.frame(nested_iframes[0])
                 time.sleep(5)
                 
-                # Trigger play
+                # Trigger play di nested iframe
                 driver.execute_script("""
-                    // Play video
-                    var videos = document.querySelectorAll('video');
-                    videos.forEach(function(v) {
-                        v.play().catch(e => console.log('Autoplay blocked'));
-                        v.muted = true;
-                    });
-                    
-                    // Click play button
-                    var playBtns = document.querySelectorAll('button, [class*="play"], [id*="play"]');
-                    playBtns.forEach(function(btn) {
-                        if(btn.offsetParent !== null) btn.click();
-                    });
+                    var v = document.querySelector('video');
+                    if (v) { v.play(); v.muted = true; }
                 """)
                 
-                # 🎯 POLLING LOGS (dari kode sebelumnya)
-                logging.info("    [POLLING] Monitoring network logs...")
-                stream_url = extract_m3u8_from_logs(driver, timeout=25)
+                time.sleep(5)
+                nested_url = extract_m3u8_from_logs(driver, timeout=20)
                 
-                if stream_url:
-                    return stream_url
+                if nested_url:
+                    return nested_url
+                
+                driver.switch_to.parent_frame()  # Kembali ke parent iframe
             
             # Retry
             if attempt < max_attempts:
-                logging.info("    [RETRY] Refreshing...")
+                logging.info("    [RETRY] Refreshing page...")
+                driver.switch_to.default_content()
                 driver.refresh()
-                time.sleep(8)
+                time.sleep(10)
                 
         except Exception as e:
             logging.error(f"    [ERROR] Attempt {attempt}: {e}")
-            save_debug_screenshot(driver, f"error_attempt_{attempt}")
             try:
+                driver.switch_to.default_content()
+                save_debug_screenshot(driver, f"error_attempt_{attempt}")
                 driver.refresh()
-                time.sleep(8)
+                time.sleep(10)
             except:
                 pass
     
@@ -521,5 +575,6 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
 
