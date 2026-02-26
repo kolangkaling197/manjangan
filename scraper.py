@@ -96,7 +96,7 @@ def jalankan_scraper():
 
     hasil = []
 
-     try:
+    try:
         driver.get(TARGET_URL)
         logging.info(f"Membuka: {TARGET_URL}")
         time.sleep(10)
@@ -115,7 +115,6 @@ def jalankan_scraper():
                 seen_urls.add(url)
 
         logging.info(f"Ditemukan {len(temp_list)} card pertandingan.")
-
 
         for item in temp_list:
             try:
@@ -199,8 +198,4 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
-
-
-
-
 
