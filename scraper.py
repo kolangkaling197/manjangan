@@ -151,6 +151,9 @@ def jalankan_scraper():
                 start_ms, ts_display = get_detailed_info(driver, item['url'])
                 stream_url = get_live_stream_link(driver)
 
+                durasi_ms = 2 * 60 * 60 * 1000 
+                end_ms = start_ms + durasi_ms
+
                 # Format Objek (Channel.java Compatible)
                 hasil.append({
                     "channelName": f"{t1} vs {t2}",
@@ -162,6 +165,7 @@ def jalankan_scraper():
                     "logoUrl": l_liga,
                     "streamUrl": stream_url,
                     "startTime": start_ms,
+                    "endTime": end_ms,
                     "status": "LIVE",
                     "contentType": "event_pertandingan",
                     "description": ts_display
@@ -194,3 +198,4 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
