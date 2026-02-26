@@ -209,7 +209,7 @@ def jalankan_scraper():
         
         # Payload dengan UUID unik untuk tiap channel
         payload = {
-            "category_name": "EVENT15", 
+            "category_name": "EVENT", 
             "order": 1, 
             "channels": {uuid.uuid4().hex: x for x in hasil}
         }
@@ -225,6 +225,7 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
 
 
