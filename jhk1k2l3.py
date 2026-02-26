@@ -9,6 +9,8 @@ import subprocess
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from datetime import datetime, timedelta, timezone
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 # --- 1. KONFIGURASI ---
 FIREBASE_URL = os.getenv("FIREBASE_URL")
@@ -60,41 +62,58 @@ def get_detailed_info(driver, match_page_url):
     return int(time.time() * 1000), "LIVE"
 
 def get_live_stream_link(driver):
-    """
-    Mencari link m3u8 dengan logika Retry 3x jika gagal.
-    Sangat berguna untuk mengatasi lag di GitHub Actions.
-    """
     max_retries = 3
     stream_url = "Not Found"
 
     for attempt in range(1, max_retries + 1):
         try:
             logging.info(f"    [ATTEMPT {attempt}] Mencari link m3u8...")
-            
-            # 1. Pastikan di konten utama & bersihkan overlay
             driver.switch_to.default_content()
-            driver.execute_script("document.querySelectorAll('.modal, .popup, [class*=\"ads\"]').forEach(el => el.remove());")
-            time.sleep(2)
+            
+            # 1. SCROLL AGRESIF: Beberapa player baru muncul saat di-scroll
+            driver.execute_script("window.scrollTo(0, 800);")
+            time.sleep(3)
+            
+            # 2. CLEAR OVERLAY
+            driver.execute_script("""
+                document.querySelectorAll('.modal, .popup, .sh-overlay, [class*="ads"]').forEach(el => el.remove());
+            """)
 
-            # 2. Cari Iframe & Masuk (Logika VS Code)
+            # 3. SMART WAIT: Tunggu Iframe muncul (maksimal 15 detik)
+            try:
+                WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.TAG_NAME, "iframe"))
+                )
+            except:
+                logging.warning(f"    [WARN] Tidak ada iframe terdeteksi setelah menunggu 15 detik.")
+
+            # 4. CARI SEMUA IFRAME (Termasuk yang tersembunyi)
             iframes = driver.find_elements(By.TAG_NAME, "iframe")
             found_iframe = False
-            for frame in iframes:
+            
+            for index, frame in enumerate(iframes):
                 src = frame.get_attribute("src") or ""
-                if any(x in src for x in ["bitmovin", "player", "stream", "embed", "cdn"]):
+                # Tambahkan 'bunchatv' atau 'taoxanh' ke filter jika perlu
+                if any(x in src for x in ["bitmovin", "player", "stream", "embed", "cdn", "taoxanh", "m3u8"]):
+                    logging.info(f"    [INFO] Masuk ke Iframe #{index}: {src[:50]}...")
                     driver.switch_to.frame(frame)
                     found_iframe = True
-                    # Paksa Video Play lewat JS jika ada
-                    driver.execute_script("if(document.querySelector('video')){document.querySelector('video').play();}")
+                    # Paksa play video
+                    driver.execute_script("""
+                        let v = document.querySelector('video');
+                        if(v) { v.play(); v.muted = true; }
+                    """)
                     break
             
             if not found_iframe:
-                logging.warning(f"    [WARN] Iframe player tidak ditemukan pada attempt {attempt}")
+                logging.warning(f"    [WARN] Iframe player spesifik tidak ditemukan di attempt {attempt}")
+                # Percobaan terakhir: coba masuk ke iframe pertama saja jika tidak ada yang cocok
+                if iframes:
+                    driver.switch_to.frame(iframes[0])
+                    logging.info("    [INFO] Mencoba masuk ke Iframe pertama sebagai fallback.")
 
-            # 3. Tunggu trafik network (Gunakan durasi yang cukup lama di GitHub)
-            time.sleep(15) 
-
-            # 4. Ambil Log Performance
+            # 5. TUNGGU TRAFIK
+            time.sleep(20) 
             driver.switch_to.default_content()
             logs = driver.get_log('performance')
 
@@ -104,21 +123,18 @@ def get_live_stream_link(driver):
                     url_match = re.search(r'"url":"(https://[^"]+\.m3u8[^"]*)"', msg)
                     if url_match:
                         found_url = url_match.group(1).replace('\\/', '/')
-                        # Filter m3u8 yang valid (bukan iklan)
-                        if "ads" not in found_url.lower() and "telemetry" not in found_url.lower():
-                            logging.info(f"    [SUCCESS] m3u8 ditemukan pada attempt {attempt}!")
+                        if "ads" not in found_url.lower():
+                            logging.info(f"    [SUCCESS] m3u8 ditemukan!")
                             return found_url
 
-            logging.warning(f"    [WARN] Belum menemukan m3u8 di attempt {attempt}. Mencoba lagi...")
-            
-            # Jika gagal di attempt ini, lakukan refresh ringan pada halaman detail
             if attempt < max_retries:
+                logging.info("    [RETRY] Refreshing page...")
                 driver.refresh()
                 time.sleep(5)
 
         except Exception as e:
-            logging.error(f"    [ERROR] Kesalahan pada attempt {attempt}: {e}")
-            if attempt < max_retries: driver.refresh()
+            logging.error(f"    [ERROR] Attempt {attempt} gagal: {e}")
+            driver.refresh()
 
     return "Not Found"
     
@@ -229,5 +245,6 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
 
