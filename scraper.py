@@ -14,7 +14,7 @@ from datetime import datetime, timedelta, timezone
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET")
 TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
-FIXED_CATEGORY_ID = "EVENT1" 
+FIXED_CATEGORY_ID = "AJ_JKS" 
 tz_jkt = timezone(timedelta(hours=7))
 
 # Setup Logging
@@ -225,6 +225,7 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
 
 
