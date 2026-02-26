@@ -60,51 +60,68 @@ def get_detailed_info(driver, match_page_url):
     return int(time.time() * 1000), "LIVE"
 
 def get_live_stream_link(driver):
+    """
+    Mencari link m3u8 dengan logika Retry 3x jika gagal.
+    Sangat berguna untuk mengatasi lag di GitHub Actions.
+    """
+    max_retries = 3
     stream_url = "Not Found"
-    try:
-        # 1. Hapus penghalang (iklan/overlay)
-        driver.execute_script("""
-            document.querySelectorAll('.modal, .popup, .sh-overlay, [class*="ads"]').forEach(el => el.remove());
-        """)
 
-        # 2. Cari dan masuk ke Iframe Player secara rekursif
-        iframes = driver.find_elements(By.TAG_NAME, "iframe")
-        for frame in iframes:
-            src = frame.get_attribute("src") or ""
-            if any(x in src for x in ["bitmovin", "player", "stream", "embed", "cdn", "m3u8"]):
-                driver.switch_to.frame(frame)
-                logging.info("    [INFO] Berhasil masuk ke iframe player.")
-                
-                # 3. PAKSA PLAY: Simulasi klik atau script play agar trafik m3u8 keluar
-                driver.execute_script("""
-                    var v = document.querySelector('video');
-                    if(v) {
-                        v.play();
-                        v.muted = true;
-                    }
-                """)
-                break
+    for attempt in range(1, max_retries + 1):
+        try:
+            logging.info(f"    [ATTEMPT {attempt}] Mencari link m3u8...")
+            
+            # 1. Pastikan di konten utama & bersihkan overlay
+            driver.switch_to.default_content()
+            driver.execute_script("document.querySelectorAll('.modal, .popup, [class*=\"ads\"]').forEach(el => el.remove());")
+            time.sleep(2)
 
-        # 4. Tunggu trafik di network
-        logging.info("    [NETWORK] Menunggu trafik stream (25 detik)...")
-        time.sleep(25) 
+            # 2. Cari Iframe & Masuk (Logika VS Code)
+            iframes = driver.find_elements(By.TAG_NAME, "iframe")
+            found_iframe = False
+            for frame in iframes:
+                src = frame.get_attribute("src") or ""
+                if any(x in src for x in ["bitmovin", "player", "stream", "embed", "cdn"]):
+                    driver.switch_to.frame(frame)
+                    found_iframe = True
+                    # Paksa Video Play lewat JS jika ada
+                    driver.execute_script("if(document.querySelector('video')){document.querySelector('video').play();}")
+                    break
+            
+            if not found_iframe:
+                logging.warning(f"    [WARN] Iframe player tidak ditemukan pada attempt {attempt}")
 
-        # 5. Kembali ke root untuk ambil log
-        driver.switch_to.default_content()
-        logs = driver.get_log('performance')
+            # 3. Tunggu trafik network (Gunakan durasi yang cukup lama di GitHub)
+            time.sleep(15) 
 
-        for entry in logs:
-            msg = entry.get('message')
-            if '.m3u8' in msg:
-                url_match = re.search(r'"url":"(https://[^"]+\.m3u8[^"]*)"', msg)
-                if url_match:
-                    found_url = url_match.group(1).replace('\\/', '/')
-                    if "ads" not in found_url.lower():
-                        logging.info("    [STREAM] Captured!")
-                        return found_url
-    except Exception as e:
-        logging.error(f"    [ERROR] Gagal di get_live_stream_link: {e}")
-    return stream_url
+            # 4. Ambil Log Performance
+            driver.switch_to.default_content()
+            logs = driver.get_log('performance')
+
+            for entry in logs:
+                msg = entry.get('message')
+                if '.m3u8' in msg:
+                    url_match = re.search(r'"url":"(https://[^"]+\.m3u8[^"]*)"', msg)
+                    if url_match:
+                        found_url = url_match.group(1).replace('\\/', '/')
+                        # Filter m3u8 yang valid (bukan iklan)
+                        if "ads" not in found_url.lower() and "telemetry" not in found_url.lower():
+                            logging.info(f"    [SUCCESS] m3u8 ditemukan pada attempt {attempt}!")
+                            return found_url
+
+            logging.warning(f"    [WARN] Belum menemukan m3u8 di attempt {attempt}. Mencoba lagi...")
+            
+            # Jika gagal di attempt ini, lakukan refresh ringan pada halaman detail
+            if attempt < max_retries:
+                driver.refresh()
+                time.sleep(5)
+
+        except Exception as e:
+            logging.error(f"    [ERROR] Kesalahan pada attempt {attempt}: {e}")
+            if attempt < max_retries: driver.refresh()
+
+    return "Not Found"
+    
 def jalankan_scraper():
     logging.info("=== START SCRAPER (HYBRID VERSION 2026) ===")
     
@@ -212,4 +229,5 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
