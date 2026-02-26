@@ -101,7 +101,7 @@ def jalankan_scraper():
         logging.info(f"Membuka: {TARGET_URL}")
         time.sleep(10)
 
-        cards = driver.find_elements(By.XPATH, "//section//a[@href]")
+        cards = driver.find_elements(By.XPATH, "//a[contains(@href, 'truc-tiep')]")
         temp_list = []
         seen_urls = set()
 
@@ -199,6 +199,7 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
 
 
