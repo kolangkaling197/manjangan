@@ -1,4 +1,4 @@
-name: Football Auto Scraper
+name: jhk1k2l3
 
 on:
   schedule:
@@ -25,4 +25,4 @@ jobs:
         env:
           FIREBASE_URL: ${{ secrets.FIREBASE_URL }}
           FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
-        run: python scraper.py
+        run: python jhk1k2l3.py
