@@ -25,6 +25,74 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(message)s'
 )
 
+def save_debug_screenshot(driver, name="debug"):
+    """Simpan screenshot untuk debugging"""
+    try:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{name}_{timestamp}.png"
+        driver.save_screenshot(filename)
+        logging.info(f"📸 Screenshot saved: {filename}")
+        return filename
+    except Exception as e:
+        logging.error(f"Gagal save screenshot: {e}")
+        return None
+
+def save_debug_html(driver, name="debug"):
+    """Simpan HTML page source"""
+    try:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{name}_{timestamp}.html"
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(driver.page_source)
+        logging.info(f"📄 HTML saved: {filename}")
+        return filename
+    except Exception as e:
+        logging.error(f"Gagal save HTML: {e}")
+        return None
+
+# --- CHROME SETUP UNTUK GITHUB ACTIONS ---
+def setup_chrome_for_github_actions():
+    """Setup Chrome khusus untuk environment GitHub Actions"""
+    chrome_ver = get_chrome_main_version()
+    logging.info(f"Detected Chrome version: {chrome_ver}")
+    
+    options = uc.ChromeOptions()
+    
+    # 🎯 KRITIS: Headless mode untuk GitHub Actions
+    options.add_argument('--headless=new')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--window-size=1920,1080')
+    
+    # Anti-detection
+    options.add_argument('--disable-blink-features=AutomationControlled')
+    options.add_argument('--disable-web-security')
+    options.add_argument('--disable-features=IsolateOrigins,site-per-process')
+    
+    # User agent
+    options.add_argument('--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36')
+    
+    # Performance logging (untuk tangkap m3u8)
+    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+    
+    # 🎯 KRITIS: Download driver otomatis tapi dengan timeout lebih lama
+    driver = None
+    max_retries = 3
+    
+    for i in range(max_retries):
+        try:
+            logging.info(f"Attempting to create driver (try {i+1}/{max_retries})...")
+            driver = uc.Chrome(options=options, version_main=chrome_ver)
+            logging.info("✅ Driver created successfully")
+            return driver
+        except Exception as e:
+            logging.error(f"❌ Failed to create driver: {e}")
+            if i < max_retries - 1:
+                time.sleep(10)
+    
+    raise Exception("Failed to initialize Chrome driver after all retries")
+
 # --- 2. FUNGSI PEMBANTU ---
 
 def get_chrome_main_version():
@@ -379,3 +447,4 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
