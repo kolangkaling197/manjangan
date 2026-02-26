@@ -2,28 +2,15 @@ name: jhk1k2l3
 
 on:
   schedule:
-    - cron: "*/120 * * * *"  # ✅ Benar: setiap 15 menit (bukan 120)
+    - cron: "*/120 * * * *" # Jalan setiap 15 menit
   workflow_dispatch:
-  repository_dispatch:  # ✅ Untuk trigger dari Cloudflare
 
 jobs:
   run-scraper:
     runs-on: ubuntu-latest
-    timeout-minutes: 12  # ✅ Jangan melebihi 15 menit interval
-    
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      # ✅ INSTALL CHROME & DEPENDENCIES (KRITIS!)
-      - name: Setup Chrome
-        run: |
-          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          echo "Chrome version:"
-          google-chrome --version
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -32,57 +19,10 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip
           pip install -r requirements.txt
-          pip install webdriver-manager  # ✅ Untuk manage chromedriver
 
-      # ✅ PRE-DOWNLOAD CHROMEDRIVER (hindari timeout saat run)
-      - name: Pre-download ChromeDriver
-        run: |
-          python -c "
-          from webdriver_manager.chrome import ChromeDriverManager
-          from selenium.webdriver.chrome.service import Service
-          ChromeDriverManager().install()
-          "
-          
-      # ✅ RUN WITH RETRY LOGIC
-      - name: Run Script (With Retry)
+      - name: Run Script
         env:
           FIREBASE_URL: ${{ secrets.FIREBASE_URL }}
           FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
-          PYTHONUNBUFFERED: "1"  # ✅ Force flush log
-        run: |
-          MAX_RETRIES=3
-          RETRY_DELAY=30
-          
-          for i in $(seq 1 $MAX_RETRIES); do
-            echo "========================================"
-            echo "ATTEMPT $i of $MAX_RETRIES"
-            echo "========================================"
-            
-            if python jhk1k2l3.py; then
-              echo "✅ SUCCESS on attempt $i"
-              exit 0
-            else
-              echo "❌ FAILED on attempt $i"
-              if [ $i -lt $MAX_RETRIES ]; then
-                echo "⏳ Waiting $RETRY_DELAY seconds before retry..."
-                sleep $RETRY_DELAY
-              fi
-            fi
-          done
-          
-          echo "❌ All attempts failed"
-          exit 1
-
-      # ✅ UPLOAD DEBUG ARTIFACTS (kalau gagal)
-      - name: Upload Debug Artifacts
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: debug-files-${{ github.run_id }}
-          retention-days: 3
-          path: |
-            *.log
-            debug_*.png
-            debug_*.html
+        run: python jhk1k2l3.py
