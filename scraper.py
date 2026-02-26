@@ -157,12 +157,12 @@ def jalankan_scraper():
                 # Format Objek (Channel.java Compatible)
                 hasil.append({
                     "channelName": f"{t1} vs {t2}",
-                    "categoryName": liga,
+                    "ligaName": liga,
                     "team1Name": t1,
                     "team2Name": t2,
                     "team1Logo": l_t1,
                     "team2Logo": l_t2,
-                    "logoUrl": l_liga,
+                    "logoligaUrl": l_liga,
                     "streamUrl": stream_url,
                     "startTime": start_ms,
                     "endTime": end_ms,
@@ -198,4 +198,5 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
