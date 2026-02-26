@@ -10,47 +10,38 @@ import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from datetime import datetime, timedelta, timezone
 
-# --- 1. KONFIGURASI & ENVIRONMENT ---
+# --- 1. KONFIGURASI ---
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET")
 TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
-FIXED_CATEGORY_ID = "EVENT1"
-
-# Setup Timezone Jakarta (WIB)
+FIXED_CATEGORY_ID = "EVENT1" 
 tz_jkt = timezone(timedelta(hours=7))
 
 # Setup Logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[logging.StreamHandler()]
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
-# --- 2. FUNGSI PEMBANTU (HELPERS) ---
+# --- 2. FUNGSI PEMBANTU ---
 
 def get_chrome_main_version():
-    """Mendeteksi versi Chrome yang terinstal di sistem GitHub Runner."""
+    """Mendeteksi versi Chrome di runner GitHub agar tidak mismatch."""
     try:
         output = subprocess.check_output(['google-chrome', '--version']).decode('utf-8')
         version = re.search(r'Chrome (\d+)', output).group(1)
-        logging.info(f"Sistem menggunakan Google Chrome versi: {version}")
         return int(version)
-    except Exception as e:
-        logging.warning(f"Gagal deteksi versi Chrome: {e}. Menggunakan mode auto.")
+    except:
         return None
 
 def get_detailed_info(driver, match_page_url):
-    """Mengambil jam tayang dari judul halaman detail."""
+    """Logika pengambilan startTime dari Title halaman detail (Script Awal)."""
     try:
-        driver.set_page_load_timeout(25)
+        driver.set_page_load_timeout(30)
         try:
             driver.get(match_page_url)
         except:
             driver.execute_script("window.stop();")
         
-        time.sleep(3)
+        time.sleep(4)
         page_title = driver.title 
-        # Mencari format HH:mm dan DD/MM
         match = re.search(r'(\d{2}:\d{2}).*?(\d{2}/\d{2})', page_title)
         
         if match:
@@ -58,17 +49,20 @@ def get_detailed_info(driver, match_page_url):
             current_year = datetime.now(tz_jkt).year
             dt_obj = datetime.strptime(f"{tgl_bln}/{current_year} {jam}", "%d/%m/%Y %H:%M")
             dt_obj = dt_obj.replace(tzinfo=tz_jkt)
-            return int(dt_obj.timestamp() * 1000), f"{tgl_bln} | {jam}"
-    except:
-        pass
+            start_ms = int(dt_obj.timestamp() * 1000)
+            
+            # Format display hari (Script Awal)
+            hari_id = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+            ts_display = f"{hari_id[dt_obj.weekday()]}, {tgl_bln} | {jam}"
+            return start_ms, ts_display
+    except: pass
     return int(time.time() * 1000), "LIVE"
 
 def get_live_stream_link(driver):
-    """Mencari link m3u8 dari trafik network browser."""
+    """Logika pencarian m3u8 dari performance logs (Script Awal)."""
     stream_url = "Not Found"
     try:
-        # Menunggu buffer network
-        time.sleep(10) 
+        time.sleep(12) 
         logs = driver.get_log('performance')
         for entry in logs:
             msg = entry.get('message')
@@ -79,122 +73,124 @@ def get_live_stream_link(driver):
                     if "ads" not in found_url.lower():
                         stream_url = found_url
                         break
-    except:
-        pass
+    except: pass
     return stream_url
 
-# --- 3. CORE SCRAPER ---
+# --- 3. MAIN SCRAPER ---
 
 def jalankan_scraper():
-    logging.info("=== MEMULAI AUTO SCRAPER ===")
+    logging.info("=== MEMULAI AUTO SCRAPER (VERSION 2026) ===")
     
-    chrome_version = get_chrome_main_version()
-    
+    chrome_ver = get_chrome_main_version()
     options = uc.ChromeOptions()
-    options.add_argument('--headless') # Wajib di GitHub Actions
+    options.add_argument('--headless') # WAJIB untuk GitHub Actions
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--window-size=1920,1080')
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     
-    driver = None
     try:
-        driver = uc.Chrome(options=options, version_main=chrome_version)
+        driver = uc.Chrome(options=options, version_main=chrome_ver)
     except Exception as e:
-        logging.critical(f"CRITICAL: Driver gagal dimuat: {e}")
+        logging.error(f"Gagal memuat driver: {e}")
         return
 
-    hasil_scraped = []
+    hasil = []
 
     try:
-        logging.info(f"Membuka target: {TARGET_URL}")
         driver.get(TARGET_URL)
-        time.sleep(8)
+        logging.info(f"Membuka: {TARGET_URL}")
+        time.sleep(10)
 
-        # Mencari semua link pertandingan
         cards = driver.find_elements(By.XPATH, "//a[contains(@href, 'truc-tiep')]")
-        raw_data = []
+        temp_list = []
         seen_urls = set()
 
+        # Ambil data kasar
         for card in cards:
             url = card.get_attribute("href")
             teks = card.text.strip()
             if url and url not in seen_urls and len(teks) > 10:
                 imgs = [img.get_attribute("src") for img in card.find_elements(By.TAG_NAME, "img")]
-                raw_data.append({"teks": teks, "url": url, "imgs": imgs})
+                temp_list.append({"teks": teks, "url": url, "imgs": imgs})
                 seen_urls.add(url)
 
-        logging.info(f"Ditemukan {len(raw_data)} potensi pertandingan.")
+        logging.info(f"Ditemukan {len(temp_list)} card pertandingan.")
 
-        for item in raw_data:
+        for item in temp_list:
             try:
-                # Parsing Teks (Nama Tim & Liga)
+                # --- LOGIKA PEMBERSIHAN (DARI SCRIPT AWAL ANDA) ---
                 lines = [l.strip() for l in item['teks'].split('\n') if l.strip()]
-                clean_lines = []
+                trash = ["CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", "-", "PHT", "HT", "FT"]
+                
+                clean_lines, scores = [], []
                 for l in lines:
-                    # Abaikan angka skor tunggal atau jam menit di baris teks
-                    if not re.match(r'^\d{2}:\d{2}$', l) and not (l.isdigit() and len(l) == 1):
-                        if len(l) > 1: clean_lines.append(l)
+                    # Deteksi waktu/skor: HH:MM, angka tunggal, menit ('), atau HT/FT
+                    is_time_score = re.match(r'^\d{2}:\d{2}$', l) or (l.isdigit() and len(l) == 1) or \
+                                   "'" in l or "+" in l or l.upper() in ["HT", "FT"]
+                    
+                    if l.isdigit() and len(l) == 1:
+                        scores.append(l)
+                    elif not is_time_score and not any(tk == l.upper() for tk in trash) and len(l) > 1:
+                        clean_lines.append(l)
 
+                # Penentuan Liga dan Tim
                 if len(clean_lines) >= 3:
                     liga, t1, t2 = clean_lines[0], clean_lines[1], clean_lines[2]
                 elif len(clean_lines) == 2:
-                    liga, t1, t2 = "Football Match", clean_lines[0], clean_lines[1]
-                else:
-                    continue
+                    liga, t1, t2 = "International Match", clean_lines[0], clean_lines[1]
+                else: continue
 
-                # Ambil Logo
+                # Logo Mapping (Script Awal)
                 img_list = item.get('imgs', [])
-                l_t1 = img_list[1] if len(img_list) >= 3 else img_list[0] if len(img_list) >= 1 else ""
-                l_t2 = img_list[2] if len(img_list) >= 3 else img_list[1] if len(img_list) >= 2 else ""
+                l_liga, l_t1, l_t2 = (img_list[0], img_list[1], img_list[2]) if len(img_list) >= 3 else \
+                                     ("", img_list[0], img_list[1]) if len(img_list) == 2 else ("", "", "")
 
                 logging.info(f"Proses: {t1} vs {t2}")
-                
-                # Masuk ke halaman detail
+
+                # Ambil detail (m3u8 & time)
                 start_ms, ts_display = get_detailed_info(driver, item['url'])
                 stream_url = get_live_stream_link(driver)
 
-                # Masukkan ke list sesuai format permintaan
-                hasil_scraped.append({
+                # Format Objek (Channel.java Compatible)
+                hasil.append({
                     "channelName": f"{t1} vs {t2}",
                     "categoryName": liga,
                     "team1Name": t1,
                     "team2Name": t2,
                     "team1Logo": l_t1,
                     "team2Logo": l_t2,
+                    "logoUrl": l_liga,
                     "streamUrl": stream_url,
                     "startTime": start_ms,
                     "status": "LIVE",
+                    "contentType": "event_pertandingan",
                     "description": ts_display
                 })
 
-            except Exception as e:
-                logging.error(f"Gagal memproses satu item: {e}")
-                continue
+            except: continue
 
     finally:
-        if driver:
-            driver.quit()
+        driver.quit()
 
-    # --- 4. KIRIM KE FIREBASE ---
-    if hasil_scraped:
-        endpoint = f"{FIREBASE_URL}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}"
+    # --- 4. PENGIRIMAN KE FIREBASE (SESUAI PERMINTAAN) ---
+    if hasil:
+        fb_url = f"{FIREBASE_URL}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}"
+        
+        # Payload dengan UUID unik untuk tiap channel
         payload = {
-            "category_name": "LIVE FOOTBALL", 
+            "category_name": "EVENT15", 
             "order": 1, 
-            "channels": {uuid.uuid4().hex[:8]: x for x in hasil_scraped}
+            "channels": {uuid.uuid4().hex: x for x in hasil}
         }
         
         try:
-            resp = requests.put(endpoint, json=payload, timeout=30)
-            if resp.status_code == 200:
-                logging.info(f"BERHASIL! {len(hasil_scraped)} data terupdate di Firebase.")
+            r = requests.put(fb_url, json=payload, timeout=30)
+            if r.status_code == 200:
+                print(f"[√] SELESAI! {len(hasil)} match diproses.")
             else:
-                logging.error(f"Firebase Error: {resp.text}")
+                print(f"[X] Firebase Error: {r.text}")
         except Exception as e:
-            logging.error(f"Gagal koneksi Firebase: {e}")
-    else:
-        logging.warning("Tidak ada data yang berhasil di-scrape.")
+            print(f"[X] Gagal mengirim data: {e}")
 
 if __name__ == "__main__":
     jalankan_scraper()
