@@ -96,30 +96,38 @@ def get_live_stream_link(driver):
 def jalankan_scraper():
     logging.info("=== MEMULAI AUTO SCRAPER (VERSION 2026) ===")
     
+    # Ambil versi chrome secara dinamis
     chrome_ver = get_chrome_main_version()
-    options.add_argument('--headless')
+
+    # 1. DEFINISIKAN variabel options
+    options = uc.ChromeOptions() 
+    
+    # 2. Tambahkan argumen (Headless & Penyamaran)
+    options.add_argument('--headless') 
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    # Set resolusi layar seperti monitor asli
     options.add_argument('--window-size=1920,1080')
-    # Gunakan User Agent asli agar tidak terdeteksi bot datacenter
     options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36')
     
+    # Aktifkan logging network untuk menangkap m3u8
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
-    
+
+    # 3. Inisialisasi Driver
+    driver = None
     try:
         driver = uc.Chrome(options=options, version_main=chrome_ver)
     except Exception as e:
-        logging.error(f"Gagal memuat driver: {e}")
+        logging.critical(f"Gagal memuat driver Chrome: {e}")
         return
 
     hasil = []
 
     try:
+        logging.info(f"Membuka Target: {TARGET_URL}")
         driver.get(TARGET_URL)
-        logging.info(f"Membuka: {TARGET_URL}")
-        time.sleep(10)
+        time.sleep(10) # Tunggu halaman utama render sempurna
 
+        # ... (lanjutkan dengan logika pencarian card pertandingan kamu)
         cards = driver.find_elements(By.XPATH, "//a[contains(@href, 'truc-tiep')]")
         temp_list = []
         seen_urls = set()
@@ -217,5 +225,6 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
 
