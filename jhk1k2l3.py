@@ -60,25 +60,36 @@ def get_detailed_info(driver, match_page_url):
     return int(time.time() * 1000), "LIVE"
 
 def get_live_stream_link(driver):
-    """Mencari link m3u8 dengan dukungan Iframe Switching (Logika VS Code)."""
     stream_url = "Not Found"
     try:
-        # 1. Bersihkan Overlay
-        driver.execute_script("document.querySelectorAll('.modal, .popup, .sh-overlay, [class*=\"ads\"]').forEach(el => el.remove());")
+        # 1. Hapus penghalang (iklan/overlay)
+        driver.execute_script("""
+            document.querySelectorAll('.modal, .popup, .sh-overlay, [class*="ads"]').forEach(el => el.remove());
+        """)
 
-        # 2. Berpindah ke iframe player (Penting agar trafik m3u8 terpicu)
+        # 2. Cari dan masuk ke Iframe Player secara rekursif
         iframes = driver.find_elements(By.TAG_NAME, "iframe")
         for frame in iframes:
             src = frame.get_attribute("src") or ""
-            if any(x in src for x in ["bitmovin", "player", "stream", "embed", "cdn"]):
+            if any(x in src for x in ["bitmovin", "player", "stream", "embed", "cdn", "m3u8"]):
                 driver.switch_to.frame(frame)
-                logging.info("    [INFO] Berhasil switch ke iframe player.")
+                logging.info("    [INFO] Berhasil masuk ke iframe player.")
+                
+                # 3. PAKSA PLAY: Simulasi klik atau script play agar trafik m3u8 keluar
+                driver.execute_script("""
+                    var v = document.querySelector('video');
+                    if(v) {
+                        v.play();
+                        v.muted = true;
+                    }
+                """)
                 break
 
-        logging.info("    [NETWORK] Menunggu trafik m3u8 (20 detik)...")
-        time.sleep(20) 
+        # 4. Tunggu trafik di network
+        logging.info("    [NETWORK] Menunggu trafik stream (25 detik)...")
+        time.sleep(25) 
 
-        # 3. Kembali ke konten utama sebelum mengambil log performance
+        # 5. Kembali ke root untuk ambil log
         driver.switch_to.default_content()
         logs = driver.get_log('performance')
 
@@ -92,9 +103,8 @@ def get_live_stream_link(driver):
                         logging.info("    [STREAM] Captured!")
                         return found_url
     except Exception as e:
-        logging.error(f"    [ERROR] Stream link: {e}")
+        logging.error(f"    [ERROR] Gagal di get_live_stream_link: {e}")
     return stream_url
-
 def jalankan_scraper():
     logging.info("=== START SCRAPER (HYBRID VERSION 2026) ===")
     
@@ -202,3 +212,4 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
