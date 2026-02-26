@@ -58,7 +58,7 @@ def get_live_stream_link(driver):
         driver.execute_script("document.querySelectorAll('.modal, .popup, .sh-overlay, [class*=\"ads\"]').forEach(el => el.remove());")
 
         logging.info("    [NETWORK] Menunggu trafik stream (20 detik)...")
-        time.sleep(20) 
+        time.sleep(30) 
 
         logs = driver.get_log('performance')
         for entry in logs:
@@ -179,3 +179,4 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
