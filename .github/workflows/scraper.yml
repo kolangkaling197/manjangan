@@ -1,16 +1,16 @@
-name: Auto Scraper
+name: Football Auto Scraper
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/10 * * * *" # Jalan setiap 15 menit
   workflow_dispatch:
 
 jobs:
-  scrape:
+  run-scraper:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -19,14 +19,10 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check Chrome Version
-        run: google-chrome --version
-
-      - name: Run Scraper
-        run: python scraper.py
+      - name: Run Script
         env:
           FIREBASE_URL: ${{ secrets.FIREBASE_URL }}
           FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
+        run: python scraper.py
