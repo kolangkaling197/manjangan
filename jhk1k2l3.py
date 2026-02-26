@@ -51,49 +51,96 @@ def save_debug_html(driver, name="debug"):
         return None
 
 # --- CHROME SETUP UNTUK GITHUB ACTIONS ---
+
+# --- 2. FUNGSI PEMBANTU ---
+
 def setup_chrome_for_github_actions():
-    """Setup Chrome khusus untuk environment GitHub Actions"""
+    """Setup Chrome dengan stealth maksimal untuk GitHub Actions"""
     chrome_ver = get_chrome_main_version()
     logging.info(f"Detected Chrome version: {chrome_ver}")
     
     options = uc.ChromeOptions()
     
-    # 🎯 KRITIS: Headless mode untuk GitHub Actions
+    # 🎯 STEALTH OPTIONS (KRITIS!)
     options.add_argument('--headless=new')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
     options.add_argument('--window-size=1920,1080')
     
-    # Anti-detection
+    # 🎯 ANTI-DETEKSI HEADLESS (TAMBAHAN BARU!)
     options.add_argument('--disable-blink-features=AutomationControlled')
     options.add_argument('--disable-web-security')
     options.add_argument('--disable-features=IsolateOrigins,site-per-process')
+    options.add_argument('--disable-site-isolation-trials')
+    options.add_argument('--disable-features=BlockInsecurePrivateNetworkRequests')
     
-    # User agent
-    options.add_argument('--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36')
+    # 🎯 MIMIC REAL BROWSER (TAMBAHAN BARU!)
+    options.add_argument('--lang=id-ID,id')
+    options.add_argument('--timezone=Asia/Jakarta')
+    options.add_argument('--disable-notifications')
+    options.add_argument('--disable-popup-blocking')
+    options.add_argument('--disable-infobars')
+    options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--allow-running-insecure-content')
     
-    # Performance logging (untuk tangkap m3u8)
+    # 🎯 USER AGENT REALISTIS (UPDATE!)
+    options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0')
+    
+    # 🎯 PREFERS (TAMBAHAN BARU!)
+    options.add_experimental_option('prefs', {
+        'profile.default_content_setting_values.notifications': 2,
+        'profile.default_content_settings.popups': 0,
+        'download.prompt_for_download': False,
+        'download.directory_upgrade': True,
+    })
+    
+    # Performance logging
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     
-    # 🎯 KRITIS: Download driver otomatis tapi dengan timeout lebih lama
+    # 🎯 UC SPECIFIC OPTIONS
+    options.add_argument('--password-store=basic')
+    options.add_argument('--enable-automation')
+    options.add_argument('--remote-debugging-port=9222')
+    
+    # Create driver dengan retry
     driver = None
     max_retries = 3
     
     for i in range(max_retries):
         try:
-            logging.info(f"Attempting to create driver (try {i+1}/{max_retries})...")
-            driver = uc.Chrome(options=options, version_main=chrome_ver)
+            logging.info(f"Creating driver (attempt {i+1}/{max_retries})...")
+            
+            # 🎯 GUNAKAN DRIVER DARI PATH SPESIFIK (lebih stabil)
+            driver = uc.Chrome(
+                options=options,
+                version_main=chrome_ver,
+                driver_executable_path=None,  # Auto download
+                use_subprocess=True  # 🎯 KRITIS untuk GitHub Actions
+            )
+            
+            # 🎯 EXECUTE CDP UNTUK BYPASS DETEKSI (TAMBAHAN BARU!)
+            driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
+                'source': '''
+                    Object.defineProperty(navigator, 'webdriver', {
+                        get: () => undefined
+                    });
+                    Object.defineProperty(navigator, 'plugins', {
+                        get: () => [1, 2, 3, 4, 5]
+                    });
+                    window.chrome = { runtime: {} };
+                '''
+            })
+            
             logging.info("✅ Driver created successfully")
             return driver
+            
         except Exception as e:
-            logging.error(f"❌ Failed to create driver: {e}")
+            logging.error(f"❌ Failed: {e}")
             if i < max_retries - 1:
                 time.sleep(10)
     
-    raise Exception("Failed to initialize Chrome driver after all retries")
-
-# --- 2. FUNGSI PEMBANTU ---
+    raise Exception("Failed to initialize driver")
 
 def get_chrome_main_version():
     try:
@@ -106,10 +153,13 @@ def get_chrome_main_version():
 def get_detailed_info(driver, match_page_url):
     """Mengambil startTime dari Title halaman detail."""
     try:
-        driver.set_page_load_strategy('eager')
+        # ❌ HAPUS: driver.set_page_load_strategy('eager')
+        
+        # Gunakan timeout saat get
+        driver.set_page_load_timeout(30)
         driver.get(match_page_url)
         
-        # Tunggu title load, max 10 detik
+        # Tunggu title load
         WebDriverWait(driver, 10).until(
             lambda d: d.title != "" and d.title != "about:blank"
         )
@@ -126,10 +176,11 @@ def get_detailed_info(driver, match_page_url):
             hari_id = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
             ts_display = f"{hari_id[dt_obj.weekday()]}, {tgl_bln} | {jam}"
             return start_ms, ts_display
+            
     except Exception as e:
         logging.warning(f"Gagal ambil detail waktu: {e}")
     
-    # Fallback ke waktu sekarang + 1 jam
+    # Fallback
     fallback_time = datetime.now(tz_jkt) + timedelta(hours=1)
     return int(fallback_time.timestamp() * 1000), "LIVE SOON"
 
@@ -179,9 +230,6 @@ def extract_m3u8_from_logs(driver, timeout=30):
     return None
 
 def get_live_stream_link(driver):
-    """
-    🔥 VERSI BARU: Lebih robust dengan polling logs
-    """
     max_attempts = 3
     stream_url = "Not Found"
     
@@ -192,89 +240,115 @@ def get_live_stream_link(driver):
             # Reset ke main content
             driver.switch_to.default_content()
             
+            # 🎯 TUNGGU PAGE LOAD LEBIH LAMA (UPDATE!)
+            time.sleep(5)  # Tunggu initial load
+            
             # Clear overlays
             driver.execute_script("""
-                document.querySelectorAll('.modal, .popup, .sh-overlay, [class*="ads"], [id*="ads"]').forEach(el => {
+                document.querySelectorAll('.modal, .popup, .sh-overlay, [class*="ads"], [id*="ads"], iframe[src*="ads"]').forEach(el => {
                     el.style.display = 'none';
                     el.remove();
                 });
             """)
             
-            # Scroll untuk trigger lazy load
-            driver.execute_script("window.scrollTo(0, 600);")
-            time.sleep(2)
+            # 🎯 SCROLL PELAN-PELAN UNTUK TRIGGER LAZY LOAD (UPDATE!)
+            for scroll in [300, 600, 900]:
+                driver.execute_script(f"window.scrollTo(0, {scroll});")
+                time.sleep(2)
             
-            # Cari iframe dengan strategi multiple
-            iframe_found = False
-            target_iframe = None
-            
-            # Tunggu iframe muncul
+            # 🎯 TUNGGU IFRAME DENGAN DELAY YANG LEBIH LAMA (UPDATE!)
             try:
-                WebDriverWait(driver, 10).until(
+                # Tunggu sampai 20 detik
+                WebDriverWait(driver, 20).until(
                     EC.presence_of_element_located((By.TAG_NAME, "iframe"))
                 )
+                logging.info(f"    ✅ Iframe detected!")
             except TimeoutException:
-                logging.warning("Tidak ada iframe yang muncul")
-                continue
-            
-            # List semua iframe
+                logging.warning(f"    ⚠️ Timeout waiting for iframe")
+                
+                # 🎯 SAVE DEBUG (TAMBAHAN BARU!)
+                save_debug_screenshot(driver, f"no_iframe_attempt_{attempt}")
+                
+                if attempt < max_attempts:
+                    driver.refresh()
+                    time.sleep(8)
+                    continue
+                else:
+                    return "Not Found"
+
+            # Cari iframe
             iframes = driver.find_elements(By.TAG_NAME, "iframe")
             logging.info(f"    Ditemukan {len(iframes)} iframe")
             
-            # Prioritas iframe berdasarkan src
-            priority_keywords = ['player', 'stream', 'embed', 'bitmovin', 'cdn', 'video']
+            # 🎯 PRINT SEMUA IFRAME SRC UNTUK DEBUG (TAMBAHAN BARU!)
+            for idx, iframe in enumerate(iframes):
+                src = iframe.get_attribute("src") or "no-src"
+                logging.info(f"      Iframe {idx}: {src[:80]}...")
+            
+            # Pilih iframe
+            target_iframe = None
+            priority_keywords = ['player', 'stream', 'embed', 'bitmovin', 'cdn', 'video', 'live']
             
             for iframe in iframes:
                 src = iframe.get_attribute("src") or ""
                 if any(kw in src.lower() for kw in priority_keywords):
                     target_iframe = iframe
-                    logging.info(f"    [PRIORITY] Iframe: {src[:50]}...")
+                    logging.info(f"    [PRIORITY] Selected: {src[:60]}...")
                     break
             
-            # Jika tidak ada priority, ambil yang pertama yang visible
-            if not target_iframe and iframes:
+            # Fallback ke iframe pertama yang visible
+            if not target_iframe:
                 for iframe in iframes:
-                    if iframe.is_displayed():
-                        target_iframe = iframe
-                        logging.info("    [FALLBACK] Menggunakan iframe visible pertama")
-                        break
+                    try:
+                        if iframe.is_displayed():
+                            target_iframe = iframe
+                            logging.info("    [FALLBACK] Using first visible iframe")
+                            break
+                    except:
+                        continue
             
             if target_iframe:
                 # Switch ke iframe
                 driver.switch_to.frame(target_iframe)
-                iframe_found = True
+                
+                # 🎯 TUNGGU IFRAME LOAD (TAMBAHAN BARU!)
+                time.sleep(5)
                 
                 # Trigger play
                 driver.execute_script("""
+                    // Play video
                     var videos = document.querySelectorAll('video');
                     videos.forEach(function(v) {
-                        v.play().catch(e => console.log('Autoplay prevented'));
+                        v.play().catch(e => console.log('Autoplay blocked'));
                         v.muted = true;
                     });
                     
-                    // Click play button jika ada
-                    var playBtn = document.querySelector('.play-button, [class*="play"], button[title*="play" i]');
-                    if(playBtn) playBtn.click();
+                    // Click play button
+                    var playBtns = document.querySelectorAll('button, [class*="play"], [id*="play"]');
+                    playBtns.forEach(function(btn) {
+                        if(btn.offsetParent !== null) btn.click();
+                    });
                 """)
                 
-                # 🎯 POLLING LOGS: Cek terus sampai m3u8 muncul (max 25 detik)
+                # 🎯 POLLING LOGS (dari kode sebelumnya)
                 logging.info("    [POLLING] Monitoring network logs...")
                 stream_url = extract_m3u8_from_logs(driver, timeout=25)
                 
                 if stream_url:
                     return stream_url
             
-            # Jika gagal, refresh dan coba lagi
+            # Retry
             if attempt < max_attempts:
-                logging.info("    [RETRY] Refreshing page...")
+                logging.info("    [RETRY] Refreshing...")
                 driver.refresh()
-                time.sleep(5)
-            
+                time.sleep(8)
+                
         except Exception as e:
             logging.error(f"    [ERROR] Attempt {attempt}: {e}")
+            save_debug_screenshot(driver, f"error_attempt_{attempt}")
             try:
                 driver.refresh()
-                time.sleep(5)
+                time.sleep(8)
             except:
                 pass
     
@@ -447,4 +521,5 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
