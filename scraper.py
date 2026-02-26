@@ -59,33 +59,52 @@ def get_detailed_info(driver, match_page_url):
     return int(time.time() * 1000), "LIVE"
 
 def get_live_stream_link(driver):
-    """Logika pencarian m3u8 dari performance logs (Script Awal)."""
+    """Logika pencarian m3u8 yang dioptimasi untuk GitHub Actions."""
     stream_url = "Not Found"
     try:
-        time.sleep(12) 
+        # 1. Simulasi Interaksi: Scroll agar player terpicu (Lazy Load)
+        driver.execute_script("window.scrollTo(0, 400);")
+        time.sleep(2)
+        
+        # 2. Hapus Overlay Iklan yang mungkin menghalangi player di mode headless
+        driver.execute_script("""
+            document.querySelectorAll('.modal, .popup, .sh-overlay, [class*="ads"]').forEach(el => el.remove());
+        """)
+
+        # 3. Tunggu lebih lama (GitHub network lebih lambat merespon stream)
+        logging.info("    [NETWORK] Menunggu trafik stream (20 detik)...")
+        time.sleep(20) 
+
+        # 4. Ambil logs performance
         logs = driver.get_log('performance')
         for entry in logs:
             msg = entry.get('message')
             if '.m3u8' in msg:
+                # Regex diperkuat untuk menangkap URL m3u8 yang bersih
                 url_match = re.search(r'"url":"(https://[^"]+\.m3u8[^"]*)"', msg)
                 if url_match:
                     found_url = url_match.group(1).replace('\\/', '/')
-                    if "ads" not in found_url.lower():
+                    # Filter link iklan/ads
+                    if "ads" not in found_url.lower() and "telemetry" not in found_url.lower():
+                        logging.info("    [STREAM] Berhasil ditangkap!")
                         stream_url = found_url
                         break
-    except: pass
+    except Exception as e:
+        logging.error(f"    [ERROR] Gagal menangkap stream: {e}")
     return stream_url
-
-# --- 3. MAIN SCRAPER ---
-
+    
 def jalankan_scraper():
     logging.info("=== MEMULAI AUTO SCRAPER (VERSION 2026) ===")
     
     chrome_ver = get_chrome_main_version()
-    options = uc.ChromeOptions()
-    options.add_argument('--headless') # WAJIB untuk GitHub Actions
+    options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
+    # Set resolusi layar seperti monitor asli
+    options.add_argument('--window-size=1920,1080')
+    # Gunakan User Agent asli agar tidak terdeteksi bot datacenter
+    options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36')
+    
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
     
     try:
@@ -198,4 +217,5 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
