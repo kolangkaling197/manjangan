@@ -55,21 +55,44 @@ def get_live_stream_link(driver):
     try:
         driver.execute_script("window.scrollTo(0, 500);")
         time.sleep(2)
+        
+        # Hapus elemen yang menghambat loading player
         driver.execute_script("document.querySelectorAll('.modal, .popup, .sh-overlay, [class*=\"ads\"]').forEach(el => el.remove());")
 
         logging.info("    [NETWORK] Menunggu trafik stream (20 detik)...")
-        time.sleep(30) 
+        time.sleep(20) 
 
         logs = driver.get_log('performance')
+        found_any_network = False
+        
         for entry in logs:
             msg = entry.get('message')
+            
+            # LOG AUDIT: Cek apa saja yang lewat di network untuk debugging
+            if 'Network.requestWillBeSent' in msg:
+                # Cari URL apapun yang mencurigakan sebagai stream (m3u8, mpd, ts, hls)
+                audit_match = re.search(r'"url":"(https://[^"]+)"', msg)
+                if audit_match:
+                    test_url = audit_match.group(1).lower()
+                    if any(ext in test_url for ext in ['.m3u8', '.ts', '.m4s', 'playlist', 'chunk']):
+                        logging.info(f"    [DEBUG-URL] Terdeteksi: {test_url[:100]}...")
+                        found_any_network = True
+
+            # PROSES UTAMA: Tangkap m3u8 asli
             if '.m3u8' in msg:
                 url_match = re.search(r'"url":"(https://[^"]+\.m3u8[^"]*)"', msg)
                 if url_match:
                     found_url = url_match.group(1).replace('\\/', '/')
                     if "ads" not in found_url.lower() and "telemetry" not in found_url.lower():
+                        logging.info(f"    [STREAM] Berhasil ditangkap: {found_url[:50]}...")
                         return found_url
-    except: pass
+
+        if not found_any_network:
+            logging.warning("    [WARN] Sama sekali tidak ada trafik media terdeteksi di network.")
+            
+    except Exception as e:
+        logging.error(f"    [ERROR] Gagal di get_live_stream_link: {e}")
+    
     return stream_url
 
 def jalankan_scraper():
@@ -179,4 +202,5 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
 
