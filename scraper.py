@@ -1,161 +1,155 @@
 import os
-import requests
+import json
 import time
 import re
 import uuid
-from datetime import datetime, timezone, timedelta
+import logging
+import requests
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
+from datetime import datetime, timedelta, timezone
 
-# ==============================
-# KONFIGURASI
-# ==============================
+# --- KONFIGURASI ---
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET")
 TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
-FIXED_CATEGORY_ID = "EVENT1" 
+FIXED_CATEGORY_ID = "EVENT1"
+
+# Setup Timezone Jakarta
 tz_jkt = timezone(timedelta(hours=7))
 
-def clean_team_name(name):
-    """Pembersihan nama tim dari sampah teks dan status waktu."""
-    if not name: return "TBA"
-    trash = ["CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", "ngy", "Sắp diễn ra", "HT", "FT"]
-    for word in trash:
-        name = re.sub(rf'\b{word}\b', '', name, flags=re.IGNORECASE)
-    name = re.sub(r'(?<![uU])\b\d+\b(?!\d)', '', name)
-    name = re.sub(r"[^a-zA-Z0-9\s.()]", "", name)
-    return " ".join(name.split())
+# --- SETUP LOGGING ---
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
-def get_stream_and_logos_full(driver, match_url, match_name):
-    """Logika interaksi paksa untuk memaksimalkan penangkapan m3u8."""
-    print(f"    [>] DEEP CHECK: {match_name}")
-    data = {"stream": "Not Found", "t1_logo": "", "t2_logo": ""}
+def get_detailed_info(driver, match_page_url):
     try:
-        driver.get(match_url)
-        time.sleep(10) # Tunggu loading awal lebih lama
-
-        # 1. Bersihkan Iklan Overlay secara agresif
-        driver.execute_script("""
-            var ads = document.querySelectorAll('.modal, .popup, .fixed, [id*="ads"], .sh-overlay');
-            ads.forEach(el => el.remove());
-        """)
-
-        # 2. Ambil Logo HD
-        img_logos = driver.find_elements(By.CSS_SELECTOR, "div[class*='team_logo'] img, .team-logo img")
-        if len(img_logos) >= 2:
-            data["t1_logo"] = img_logos[0].get_attribute("src")
-            data["t2_logo"] = img_logos[1].get_attribute("src")
-
-        # 3. Paksa klik di area player dan pindah iframe
+        driver.set_page_load_timeout(35)
         try:
-            iframes = driver.find_elements(By.TAG_NAME, "iframe")
-            for frame in iframes:
-                src = frame.get_attribute("src") or ""
-                if any(x in src for x in ["player", "stream", "embed", "bitmovin"]):
-                    driver.switch_to.frame(frame)
-                    # Klik elemen video atau tombol play di dalam iframe
-                    driver.execute_script("""
-                        var v = document.querySelector('video') || document.querySelector('.play-button');
-                        if(v) v.click();
-                    """)
-                    break
-        except: pass
+            driver.get(match_page_url)
+        except:
+            driver.execute_script("window.stop();")
         
-        print("    [>] Menunggu traffic m3u8 (20 detik)...")
-        time.sleep(20) # Waktu krusial untuk menangkap stream
-        driver.switch_to.default_content()
+        time.sleep(4)
+        page_title = driver.title
+        match = re.search(r'(\d{2}:\d{2}).*?(\d{2}/\d{2})', page_title)
+        
+        if match:
+            jam, tgl_bln = match.group(1), match.group(2)
+            current_year = datetime.now(tz_jkt).year
+            dt_obj = datetime.strptime(f"{tgl_bln}/{current_year} {jam}", "%d/%m/%Y %H:%M")
+            # Set timezone ke objek datetime
+            dt_obj = dt_obj.replace(tzinfo=tz_jkt)
+            return int(dt_obj.timestamp() * 1000), f"{tgl_bln} | {jam}"
+    except: pass
+    return int(time.time() * 1000), "LIVE"
 
-        # 4. Tangkap dari Performance Logs
+def get_live_stream_link(driver):
+    stream_url = "Not Found"
+    try:
+        time.sleep(12) 
         logs = driver.get_log('performance')
         for entry in logs:
-            msg = entry.get('message', '')
+            msg = entry.get('message')
             if '.m3u8' in msg:
-                url_match = re.search(r'"url":"(https://.*?\.m3u8.*?)"', msg)
+                url_match = re.search(r'"url":"(https://[^"]+\.m3u8[^"]*)"', msg)
                 if url_match:
-                    data["stream"] = url_match.group(1).replace('\\/', '/')
-                    print(f"    [√] m3u8 FOUND!")
-                    break
+                    found_url = url_match.group(1).replace('\\/', '/')
+                    if "ads" not in found_url.lower():
+                        stream_url = found_url
+                        break
     except: pass
-    return data
+    return stream_url
 
 def jalankan_scraper():
-    print(f"===== START FULL CHECK SCRAPER (ALL MATCHES) =====")
+    logging.info("=== START SCRAPER (REST API MODE) ===")
+
     options = uc.ChromeOptions()
-    options.add_argument("--headless=new")
-    options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
-    driver = uc.Chrome(options=options, version_main=144)
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.page_load_strategy = 'eager'
+    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+    
+    try:
+        driver = uc.Chrome(options=options)
+    except Exception as e:
+        logging.critical(f"Gagal Driver: {e}")
+        return
+
     hasil = []
 
     try:
         driver.get(TARGET_URL)
-        time.sleep(15)
+        logging.info("Membuka Halaman Utama...")
+        time.sleep(10)
 
-        # Scroll dalam untuk load semua konten
-        for _ in range(15):
-            driver.execute_script("window.scrollBy(0, 1000);")
-            time.sleep(1)
-
-        cards = driver.find_elements(By.XPATH, "//a[contains(@href,'truc-tiep')]")
-        raw_list = []
+        cards = driver.find_elements(By.XPATH, "//a[contains(@href, 'truc-tiep')]")
+        temp_list = []
         seen_urls = set()
 
         for card in cards:
             url = card.get_attribute("href")
-            txt = card.text.strip()
-            if url and url not in seen_urls and len(txt) > 10:
-                raw_list.append({"url": url, "text": txt})
+            teks = card.text.strip()
+            if url and url not in seen_urls and len(teks) > 10:
+                imgs = [img.get_attribute("src") for img in card.find_elements(By.TAG_NAME, "img")]
+                temp_list.append({"teks": teks, "url": url, "imgs": imgs})
                 seen_urls.add(url)
 
-        print(f"[*] Total {len(raw_list)} match ditemukan. Memproses...")
-
-        for item in raw_list:
+        for item in temp_list:
             try:
-                lines = [l.strip() for l in item["text"].split("\n") if l.strip()]
+                lines = [l.strip() for l in item['teks'].split('\n') if l.strip()]
                 clean_lines = []
                 for l in lines:
-                    if l.upper() in ["HT", "FT", "LIVE"] or re.match(r"^\d+('\+?\d*)?$", l): continue
-                    if l.isdigit() and len(l) <= 2: continue
-                    clean_lines.append(l)
+                    is_time_score = re.match(r'^\d{2}:\d{2}$', l) or (l.isdigit() and len(l) == 1) or "'" in l or "+" in l
+                    if not is_time_score and len(l) > 1:
+                        clean_lines.append(l)
 
-                if len(clean_lines) < 3: continue
-                liga, h_raw, a_raw = clean_lines[0], clean_lines[1], clean_lines[2]
-                home, away = clean_team_name(h_raw), clean_team_name(a_raw)
+                if len(clean_lines) >= 3:
+                    liga, t1, t2 = clean_lines[0], clean_lines[1], clean_lines[2]
+                else: continue
 
-                # Jalankan Deep Check ke semua halaman
-                detail = get_stream_and_logos_full(driver, item["url"], f"{home} vs {away}")
-                
-                # Deteksi Waktu
-                jam_match = re.search(r"(\d{2}:\d{2})\s+(\d{2}/\d{2})", item["text"])
-                start_ts = int(datetime.strptime(f"{jam_match.group(1)} {jam_match.group(2)}/2026", "%H:%M %d/%m/%Y").replace(tzinfo=tz_jkt).timestamp() * 1000) if jam_match else int(time.time() * 1000)
+                img_list = item.get('imgs', [])
+                l_t1, l_t2 = (img_list[1], img_list[2]) if len(img_list) >= 3 else (img_list[0], img_list[1]) if len(img_list) == 2 else ("", "")
 
-                status = "live" if detail["stream"] != "Not Found" else "upcoming"
+                start_ms, ts_display = get_detailed_info(driver, item['url'])
+                stream_url = get_live_stream_link(driver)
 
                 hasil.append({
-                    "channelName": f"[{liga}] {home} vs {away}",
-                    "team1Name": home, "team1Logo": detail["t1_logo"] or "https://via.placeholder.com/150",
-                    "team2Name": away, "team2Logo": detail["t2_logo"] or "https://via.placeholder.com/150",
-                    "status": status,
-                    "startTime": start_ts,
-                    "endTime": start_ts + 7200000,
-                    "streamUrl": detail["stream"],
-                    "contentType": "event_pertandingan",
-                    "playerType": "internal_with_headers",
-                    "referer": "https://bunchatv.net/"
+                    "channelName": f"{t1} vs {t2}",
+                    "categoryName": liga,
+                    "team1Name": t1,
+                    "team2Name": t2,
+                    "team1Logo": l_t1,
+                    "team2Logo": l_t2,
+                    "streamUrl": stream_url,
+                    "startTime": start_ms,
+                    "status": "LIVE",
+                    "description": ts_display
                 })
-                print(f"    [{status.upper()}] {home} vs {away}")
-                
-                driver.get(TARGET_URL)
-                time.sleep(3)
+                logging.info(f"[√] Captured: {t1} vs {t2}")
+
             except: continue
 
     finally:
         driver.quit()
 
     if hasil:
-        # Kirim ke Firebase
+        # Kirim ke Firebase sesuai format yang diminta
         fb_url = f"{FIREBASE_URL}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}"
-        requests.put(fb_url, json={"category_name": "EVENT15", "order": 1, "channels": {uuid.uuid4().hex: x for x in hasil}}, timeout=30)
-        print(f"[√] SELESAI! {len(hasil)} match diproses.")
+        payload = {
+            "category_name": "EVENT15", 
+            "order": 1, 
+            "channels": {uuid.uuid4().hex: x for x in hasil}
+        }
+        
+        try:
+            response = requests.put(fb_url, json=payload, timeout=30)
+            if response.status_code == 200:
+                print(f"[√] SELESAI! {len(hasil)} match diproses dan dikirim.")
+            else:
+                print(f"[X] Gagal kirim ke Firebase: {response.text}")
+        except Exception as e:
+            print(f"[X] Error Request: {e}")
 
 if __name__ == "__main__":
     jalankan_scraper()
