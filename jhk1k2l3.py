@@ -6,11 +6,13 @@ import uuid
 import logging
 import requests
 import subprocess
+import random
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from datetime import datetime, timedelta, timezone
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 
 # --- 1. KONFIGURASI ---
 FIREBASE_URL = os.getenv("FIREBASE_URL")
@@ -25,10 +27,9 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(message)s'
 )
 
-# --- 2. FUNGSI PEMBANTU ---
+# --- 2. FUNGSI STEALTH & PEMBANTU ---
 
 def get_chrome_main_version():
-    """Mendeteksi versi Chrome di runner GitHub agar tidak mismatch."""
     try:
         output = subprocess.check_output(['google-chrome', '--version']).decode('utf-8')
         version = re.search(r'Chrome (\d+)', output).group(1)
@@ -36,14 +37,22 @@ def get_chrome_main_version():
     except:
         return None
 
+def human_delay(min_s=2, max_s=5):
+    """Jeda acak untuk meniru perilaku manusia."""
+    time.sleep(random.uniform(min_s, max_s))
+
+def human_scroll(driver):
+    """Scroll halaman secara bertahap, bukan instan."""
+    total_height = int(driver.execute_script("return document.body.scrollHeight"))
+    for i in range(1, total_height, random.randint(400, 700)):
+        driver.execute_script(f"window.scrollTo(0, {i});")
+        time.sleep(random.uniform(0.3, 0.7))
+
 def get_detailed_info(driver, match_page_url):
-    """Mengambil startTime dari Title halaman detail."""
     try:
-        driver.set_page_load_timeout(35)
-        try:
-            driver.get(match_page_url)
-        except:
-            driver.execute_script("window.stop();")
+        human_delay(3, 6) # Jeda sebelum klik/buka detail
+        driver.get(match_page_url)
+        human_scroll(driver) # Simulasi membaca konten
         
         time.sleep(4)
         page_title = driver.title 
@@ -62,59 +71,20 @@ def get_detailed_info(driver, match_page_url):
     return int(time.time() * 1000), "LIVE"
 
 def get_live_stream_link(driver):
-    max_retries = 3
-    stream_url = "Not Found"
-
+    max_retries = 2
     for attempt in range(1, max_retries + 1):
         try:
             logging.info(f"    [ATTEMPT {attempt}] Mencari link m3u8...")
             driver.switch_to.default_content()
             
-            # 1. SCROLL AGRESIF: Beberapa player baru muncul saat di-scroll
-            driver.execute_script("window.scrollTo(0, 800);")
-            time.sleep(3)
-            
-            # 2. CLEAR OVERLAY
-            driver.execute_script("""
-                document.querySelectorAll('.modal, .popup, .sh-overlay, [class*="ads"]').forEach(el => el.remove());
-            """)
-
-            # 3. SMART WAIT: Tunggu Iframe muncul (maksimal 15 detik)
+            # Simulasi gerakan mouse ke area video
             try:
-                WebDriverWait(driver, 15).until(
-                    EC.presence_of_element_located((By.TAG_NAME, "iframe"))
-                )
-            except:
-                logging.warning(f"    [WARN] Tidak ada iframe terdeteksi setelah menunggu 15 detik.")
+                action = ActionChains(driver)
+                video_area = driver.find_element(By.TAG_NAME, "body")
+                action.move_to_element_with_offset(video_area, random.randint(100,200), random.randint(100,200)).perform()
+            except: pass
 
-            # 4. CARI SEMUA IFRAME (Termasuk yang tersembunyi)
-            iframes = driver.find_elements(By.TAG_NAME, "iframe")
-            found_iframe = False
-            
-            for index, frame in enumerate(iframes):
-                src = frame.get_attribute("src") or ""
-                # Tambahkan 'bunchatv' atau 'taoxanh' ke filter jika perlu
-                if any(x in src for x in ["bitmovin", "player", "stream", "embed", "cdn", "taoxanh", "m3u8"]):
-                    logging.info(f"    [INFO] Masuk ke Iframe #{index}: {src[:50]}...")
-                    driver.switch_to.frame(frame)
-                    found_iframe = True
-                    # Paksa play video
-                    driver.execute_script("""
-                        let v = document.querySelector('video');
-                        if(v) { v.play(); v.muted = true; }
-                    """)
-                    break
-            
-            if not found_iframe:
-                logging.warning(f"    [WARN] Iframe player spesifik tidak ditemukan di attempt {attempt}")
-                # Percobaan terakhir: coba masuk ke iframe pertama saja jika tidak ada yang cocok
-                if iframes:
-                    driver.switch_to.frame(iframes[0])
-                    logging.info("    [INFO] Mencoba masuk ke Iframe pertama sebagai fallback.")
-
-            # 5. TUNGGU TRAFIK
-            time.sleep(20) 
-            driver.switch_to.default_content()
+            time.sleep(20) # Tunggu traffic network
             logs = driver.get_log('performance')
 
             for entry in logs:
@@ -128,44 +98,47 @@ def get_live_stream_link(driver):
                             return found_url
 
             if attempt < max_retries:
-                logging.info("    [RETRY] Refreshing page...")
                 driver.refresh()
-                time.sleep(5)
-
+                human_delay(5, 8)
         except Exception as e:
-            logging.error(f"    [ERROR] Attempt {attempt} gagal: {e}")
+            logging.error(f"    [ERROR] Gagal di attempt {attempt}: {e}")
             driver.refresh()
 
     return "Not Found"
-    
+
+# --- 3. JALANKAN SCRAPER ---
+
 def jalankan_scraper():
-    logging.info("=== START SCRAPER (HYBRID VERSION 2026) ===")
+    logging.info("=== START SCRAPER (STEALTH MODE 2026) ===")
     
     chrome_ver = get_chrome_main_version()
     options = uc.ChromeOptions()
-    options.page_load_strategy = 'eager'
-    options.add_argument('--headless')
+    
+    # Gunakan mode headless baru yang lebih sulit dideteksi
+    options.add_argument('--headless=new')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--window-size=1366,768')
+    options.add_argument('--window-size=1920,1080')
     options.add_argument('--disable-blink-features=AutomationControlled')
+    
+    # Rotasi User Agent ke yang lebih modern
     options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36')
+    
     options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
 
     driver = None
     try:
         driver = uc.Chrome(options=options, version_main=chrome_ver)
-    except Exception as e:
-        logging.critical(f"Gagal memuat Chrome Driver: {e}")
-        return
+        
+        # Inject script untuk sembunyikan jejak bot
+        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+            "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+        })
 
-    hasil_akhir = []
-    try:
         driver.get(TARGET_URL)
         logging.info("Membuka Halaman Utama...")
-        time.sleep(10)
+        human_delay(10, 15) # Waktu untuk melewati tantangan bot pasif
 
-        # Ambil data kasar semua pertandingan
         cards = driver.find_elements(By.XPATH, "//a[contains(@href, 'truc-tiep')]")
         targets = []
         seen_urls = set()
@@ -180,16 +153,17 @@ def jalankan_scraper():
 
         logging.info(f"Ditemukan {len(targets)} pertandingan.")
 
-        for item in targets:
+        hasil_akhir = []
+        # Batasi jumlah proses agar IP tidak dicurigai (Scraping bertahap)
+        for item in targets[:10]: 
             try:
-                # Parsing Teks (Tim & Liga)
                 lines = [l.strip() for l in item['teks'].split('\n') if l.strip()]
                 trash = ["CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", "-", "PHT", "HT", "FT"]
                 
                 clean_lines = []
                 for l in lines:
                     is_time_score = re.match(r'^\d{2}:\d{2}$', l) or (l.isdigit() and len(l) == 1) or \
-                                   "'" in l or "+" in l or l.upper() in ["HT", "FT"]
+                                    "'" in l or "+" in l or l.upper() in ["HT", "FT"]
                     if not is_time_score and not any(tk == l.upper() for tk in trash) and len(l) > 1:
                         clean_lines.append(l)
 
@@ -199,17 +173,16 @@ def jalankan_scraper():
                     liga, t1, t2 = "International Match", clean_lines[0], clean_lines[1]
                 else: continue
 
-                # Ambil Logo
                 img_list = item.get('imgs', [])
                 l_liga, l_t1, l_t2 = (img_list[0], img_list[1], img_list[2]) if len(img_list) >= 3 else \
                                      ("", img_list[0], img_list[1]) if len(img_list) == 2 else ("", "", "")
 
                 logging.info(f"Proses: {t1} vs {t2}")
 
-                # Masuk Detail
                 start_ms, ts_display = get_detailed_info(driver, item['url'])
                 stream_url = get_live_stream_link(driver)
 
+                # --- FORMAT HASIL AKHIR SESUAI PERMINTAAN ---
                 hasil_akhir.append({
                     "channelName": f"{t1} vs {t2}",
                     "ligaName": liga,
@@ -220,13 +193,17 @@ def jalankan_scraper():
                     "status": "LIVE", "contentType": "event_pertandingan",
                     "description": ts_display
                 })
+                
+                # Istirahat antar item agar tidak terdeteksi flooding
+                human_delay(4, 8)
+
             except Exception as e:
                 logging.warning(f"Gagal memproses item: {e}")
 
     finally:
         if driver: driver.quit()
 
-    # 3. KIRIM KE FIREBASE
+    # --- 4. KIRIM KE FIREBASE ---
     if hasil_akhir:
         fb_url = f"{FIREBASE_URL}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}"
         payload = {
@@ -245,7 +222,3 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
-
-
-
-
