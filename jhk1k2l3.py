@@ -18,7 +18,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET")
 TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
-# URL Cadangan dari GitHub jika m3u8 tidak terdeteksi di browser
+# Database eksternal sebagai cadangan jika link di situs utama gagal
 FALLBACK_M3U_URL = "https://raw.githubusercontent.com/t23-02/bongda/refs/heads/main/bongda.m3u"
 FIXED_CATEGORY_ID = "AJ_JKS" 
 tz_jkt = timezone(timedelta(hours=7))
@@ -29,7 +29,7 @@ logging.basicConfig(
     format='%(asctime)s [%(levelname)s] %(message)s'
 )
 
-# --- 2. FUNGSI STEALTH & FALLBACK ---
+# --- 2. FUNGSI PEMBANTU & STEALTH ---
 
 def get_chrome_main_version():
     try:
@@ -46,39 +46,39 @@ def get_fallback_streams():
         response = requests.get(FALLBACK_M3U_URL, timeout=15)
         if response.status_code == 200:
             content = response.text
-            # Ekstrak Nama dan URL m3u8
+            # Ekstrak Nama Channel dan URL m3u8
             matches = re.findall(r'#EXTINF:.*?,(.*?)\n(http.*)', content)
             for name, url in matches:
                 streams[name.lower().strip()] = url.strip()
             logging.info(f"Berhasil memuat {len(streams)} link cadangan dari GitHub.")
     except Exception as e:
-        logging.error(f"Gagal mengambil fallback: {e}")
+        logging.error(f"Gagal mengambil fallback M3U: {e}")
     return streams
 
-def find_best_link(t1, t2, raw_url, fallback_db):
-    """Logika pemilihan link: Browser -> Fallback GitHub -> Not Found."""
-    if raw_url != "Not Found" and len(raw_url) > 10:
-        return raw_url
+def find_fallback_link(t1, t2, current_url, fallback_db):
+    """Mencari link di database cadangan jika link utama Not Found."""
+    if current_url != "Not Found" and len(current_url) > 10:
+        return current_url
     
     # Cari kecocokan nama tim di database GitHub
-    search_key_1 = t1.lower()
-    search_key_2 = t2.lower()
+    s1, s2 = t1.lower(), t2.lower()
     for name_in_db, url_in_db in fallback_db.items():
-        if search_key_1 in name_in_db or search_key_2 in name_in_db:
-            logging.info(f"    [FALLBACK] Link ditemukan di GitHub untuk {t1} vs {t2}")
+        if s1 in name_in_db or s2 in name_in_db:
+            logging.info(f"    [FALLBACK] Menggunakan link cadangan untuk {t1} vs {t2}")
             return url_in_db
     return "Not Found"
 
-def human_delay(min_s=3, max_s=7):
-    """Meniru jeda waktu manusia."""
-    time.sleep(random.uniform(min_s, max_s))
-
-# --- 3. FUNGSI SCRAPER ---
-
 def get_detailed_info(driver, match_page_url):
     try:
-        driver.get(match_page_url)
-        human_delay(4, 6)
+        driver.set_page_load_timeout(35)
+        try:
+            # Jeda acak sebelum masuk detail (Stealth)
+            time.sleep(random.uniform(2, 5))
+            driver.get(match_page_url)
+        except:
+            driver.execute_script("window.stop();")
+        
+        time.sleep(4)
         page_title = driver.title 
         match = re.search(r'(\d{2}:\d{2}).*?(\d{2}/\d{2})', page_title)
         
@@ -87,6 +87,7 @@ def get_detailed_info(driver, match_page_url):
             current_year = datetime.now(tz_jkt).year
             dt_obj = datetime.strptime(f"{tgl_bln}/{current_year} {jam}", "%d/%m/%Y %H:%M").replace(tzinfo=tz_jkt)
             start_ms = int(dt_obj.timestamp() * 1000)
+            
             hari_id = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
             ts_display = f"{hari_id[dt_obj.weekday()]}, {tgl_bln} | {jam}"
             return start_ms, ts_display
@@ -97,13 +98,38 @@ def get_live_stream_link(driver):
     max_retries = 2
     for attempt in range(1, max_retries + 1):
         try:
+            logging.info(f"    [ATTEMPT {attempt}] Mencari link m3u8...")
             driver.switch_to.default_content()
-            # Simulasi pergerakan mouse sebelum menunggu traffic
-            action = ActionChains(driver)
-            action.move_by_offset(random.randint(0, 100), random.randint(0, 100)).perform()
             
-            time.sleep(15) 
+            # Simulasi pergerakan mouse agar tidak terdeteksi bot (Stealth)
+            try:
+                action = ActionChains(driver)
+                action.move_by_offset(random.randint(10, 50), random.randint(10, 50)).perform()
+            except: pass
+
+            driver.execute_script("window.scrollTo(0, 800);")
+            time.sleep(3)
+            
+            driver.execute_script("""
+                document.querySelectorAll('.modal, .popup, .sh-overlay, [class*="ads"]').forEach(el => el.remove());
+            """)
+
+            try:
+                WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "iframe")))
+            except: pass
+
+            iframes = driver.find_elements(By.TAG_NAME, "iframe")
+            for frame in iframes:
+                src = frame.get_attribute("src") or ""
+                if any(x in src for x in ["bitmovin", "player", "stream", "embed", "cdn", "taoxanh", "m3u8"]):
+                    driver.switch_to.frame(frame)
+                    driver.execute_script("let v = document.querySelector('video'); if(v) { v.play(); v.muted = true; }")
+                    break
+            
+            time.sleep(20) 
+            driver.switch_to.default_content()
             logs = driver.get_log('performance')
+
             for entry in logs:
                 msg = entry.get('message')
                 if '.m3u8' in msg:
@@ -112,18 +138,25 @@ def get_live_stream_link(driver):
                         found_url = url_match.group(1).replace('\\/', '/')
                         if "ads" not in found_url.lower():
                             return found_url
+
+            if attempt < max_retries:
+                driver.refresh()
+                time.sleep(5)
+        except:
             driver.refresh()
-            human_delay(5, 8)
-        except: pass
+
     return "Not Found"
 
+# --- 3. JALANKAN SCRAPER ---
+
 def jalankan_scraper():
-    logging.info("=== START STEALTH SCRAPER (HYBRID 2026) ===")
+    logging.info("=== START SCRAPER (STEALTH HYBRID 2026) ===")
     fallback_db = get_fallback_streams()
     
     chrome_ver = get_chrome_main_version()
     options = uc.ChromeOptions()
-    options.add_argument('--headless=new')
+    options.page_load_strategy = 'eager'
+    options.add_argument('--headless=new') # Gunakan mode headless terbaru agar lebih sulit dideteksi
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1920,1080')
@@ -134,13 +167,14 @@ def jalankan_scraper():
     driver = None
     try:
         driver = uc.Chrome(options=options, version_main=chrome_ver)
+        # Sembunyikan properti webdriver (Stealth)
         driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
             "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
         })
 
         driver.get(TARGET_URL)
         logging.info("Membuka Halaman Utama...")
-        human_delay(10, 15)
+        time.sleep(10)
 
         cards = driver.find_elements(By.XPATH, "//a[contains(@href, 'truc-tiep')]")
         targets = []
@@ -157,11 +191,18 @@ def jalankan_scraper():
         logging.info(f"Ditemukan {len(targets)} pertandingan.")
 
         hasil_akhir = []
-        for item in targets[:12]: # Limit 12 per run agar tidak dicurigai
+        for item in targets:
             try:
+                # --- TETAP GUNAKAN KODE PENANGAMBILAN NAMA ASLI ANDA ---
                 lines = [l.strip() for l in item['teks'].split('\n') if l.strip()]
                 trash = ["CƯỢC", "XEM", "LIVE", "TRỰC", "TỶ LỆ", "KÈO", "CLICK", "VS", "-", "PHT", "HT", "FT"]
-                clean_lines = [l for l in lines if not any(tk == l.upper() for tk in trash) and len(l) > 1]
+                
+                clean_lines = []
+                for l in lines:
+                    is_time_score = re.match(r'^\d{2}:\d{2}$', l) or (l.isdigit() and len(l) == 1) or \
+                                    "'" in l or "+" in l or l.upper() in ["HT", "FT"]
+                    if not is_time_score and not any(tk == l.upper() for tk in trash) and len(l) > 1:
+                        clean_lines.append(l)
 
                 if len(clean_lines) >= 3:
                     liga, t1, t2 = clean_lines[0], clean_lines[1], clean_lines[2]
@@ -176,10 +217,10 @@ def jalankan_scraper():
                 logging.info(f"Proses: {t1} vs {t2}")
 
                 start_ms, ts_display = get_detailed_info(driver, item['url'])
-                raw_url = get_live_stream_link(driver)
+                raw_stream_url = get_live_stream_link(driver)
                 
-                # Gunakan Fallback GitHub jika browser gagal
-                stream_url = find_best_link(t1, t2, raw_url, fallback_db)
+                # Tambahkan logika Fallback ke GitHub jika raw_stream_url tidak ditemukan
+                stream_url = find_fallback_link(t1, t2, raw_stream_url, fallback_db)
 
                 hasil_akhir.append({
                     "channelName": f"{t1} vs {t2}",
@@ -191,7 +232,10 @@ def jalankan_scraper():
                     "status": "LIVE", "contentType": "event_pertandingan",
                     "description": ts_display
                 })
-                human_delay(5, 10)
+                
+                # Delay antar item agar IP tidak dicurigai (Stealth)
+                time.sleep(random.uniform(3, 7))
+
             except Exception as e:
                 logging.warning(f"Gagal memproses item: {e}")
 
@@ -201,13 +245,16 @@ def jalankan_scraper():
     if hasil_akhir:
         fb_url = f"{FIREBASE_URL}/playlist/{FIXED_CATEGORY_ID}.json?auth={FIREBASE_SECRET}"
         payload = {
-            "category_name": "EVENT LIVE", "order": 1, 
+            "category_name": "EVENT LIVE", 
+            "order": 1, 
             "channels": {uuid.uuid4().hex: x for x in hasil_akhir}
         }
         try:
             r = requests.put(fb_url, json=payload, timeout=30)
-            if r.status_code == 200: print(f"[√] SELESAI! {len(hasil_akhir)} match diproses.")
-        except Exception as e: print(f"[X] Gagal mengirim data: {e}")
+            if r.status_code == 200:
+                print(f"[√] SELESAI! {len(hasil_akhir)} match diproses.")
+        except Exception as e:
+            print(f"[X] Gagal mengirim data: {e}")
 
 if __name__ == "__main__":
     jalankan_scraper()
