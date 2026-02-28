@@ -17,9 +17,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 # --- 1. KONFIGURASI ---
 FIREBASE_URL = os.getenv("FIREBASE_URL")
 FIREBASE_SECRET = os.getenv("FIREBASE_SECRET")
-TARGET_URL = "https://bunchatv.net/truc-tiep-bong-da-xoilac-tv"
-# Database eksternal sebagai cadangan jika link di situs utama gagal
-FALLBACK_M3U_URL = "https://raw.githubusercontent.com/t23-02/bongda/refs/heads/main/bongda.m3u"
+TARGET_URL = "https://khandaia2.me/trang-chu?type=football"
 FIXED_CATEGORY_ID = "AJ_JKS" 
 tz_jkt = timezone(timedelta(hours=7))
 
@@ -258,3 +256,4 @@ def jalankan_scraper():
 
 if __name__ == "__main__":
     jalankan_scraper()
+
