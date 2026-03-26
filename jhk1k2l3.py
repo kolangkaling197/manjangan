@@ -50,9 +50,7 @@ def scrap_vision_deep_sniff():
                     
                     if isinstance(body, dict):
                         count += 1
-                        # Ubah baris pembuatan filename di scraper.py kamu menjadi:
-                        timestamp = time.strftime("%Y%m%d-%H%M%S")
-                        filename = f"debug_json/paket_{timestamp}_{count}_{url_path}.json"
+                        filename = f"debug_json/paket_{count}_{url_path}.json"
                         
                         # Simpan ke file
                         with open(filename, "w", encoding="utf-8") as f:
