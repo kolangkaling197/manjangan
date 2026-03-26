@@ -1,4 +1,4 @@
-name: madhd
+name: Vision Plus Scraper
 
 on:
   workflow_dispatch: # Tombol manual di tab Actions
