@@ -6,78 +6,86 @@ import time
 # Buat folder untuk hasil scan jika belum ada
 if not os.path.exists('debug_json'):
     os.makedirs('debug_json')
+    print("[*] Folder debug_json dibuat.", flush=True)
 
 def scrap_vision_deep_sniff():
-    # KONFIGURASI HEADLESS (Penting untuk GitHub Actions)
     co = ChromiumOptions()
-    co.headless()  # Menjalankan browser tanpa jendela fisik
-    co.set_argument('--no-sandbox')  # Bypass OS security model
+    co.headless()
+    co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
 
     page = ChromiumPage(co)
-    print("--- DEEP SNIFFING VISION+ (MODE OTOMATIS GITHUB) ---")
+    print("--- STARTING VISION+ SNIFFER (MODE GITHUB) ---", flush=True)
     
-    # Mulai pantau aktivitas network
     page.listen.start() 
     
     try:
-        # Buka halaman target
         url = 'https://www.visionplus.id/webclient/?pageId=4030'
+        print(f"[*] Membuka URL: {url}", flush=True)
         page.get(url)
-        print(f"[*] Membuka: {url}")
+        
+        # Simulasi scroll
+        for s in range(5):
+            page.scroll.down(2000)
+            time.sleep(2)
+            print(f"    > Auto-Scroll Step {s+1}/5...", flush=True)
+
+        print("[*] Menganalisis paket network yang masuk...", flush=True)
         
         count = 0
-        found_data = False
-        
-        # SIMULASI INTERAKSI (Otomatis gantiin tangan manusia)
-        print("[*] Melakukan Auto-Scroll untuk memicu loading data...")
-        for s in range(5):
-            page.scroll.down(2000) # Scroll ke bawah
-            time.sleep(2)          # Tunggu konten render
-            print(f"    > Scroll step {s+1}/5")
+        found_target = False
+        start_time = time.time()
+        timeout = 120  # Batas waktu maksimal 2 menit agar tidak stuck di GitHub
 
-        # Cek paket yang tertangkap selama 30 detik terakhir
-        print("[*] Menganalisis paket network yang tertangkap...")
-        
-        # Ambil semua paket yang tertangkap di listener
         for res in page.listen.steps():
+            # Proteksi agar tidak stuck selamanya
+            if time.time() - start_time > timeout:
+                print("[!] Timeout tercapai (120 detik). Menghentikan sniffing.", flush=True)
+                break
+
             try:
-                # Filter hanya respon yang memiliki body dan berupa JSON
+                # Log setiap URL yang lewat (agar kamu tahu script tidak mati)
+                # print(f"    [Network] {res.url[:70]}...", flush=True)
+
                 if res.response.body is not None:
                     body = res.response.body
-                    url_path = res.url.split('/')[-1].split('?')[0]
                     
                     if isinstance(body, dict):
                         count += 1
+                        url_path = res.url.split('/')[-1].split('?')[0]
                         filename = f"debug_json/paket_{count}_{url_path}.json"
                         
-                        # Simpan ke file
+                        # Simpan semua paket JSON untuk di-audit
                         with open(filename, "w", encoding="utf-8") as f:
                             json.dump(body, f, indent=4)
                         
-                        # Cek kata kunci target
-                        body_str = str(body).lower()
-                        if 'clusters' in body_str or 'originaltitle' in body_str or 'sport' in body_str:
-                            print(f"[!!!] DATA BERHARGA DITEMUKAN: {filename}")
-                            found_data = True
-            except Exception:
+                        # LOG KHUSUS JIKA TARGET 1799 KETEMU
+                        if '1799' in res.url or '1799' in str(body):
+                            print(f"\n[!!!] TARGET API 1799 DITEMUKAN: {filename}", flush=True)
+                            print(f"      URL: {res.url}", flush=True)
+                            found_target = True
+                            # Optional: break jika hanya ingin ambil 1799 saja
+                            # break 
+
+            except Exception as e:
                 continue
             
-            # Limit agar tidak terlalu banyak file (opsional)
-            if count > 50: break
+            if count >= 60: # Batasi jumlah file agar repo tidak bengkak
+                print("[*] Sudah mencapai limit 60 file. Selesai.", flush=True)
+                break
 
-        if not found_data:
-            print("\n[-] Scan selesai. Tidak ada pola 'clusters' yang spesifik, silakan cek manual di folder 'debug_json'.")
+        if not found_target:
+            print("\n[-] Scan selesai. Target 1799 tidak tertangkap secara spesifik.", flush=True)
         else:
-            print(f"\n[+] Selesai! Berhasil menangkap {count} paket JSON.")
+            print(f"\n[+] Berhasil menangkap total {count} paket JSON.", flush=True)
 
     except Exception as e:
-        print(f"[-] Terjadi kesalahan: {e}")
+        print(f"[-] Terjadi kesalahan fatal: {e}", flush=True)
     finally:
         page.listen.stop()
         page.quit()
-        print("[*] Browser ditutup.")
+        print("[*] Browser ditutup. Proses selesai.", flush=True)
 
 if __name__ == "__main__":
     scrap_vision_deep_sniff()
