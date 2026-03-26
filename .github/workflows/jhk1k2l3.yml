@@ -1,20 +1,23 @@
-name: Vision Plus Scraper
+name: Vision Plus Scraper Auto-Save
 
 on:
-  workflow_dispatch: # Tombol manual di tab Actions
-  push:
-    branches: [ main ]
+  workflow_dispatch: # Agar bisa dijalankan manual
+  schedule:
+    - cron: '0 * * * *' # Opsional: Berjalan otomatis setiap jam
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Memberi izin GitHub Actions untuk menulis/mengunggah file ke repo
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.9'
 
@@ -31,8 +34,10 @@ jobs:
     - name: Run Scraper
       run: python jhk1k2l3.py
 
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: scraped-json-data
-        path: debug_json/
+    - name: Commit and Push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add debug_json/*.json
+        # Hanya commit jika ada file baru agar tidak error
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update data JSON: $(date)" && git push)
