@@ -1,20 +1,24 @@
 name: Vision Plus Scraper
 
 on:
-  workflow_dispatch: # Tombol manual di tab Actions
+  workflow_dispatch: 
   push:
     branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    # Memberikan izin agar GitHub Actions bisa menulis/mengunggah file ke repo kamu
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4 # Update ke v4 yang lebih stabil
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.9'
 
@@ -31,8 +35,19 @@ jobs:
     - name: Run Scraper
       run: python jhk1k213.py
 
-    - name: Upload Artifacts
+    - name: Commit and Push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        
+        # Pastikan hanya file target yang di-add
+        git add debug_json/paket_21_1799.json
+        
+        # Hanya commit jika ada perubahan data agar tidak error
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update API 1799: $(date)" && git push)
+
+    - name: Upload Artifacts (Optional)
       uses: actions/upload-artifact@v4
       with:
-        name: scraped-json-data
-        path: debug_json/
+        name: 1799-data
+        path: debug_json/paket_21_1799.json
