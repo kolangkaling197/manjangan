@@ -32,7 +32,6 @@ jobs:
         sudo apt-get install -y google-chrome-stable
 
     - name: Run Scraper
-      # Kita tambahkan perintah buat folder agar tidak error jika folder belum ada
       run: |
         mkdir -p debug_json
         python jhk1k213.py
@@ -42,24 +41,20 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
-        # Gunakan pengecekan file sebelum git add
-        if [ -f "debug_json/paket_21_1799.json" ]; then
-          git add debug_json/paket_21_1799.json
-          
-          # Hanya commit jika ada perubahan asli
-          if ! git diff --cached --quiet; then
-            git commit -m "Update API 1799: $(date)"
-            git push
-          else
-            echo "Tidak ada perubahan pada data JSON."
-          fi
+        # 1. Tambahkan SEMUA file .json di folder debug_json
+        # Gunakan wildcard * agar paket_1, paket_6, paket_51 semuanya kena
+        git add debug_json/*.json
+        
+        # 2. Cek apakah ada file yang masuk ke area 'staged' (siap commit)
+        if ! git diff --cached --quiet; then
+          git commit -m "Update All Vision+ Packets: $(date)"
+          git push
         else
-          echo "FATAL: File JSON tidak ditemukan. Scraper gagal membuat file!"
-          exit 1
+          echo "Tidak ada perubahan data baru pada paket-paket JSON."
         fi
 
     - name: Upload Artifacts (Optional)
-      if: always() # Tetap upload meskipun step sebelumnya gagal untuk debugging
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: 1799-data
