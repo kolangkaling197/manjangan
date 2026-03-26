@@ -6,6 +6,7 @@ import time
 # Pastikan folder ada
 if not os.path.exists('debug_json'):
     os.makedirs('debug_json')
+    print("[*] Folder debug_json siap.")
 
 def scrap_vision_target_1799():
     co = ChromiumOptions()
@@ -17,17 +18,16 @@ def scrap_vision_target_1799():
     page = ChromiumPage(co)
     print("--- TARGETED SNIFFING: API 1799 ONLY ---", flush=True)
     
-    # Mulai monitor network
     page.listen.start() 
+    # Catat waktu mulai secara manual
+    script_start = time.time()
     
     try:
-        # Langsung buka halaman yang memicu API tersebut
         url = 'https://www.visionplus.id/webclient/?pageId=4030'
         print(f"[*] Membuka Vision+ Sports Page...", flush=True)
         page.get(url)
         
         found = False
-        # Simulasi sedikit scroll untuk trigger loading API
         for s in range(3):
             page.scroll.down(1500)
             time.sleep(2)
@@ -35,29 +35,25 @@ def scrap_vision_target_1799():
 
         print("[*] Mencari paket 1799 di lalu lintas data...", flush=True)
         
-        # Loop paket yang lewat
-        for res in page.listen.steps():
-            # FILTER UTAMA: Hanya ambil jika ada '1799' di URL-nya
+        # Gunakan timeout manual 90 detik
+        for res in page.listen.steps(timeout=90):
             if '1799' in res.url:
                 try:
                     if res.response.body is not None:
                         body = res.response.body
-                        
-                        # Simpan hanya file ini
                         filename = "debug_json/paket_21_1799.json"
                         with open(filename, "w", encoding="utf-8") as f:
                             json.dump(body, f, indent=4)
                         
                         print(f"\n[OK] BERHASIL! File disimpan: {filename}", flush=True)
-                        print(f"[OK] Endpoint: {res.url}", flush=True)
                         found = True
-                        break # LANGSUNG BERHENTI setelah ketemu
-                except Exception:
+                        break 
+                except:
                     continue
             
-            # Timeout proteksi agar tidak stuck (60 detik saja)
-            if time.time() - page.listen._start_time > 60:
-                print("[!] Timeout: Paket 1799 tidak ditemukan dalam 60 detik.", flush=True)
+            # Pengaman tambahan jika steps() tidak kunjung selesai
+            if time.time() - script_start > 120:
+                print("[!] Timeout global tercapai.", flush=True)
                 break
 
         if not found:
@@ -68,7 +64,7 @@ def scrap_vision_target_1799():
     finally:
         page.listen.stop()
         page.quit()
-        print("[*] Selesai.", flush=True)
+        print("[*] Proses Selesai.", flush=True)
 
 if __name__ == "__main__":
     scrap_vision_target_1799()
