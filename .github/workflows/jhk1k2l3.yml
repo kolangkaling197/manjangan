@@ -9,13 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
-    # Memberikan izin agar GitHub Actions bisa menulis/mengunggah file ke repo kamu
     permissions:
       contents: write
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4 # Update ke v4 yang lebih stabil
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -33,21 +32,35 @@ jobs:
         sudo apt-get install -y google-chrome-stable
 
     - name: Run Scraper
-      run: python jhk1k213.py
+      # Kita tambahkan perintah buat folder agar tidak error jika folder belum ada
+      run: |
+        mkdir -p debug_json
+        python jhk1k213.py
 
     - name: Commit and Push changes
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
-        # Pastikan hanya file target yang di-add
-        git add debug_json/paket_21_1799.json
-        
-        # Hanya commit jika ada perubahan data agar tidak error
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update API 1799: $(date)" && git push)
+        # Gunakan pengecekan file sebelum git add
+        if [ -f "debug_json/paket_21_1799.json" ]; then
+          git add debug_json/paket_21_1799.json
+          
+          # Hanya commit jika ada perubahan asli
+          if ! git diff --cached --quiet; then
+            git commit -m "Update API 1799: $(date)"
+            git push
+          else
+            echo "Tidak ada perubahan pada data JSON."
+          fi
+        else
+          echo "FATAL: File JSON tidak ditemukan. Scraper gagal membuat file!"
+          exit 1
+        fi
 
     - name: Upload Artifacts (Optional)
+      if: always() # Tetap upload meskipun step sebelumnya gagal untuk debugging
       uses: actions/upload-artifact@v4
       with:
         name: 1799-data
-        path: debug_json/paket_21_1799.json
+        path: debug_json/
