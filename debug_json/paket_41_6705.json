@@ -1,0 +1,33 @@
+{
+    "id": 6705,
+    "nodes": [
+        {
+            "ordinal": 0,
+            "analyticsRef": "6793",
+            "bannerType": "STANDARD",
+            "display": {
+                "duration": 8,
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "974/610974-BANNER_COMPANION_INLINE-l.jpg"
+                            }
+                        }
+                    }
+                ]
+            },
+            "interaction": {
+                "arun": false,
+                "prerun": 0,
+                "select": {
+                    "type": "APP",
+                    "appReference": "SUBSCRIPTION"
+                }
+            },
+            "type": "BANNER"
+        }
+    ]
+}

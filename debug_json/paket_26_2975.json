@@ -1,0 +1,2959 @@
+{
+    "id": 2975,
+    "nodes": [
+        {
+            "ordinal": 0,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/300422/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "565/695565-SNAPSHOT-l.jpg",
+                                "m": "558/695558-SNAPSHOT-m.jpg",
+                                "s": "560/695560-SNAPSHOT-s.jpg",
+                                "xl": "566/695566-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Game of the Century: Borussia Dortmund Legends vs. SL Benfica Legends"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND4455841575005975",
+                        "deliveryId": "DLVY4455842147005201"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND4455841575005975",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY4455842147005201",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-25T17:45:00Z",
+                        "broadcastEnd": "2026-03-25T20:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-25T20:00:00Z",
+                        "visibilityCatchupStart": "2026-03-25T20:05:00Z",
+                        "visibilityCatchupEnd": "2026-04-01T16:19:30Z",
+                        "channelServiceId": "00000000000000000115",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2xz2v5wuvgur6/DASH/63c0da12bb4d48afbaf053f51dff2353/HLS/b9fc626578f34e0db7ff123168ace53a/00000000000000000115?start=1774460400&end=1774469100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2xz2v5wuvgur6/DASH/63c0da12bb4d48afbaf053f51dff2353/HLS/b9fc626578f34e0db7ff123168ace53a/00000000000000000115?start=1774460400&end=1774469100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 1,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;0;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/299342/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "365/694365-SNAPSHOT-l.jpg",
+                                "m": "362/694362-SNAPSHOT-m.jpg",
+                                "s": "363/694363-SNAPSHOT-s.jpg",
+                                "xl": "366/694366-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Premier Padel 2026: Miami P1 - Day 3 (2)"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3816570901000442",
+                        "deliveryId": "DLVY3816575488003984"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3816570901000442",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3816575488003984",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-25T20:00:00Z",
+                        "broadcastEnd": "2026-03-26T00:30:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-26T00:30:00Z",
+                        "visibilityCatchupStart": "2026-03-26T00:35:00Z",
+                        "visibilityCatchupEnd": "2026-04-01T18:34:30Z",
+                        "channelServiceId": "00000000000000000123",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774468500&end=1774485300",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774468500&end=1774485300",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 2,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/299248/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "520/694520-SNAPSHOT-l.jpg",
+                                "m": "528/694528-SNAPSHOT-m.jpg",
+                                "s": "515/694515-SNAPSHOT-s.jpg",
+                                "xl": "517/694517-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "UEFA Women's Champions League 2025/26: Man United vs Bayern - QF, 1st Leg"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3813990649000328",
+                        "deliveryId": "DLVY3814000429004654"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3813990649000328",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3814000429004654",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-25T19:55:00Z",
+                        "broadcastEnd": "2026-03-25T22:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-25T22:00:00Z",
+                        "visibilityCatchupStart": "2026-03-25T22:05:00Z",
+                        "visibilityCatchupEnd": "2026-04-01T18:29:30Z",
+                        "channelServiceId": "00000000000000000122",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774468200&end=1774476300",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774468200&end=1774476300",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 3,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/299270/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "411/694411-SNAPSHOT-l.jpg",
+                                "m": "413/694413-SNAPSHOT-m.jpg",
+                                "s": "401/694401-SNAPSHOT-s.jpg",
+                                "xl": "406/694406-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "UEFA Women's Champions League 2025/26: Real Madrid vs Barcelona - QF, 1st Leg"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3813995054004550",
+                        "deliveryId": "DLVY3814000417009538"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3813995054004550",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3814000417009538",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-25T17:40:00Z",
+                        "broadcastEnd": "2026-03-25T19:55:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-25T19:55:00Z",
+                        "visibilityCatchupStart": "2026-03-25T20:00:00Z",
+                        "visibilityCatchupEnd": "2026-04-01T16:14:30Z",
+                        "channelServiceId": "00000000000000000122",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774460100&end=1774468800",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774460100&end=1774468800",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 4,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/300166/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "295/694295-SNAPSHOT-l.jpg",
+                                "m": "297/694297-SNAPSHOT-m.jpg",
+                                "s": "287/694287-SNAPSHOT-s.jpg",
+                                "xl": "292/694292-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Drawing AFC Champions League Elite Jeddah 2026"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND4408084887002477",
+                        "deliveryId": "DLVY4408092272008709"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND4408084887002477",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY4408092272008709",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-25T07:00:00Z",
+                        "broadcastEnd": "2026-03-25T07:30:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-25T07:30:00Z",
+                        "visibilityCatchupStart": "2026-03-25T07:35:00Z",
+                        "visibilityCatchupEnd": "2026-04-01T05:34:30Z",
+                        "channelServiceId": "00000000000000000115",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2xz2v5wuvgur6/DASH/63c0da12bb4d48afbaf053f51dff2353/HLS/b9fc626578f34e0db7ff123168ace53a/00000000000000000115?start=1774421700&end=1774424100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2xz2v5wuvgur6/DASH/63c0da12bb4d48afbaf053f51dff2353/HLS/b9fc626578f34e0db7ff123168ace53a/00000000000000000115?start=1774421700&end=1774424100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 5,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;0;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/299336/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "476/691476-SNAPSHOT-l.jpg",
+                                "m": "473/691473-SNAPSHOT-m.jpg",
+                                "s": "481/691481-SNAPSHOT-s.jpg",
+                                "xl": "474/691474-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Premier Padel 2026: Miami P1 - Day 2 (2)"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3816568686001286",
+                        "deliveryId": "DLVY3816575218006413"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3816568686001286",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3816575218006413",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-24T20:00:00Z",
+                        "broadcastEnd": "2026-03-25T00:30:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-25T00:30:00Z",
+                        "visibilityCatchupStart": "2026-03-25T00:35:00Z",
+                        "visibilityCatchupEnd": "2026-03-31T18:34:30Z",
+                        "channelServiceId": "00000000000000000123",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774382100&end=1774398900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774382100&end=1774398900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 6,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/299290/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "536/691536-SNAPSHOT-l.jpg",
+                                "m": "531/691531-SNAPSHOT-m.jpg",
+                                "s": "535/691535-SNAPSHOT-s.jpg",
+                                "xl": "529/691529-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "UEFA Women's Champions League 2025/26: Arsenal vs Chelsea - QF, 1st Leg"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3813999501006057",
+                        "deliveryId": "DLVY3814000228006877"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3813999501006057",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3814000228006877",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-24T19:55:00Z",
+                        "broadcastEnd": "2026-03-24T22:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-24T22:00:00Z",
+                        "visibilityCatchupStart": "2026-03-24T22:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-31T18:29:30Z",
+                        "channelServiceId": "00000000000000000122",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774381800&end=1774389900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774381800&end=1774389900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 7,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/299064/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "306/693306-SNAPSHOT-l.jpg",
+                                "m": "299/693299-SNAPSHOT-m.jpg",
+                                "s": "303/693303-SNAPSHOT-s.jpg",
+                                "xl": "310/693310-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "LaLiga 2 2025/26: Castellon vs Cultural Leonesa"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3735332142003322",
+                        "deliveryId": "DLVY3735335485000598"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3735332142003322",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3735335485000598",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-23T19:52:00Z",
+                        "broadcastEnd": "2026-03-23T22:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-23T22:00:00Z",
+                        "visibilityCatchupStart": "2026-03-23T22:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-30T18:26:30Z",
+                        "channelServiceId": "00000000000000000123",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774295220&end=1774303500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774295220&end=1774303500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 8,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;7;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/297936/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "254/691254-SNAPSHOT-l.jpg",
+                                "m": "250/691250-SNAPSHOT-m.jpg",
+                                "s": "245/691245-SNAPSHOT-s.jpg",
+                                "xl": "252/691252-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "MotoGP 2026: Estrella Galicia 0,0 Grand Prix of Brazil - Race"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3298353850001691",
+                        "deliveryId": "DLVY3298367888002089"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3298353850001691",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3298367888002089",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-22T14:45:00Z",
+                        "broadcastEnd": "2026-03-22T19:30:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-22T19:30:00Z",
+                        "visibilityCatchupStart": "2026-03-22T19:35:00Z",
+                        "visibilityCatchupEnd": "2026-03-29T13:19:30Z",
+                        "channelServiceId": "00000000000000000120",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/46d9cf39b9a84183b8d5022ac8f4bc41/HLS/c9fa5b263fce42668499ab0376d1ff45/00000000000000000120?start=1774190400&end=1774208100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/46d9cf39b9a84183b8d5022ac8f4bc41/HLS/c9fa5b263fce42668499ab0376d1ff45/00000000000000000120?start=1774190400&end=1774208100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 9,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;0;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/299060/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "429/691429-SNAPSHOT-l.jpg",
+                                "m": "428/691428-SNAPSHOT-m.jpg",
+                                "s": "425/691425-SNAPSHOT-s.jpg",
+                                "xl": "422/691422-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Premier Padel 2026: Cancun P2 - Women's Final"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3735331720002401",
+                        "deliveryId": "DLVY3735335247001232"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3735331720002401",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3735335247001232",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-22T22:00:00Z",
+                        "broadcastEnd": "2026-03-22T23:30:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-22T23:30:00Z",
+                        "visibilityCatchupStart": "2026-03-22T23:35:00Z",
+                        "visibilityCatchupEnd": "2026-03-29T20:34:30Z",
+                        "channelServiceId": "00000000000000000123",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774216500&end=1774222500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774216500&end=1774222500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 10,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/299126/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "408/691408-SNAPSHOT-l.jpg",
+                                "m": "397/691397-SNAPSHOT-m.jpg",
+                                "s": "407/691407-SNAPSHOT-s.jpg",
+                                "xl": "396/691396-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "LaLiga 2025/26: Real Madrid vs Atletico Madrid"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3740424194009786",
+                        "deliveryId": "DLVY3740429901001539"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3740424194009786",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3740429901001539",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-22T19:55:00Z",
+                        "broadcastEnd": "2026-03-22T22:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-22T22:00:00Z",
+                        "visibilityCatchupStart": "2026-03-22T22:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-29T18:29:30Z",
+                        "channelServiceId": "00000000000000000122",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774209000&end=1774217100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774209000&end=1774217100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 11,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/298238/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "262/693262-SNAPSHOT-l.jpg",
+                                "m": "266/693266-SNAPSHOT-m.jpg",
+                                "s": "267/693267-SNAPSHOT-s.jpg",
+                                "xl": "264/693264-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "LaLiga 2025/26: Celta Vigo vs Alaves"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3394294162006486",
+                        "deliveryId": "DLVY3394299758000886"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3394294162006486",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3394299758000886",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-22T15:10:00Z",
+                        "broadcastEnd": "2026-03-22T17:25:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-22T17:25:00Z",
+                        "visibilityCatchupStart": "2026-03-22T17:30:00Z",
+                        "visibilityCatchupEnd": "2026-03-29T13:44:30Z",
+                        "channelServiceId": "00000000000000000122",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774191900&end=1774200600",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774191900&end=1774200600",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 12,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/298252/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "234/693234-SNAPSHOT-l.jpg",
+                                "m": "235/693235-SNAPSHOT-m.jpg",
+                                "s": "230/693230-SNAPSHOT-s.jpg",
+                                "xl": "236/693236-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "LaLiga 2025/26: Sevilla vs Valencia"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3394297544008578",
+                        "deliveryId": "DLVY3394299579007313"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3394297544008578",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3394299579007313",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-21T19:55:00Z",
+                        "broadcastEnd": "2026-03-21T22:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-21T22:00:00Z",
+                        "visibilityCatchupStart": "2026-03-21T22:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-28T18:29:30Z",
+                        "channelServiceId": "00000000000000000122",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774122600&end=1774130700",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774122600&end=1774130700",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 13,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/299070/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "350/691350-SNAPSHOT-l.jpg",
+                                "m": "347/691347-SNAPSHOT-m.jpg",
+                                "s": "356/691356-SNAPSHOT-s.jpg",
+                                "xl": "345/691345-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Women's Super League 2025/26: Brighton vs Liverpool"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3735333953008991",
+                        "deliveryId": "DLVY3735335100005788"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3735333953008991",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3735335100005788",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-22T11:50:00Z",
+                        "broadcastEnd": "2026-03-22T14:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-22T14:00:00Z",
+                        "visibilityCatchupStart": "2026-03-22T14:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-29T10:24:30Z",
+                        "channelServiceId": "00000000000000000123",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774179900&end=1774188300",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774179900&end=1774188300",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 14,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;13;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/297922/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "273/693273-SNAPSHOT-l.jpg",
+                                "m": "270/693270-SNAPSHOT-m.jpg",
+                                "s": "281/693281-SNAPSHOT-s.jpg",
+                                "xl": "276/693276-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "LET 2026: Australian WPGA Championship - Day 2"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3298347818000606",
+                        "deliveryId": "DLVY3298367798001017"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3298347818000606",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3298367798001017",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-22T02:00:00Z",
+                        "broadcastEnd": "2026-03-22T07:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-22T07:00:00Z",
+                        "visibilityCatchupStart": "2026-03-22T07:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-29T00:34:30Z",
+                        "channelServiceId": "00000000000000000120",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/46d9cf39b9a84183b8d5022ac8f4bc41/HLS/c9fa5b263fce42668499ab0376d1ff45/00000000000000000120?start=1774144500&end=1774163100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/46d9cf39b9a84183b8d5022ac8f4bc41/HLS/c9fa5b263fce42668499ab0376d1ff45/00000000000000000120?start=1774144500&end=1774163100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 15,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;0;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/299046/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "322/691322-SNAPSHOT-l.jpg",
+                                "m": "318/691318-SNAPSHOT-m.jpg",
+                                "s": "319/691319-SNAPSHOT-s.jpg",
+                                "xl": "321/691321-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Premier Padel 2026: Cancun P2 - Women's Semifinals"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3735329538006708",
+                        "deliveryId": "DLVY3735334950004935"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3735329538006708",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3735334950004935",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-21T22:00:00Z",
+                        "broadcastEnd": "2026-03-22T00:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-22T00:00:00Z",
+                        "visibilityCatchupStart": "2026-03-22T00:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-28T20:34:30Z",
+                        "channelServiceId": "00000000000000000123",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774130100&end=1774137900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774130100&end=1774137900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 16,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/298208/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "128/691128-SNAPSHOT-l.jpg",
+                                "m": "125/691125-SNAPSHOT-m.jpg",
+                                "s": "135/691135-SNAPSHOT-s.jpg",
+                                "xl": "126/691126-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "LaLiga 2025/26: Espanyol vs Getafe"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3394288685003573",
+                        "deliveryId": "DLVY3394299540002056"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3394288685003573",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3394299540002056",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-21T15:10:00Z",
+                        "broadcastEnd": "2026-03-21T17:25:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-21T17:25:00Z",
+                        "visibilityCatchupStart": "2026-03-21T17:30:00Z",
+                        "visibilityCatchupEnd": "2026-03-28T13:44:30Z",
+                        "channelServiceId": "00000000000000000122",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774105500&end=1774114200",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774105500&end=1774114200",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 17,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;13;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/297910/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "821/690821-SNAPSHOT-l.jpg",
+                                "m": "817/690817-SNAPSHOT-m.jpg",
+                                "s": "822/690822-SNAPSHOT-s.jpg",
+                                "xl": "814/690814-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "LIV Golf League 2026: South Africa - Round 3"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3297029756006957",
+                        "deliveryId": "DLVY3297036039005374"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3297029756006957",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3297036039005374",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-21T10:15:00Z",
+                        "broadcastEnd": "2026-03-21T15:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-21T15:00:00Z",
+                        "visibilityCatchupStart": "2026-03-21T15:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-28T08:49:30Z",
+                        "channelServiceId": "00000000000000000119",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d3b0v7fggu5zwm/DASH/b4814ae93ca84dd3bb5b0aff76ca263f/HLS/85430fecde0940e392b51acee385c25f/00000000000000000119?start=1774087800&end=1774105500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d3b0v7fggu5zwm/DASH/b4814ae93ca84dd3bb5b0aff76ca263f/HLS/85430fecde0940e392b51acee385c25f/00000000000000000119?start=1774087800&end=1774105500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 18,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;7;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/297938/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "032/691032-SNAPSHOT-l.jpg",
+                                "m": "033/691033-SNAPSHOT-m.jpg",
+                                "s": "038/691038-SNAPSHOT-s.jpg",
+                                "xl": "043/691043-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "MotoGP 2026: Estrella Galicia 0,0 Grand Prix of Brazil - Qualifying/Sprint"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3298354526008485",
+                        "deliveryId": "DLVY3298367723003634"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3298354526008485",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3298367723003634",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-21T15:40:00Z",
+                        "broadcastEnd": "2026-03-21T19:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-21T19:00:00Z",
+                        "visibilityCatchupStart": "2026-03-21T19:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-28T14:14:30Z",
+                        "channelServiceId": "00000000000000000120",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/46d9cf39b9a84183b8d5022ac8f4bc41/HLS/c9fa5b263fce42668499ab0376d1ff45/00000000000000000120?start=1774107300&end=1774119900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/46d9cf39b9a84183b8d5022ac8f4bc41/HLS/c9fa5b263fce42668499ab0376d1ff45/00000000000000000120?start=1774107300&end=1774119900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 19,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/298934/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "164/691164-SNAPSHOT-l.jpg",
+                                "m": "152/691152-SNAPSHOT-m.jpg",
+                                "s": "153/691153-SNAPSHOT-s.jpg",
+                                "xl": "161/691161-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Women's Super League 2025/26: Man City vs Tottenham"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3727469308005309",
+                        "deliveryId": "DLVY3727473756002233"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3727469308005309",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3727473756002233",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-21T11:50:00Z",
+                        "broadcastEnd": "2026-03-21T14:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-21T14:00:00Z",
+                        "visibilityCatchupStart": "2026-03-21T14:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-28T10:24:30Z",
+                        "channelServiceId": "00000000000000000123",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774093500&end=1774101900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1774093500&end=1774101900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 20,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/297864/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "184/686184-SNAPSHOT-l.jpg",
+                                "m": "178/686178-SNAPSHOT-m.jpg",
+                                "s": "187/686187-SNAPSHOT-s.jpg",
+                                "xl": "185/686185-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "AFC Women's Asian Cup Australia 2026 - Final"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3292295976004852",
+                        "deliveryId": "DLVY3292349374001271"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3292295976004852",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3292349374001271",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-21T08:55:00Z",
+                        "broadcastEnd": "2026-03-21T11:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-21T11:00:00Z",
+                        "visibilityCatchupStart": "2026-03-21T11:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-28T07:29:30Z",
+                        "channelServiceId": "00000000000000000115",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2xz2v5wuvgur6/DASH/63c0da12bb4d48afbaf053f51dff2353/HLS/b9fc626578f34e0db7ff123168ace53a/00000000000000000115?start=1774083000&end=1774091100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2xz2v5wuvgur6/DASH/63c0da12bb4d48afbaf053f51dff2353/HLS/b9fc626578f34e0db7ff123168ace53a/00000000000000000115?start=1774083000&end=1774091100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 21,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;13;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/297932/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "290/693290-SNAPSHOT-l.jpg",
+                                "m": "294/693294-SNAPSHOT-m.jpg",
+                                "s": "291/693291-SNAPSHOT-s.jpg",
+                                "xl": "292/693292-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "LET 2026: Australian WPGA Championship - Day 1"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3298351254004522",
+                        "deliveryId": "DLVY3298367632007155"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3298351254004522",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3298367632007155",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-21T02:00:00Z",
+                        "broadcastEnd": "2026-03-21T07:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-21T07:00:00Z",
+                        "visibilityCatchupStart": "2026-03-21T07:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-28T00:34:30Z",
+                        "channelServiceId": "00000000000000000120",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/46d9cf39b9a84183b8d5022ac8f4bc41/HLS/c9fa5b263fce42668499ab0376d1ff45/00000000000000000120?start=1774058100&end=1774076700",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/46d9cf39b9a84183b8d5022ac8f4bc41/HLS/c9fa5b263fce42668499ab0376d1ff45/00000000000000000120?start=1774058100&end=1774076700",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 22,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/298212/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "092/691092-SNAPSHOT-l.jpg",
+                                "m": "094/691094-SNAPSHOT-m.jpg",
+                                "s": "098/691098-SNAPSHOT-s.jpg",
+                                "xl": "104/691104-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "LaLiga 2025/26: Villarreal vs Real Sociedad"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3394289491002075",
+                        "deliveryId": "DLVY3394299350000261"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3394289491002075",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3394299350000261",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-20T19:55:00Z",
+                        "broadcastEnd": "2026-03-20T22:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-20T22:00:00Z",
+                        "visibilityCatchupStart": "2026-03-20T22:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-27T18:29:30Z",
+                        "channelServiceId": "00000000000000000122",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774036200&end=1774044300",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1774036200&end=1774044300",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 23,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;7;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/297924/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "888/690888-SNAPSHOT-l.jpg",
+                                "m": "884/690884-SNAPSHOT-m.jpg",
+                                "s": "889/690889-SNAPSHOT-s.jpg",
+                                "xl": "883/690883-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "MotoGP 2026: Estrella Galicia 0,0 Grand Prix of Brazil - Practice"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3298348063001310",
+                        "deliveryId": "DLVY3298367546001464"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3298348063001310",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3298367546001464",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-20T16:10:00Z",
+                        "broadcastEnd": "2026-03-20T20:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-20T20:00:00Z",
+                        "visibilityCatchupStart": "2026-03-20T20:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-27T14:44:30Z",
+                        "channelServiceId": "00000000000000000120",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/46d9cf39b9a84183b8d5022ac8f4bc41/HLS/c9fa5b263fce42668499ab0376d1ff45/00000000000000000120?start=1774022700&end=1774037100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/46d9cf39b9a84183b8d5022ac8f4bc41/HLS/c9fa5b263fce42668499ab0376d1ff45/00000000000000000120?start=1774022700&end=1774037100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 24,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;0;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/298944/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "959/690959-SNAPSHOT-l.jpg",
+                                "m": "962/690962-SNAPSHOT-m.jpg",
+                                "s": "960/690960-SNAPSHOT-s.jpg",
+                                "xl": "963/690963-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Premier Padel 2026: Cancun P2 - Day 3 (2)"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3727472143005236",
+                        "deliveryId": "DLVY3727473467004400"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3727472143005236",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3727473467004400",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-19T22:00:00Z",
+                        "broadcastEnd": "2026-03-20T03:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-20T03:00:00Z",
+                        "visibilityCatchupStart": "2026-03-20T03:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-26T20:34:30Z",
+                        "channelServiceId": "00000000000000000123",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1773957300&end=1773975900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/cfca527d0f16403396a71b2d3d54c32f/HLS/6d91f1c44fde4b938444e7d7588d118b/00000000000000000123?start=1773957300&end=1773975900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 25,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 4,
+                "isAdult": false,
+                "genres": [
+                    "4;3;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/298258/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "647/688647-SNAPSHOT-l.jpg",
+                                "m": "649/688649-SNAPSHOT-m.jpg",
+                                "s": "642/688642-SNAPSHOT-s.jpg",
+                                "xl": "646/688646-SNAPSHOT-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "UEFA Europa League 2025/26: Aston Villa vs Lille - R16, 2nd Leg"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND3394298600005205",
+                        "deliveryId": "DLVY3394299161006790"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND3394298600005205",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3394299161006790",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-19T19:55:00Z",
+                        "broadcastEnd": "2026-03-19T22:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-19T22:00:00Z",
+                        "visibilityCatchupStart": "2026-03-19T22:05:00Z",
+                        "visibilityCatchupEnd": "2026-03-26T18:29:30Z",
+                        "channelServiceId": "00000000000000000122",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1773949800&end=1773957900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d6m3sfa7e58z5/DASH/3b0660e05eed4d769521eb0275aab3ab/HLS/d1fcba91940f4e3d90c125aeb35dd080/00000000000000000122?start=1773949800&end=1773957900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 27,
+            "display": {
+                "localisation": []
+            },
+            "interaction": {
+                "select": {
+                    "type": "PAGE",
+                    "url": "/elements/page/1754",
+                    "method": "GET",
+                    "personalised": false,
+                    "pageId": 1754
+                }
+            },
+            "type": "LINK"
+        }
+    ]
+}
