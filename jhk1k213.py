@@ -6,62 +6,66 @@ import time
 # Pastikan folder ada
 if not os.path.exists('debug_json'):
     os.makedirs('debug_json')
-    print("[*] Folder debug_json siap.")
 
-def scrap_vision_target_1799():
+def scrap_all_vision_events():
     co = ChromiumOptions()
-    co.headless() # Wajib untuk GitHub Actions
+    co.headless()
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
-    co.set_argument('--disable-dev-shm-usage') # Penting untuk lingkungan Docker/Actions
+    co.set_argument('--disable-dev-shm-usage')
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
 
     page = ChromiumPage(co)
-    print("--- TARGETED SNIFFING: API 1799 ONLY ---", flush=True)
+    print("--- GLOBAL SNIFFING: ALL SPORTS EVENTS ---", flush=True)
     
-    # Mulai listen sebelum membuka URL
-    page.listen.start('1799') # Langsung filter target '1799' agar efisien
+    # Listen ke semua URL yang mengandung pola umum API Vision+
+    # Biasanya URL-nya mengandung '/cluster/' atau ID paket tertentu
+    page.listen.start('v1/program') 
     
     try:
         url = 'https://www.visionplus.id/webclient/?pageId=4030'
         print(f"[*] Membuka Vision+ Sports Page...", flush=True)
         page.get(url)
         
-        # Trigger scroll agar API dipanggil
-        for s in range(3):
-            page.scroll.down(1500)
-            print(f"    > Triggering data (Step {s+1}/3)...", flush=True)
-            time.sleep(3) # Beri jeda lebih lama agar loading selesai
+        # Scroll lebih banyak dan lebih lama untuk memancing semua API keluar
+        for s in range(6): # Tambah range scroll
+            page.scroll.down(2000)
+            print(f"    > Scrolled (Step {s+1}/6)...", flush=True)
+            time.sleep(4) 
 
-        print("[*] Menunggu paket 1799 muncul...", flush=True)
+        print("[*] Mengumpulkan semua paket data yang tertangkap...", flush=True)
         
-        # GANTI STEPS DENGAN WAIT (Lebih stabil)
-        res = page.listen.wait(timeout=60) 
-        
-        if res:
-            print(f"[+] Paket ditemukan: {res.url}", flush=True)
-            body = res.response.body
+        captured_count = 0
+        all_nodes = []
+
+        # Ambil semua paket yang sudah tertangkap di buffer listener
+        for res in page.listen.steps(count=10, timeout=10):
+            if res.response.body:
+                data = res.response.body
+                # Pastikan ini adalah data event (memiliki struktur 'nodes')
+                if isinstance(data, dict) and 'nodes' in data:
+                    all_nodes.extend(data['nodes'])
+                    captured_count += 1
+                    print(f"    [+] Berhasil mengambil {len(data['nodes'])} node dari: {res.url[:50]}...", flush=True)
+
+        if all_nodes:
+            # Gabungkan semua ke dalam satu file utama agar Cloudflare Worker mudah membacanya
+            final_data = {"nodes": all_nodes}
+            filename = "debug_json/paket_21_1799.json" # Tetap gunakan nama ini agar Worker tidak perlu diubah
             
-            if body:
-                filename = "debug_json/paket_21_1799.json"
-                with open(filename, "w", encoding="utf-8") as f:
-                    json.dump(body, f, indent=4)
-                print(f"[OK] BERHASIL! Data disimpan ke {filename}", flush=True)
-            else:
-                print("[-] Respon kosong (body is None)", flush=True)
+            with open(filename, "w", encoding="utf-8") as f:
+                json.dump(final_data, f, indent=4)
+            
+            print(f"\n[OK] TOTAL: {len(all_nodes)} event disimpan ke {filename}", flush=True)
         else:
-            print("[-] Gagal: Paket 1799 tidak lewat dalam 60 detik.", flush=True)
+            print("[-] Tidak ada data event yang tertangkap.", flush=True)
 
     except Exception as e:
-        print(f"[-] Error fatal: {e}", flush=True)
+        print(f"[-] Error: {e}", flush=True)
     finally:
-        # Stop listener dengan aman
-        try:
-            page.listen.stop()
-        except:
-            pass
+        page.listen.stop()
         page.quit()
         print("[*] Selesai.", flush=True)
 
 if __name__ == "__main__":
-    scrap_vision_target_1799()
+    scrap_all_vision_events()
