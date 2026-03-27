@@ -3,78 +3,70 @@ import json
 import os
 import time
 
-# Persiapan Folder
-# Folder ini akan menampung semua file JSON mentah dari network
+# Folder hasil scan
 if not os.path.exists('debug_json'):
     os.makedirs('debug_json')
-    print("[*] Folder 'debug_json' telah dibuat.")
 
-def scrap_vision_raw_per_file():
-    # Konfigurasi Browser (Wajib Headless untuk GitHub Actions)
+def scrap_vision_nested():
     co = ChromiumOptions()
     co.headless()
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
     co.set_argument('--disable-dev-shm-usage')
-    co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
-
-    page = ChromiumPage(co)
-    print("\n" + "="*50)
-    print("--- MODE SIMPAN RAW JSON PER-FILE ---")
-    print("="*50 + "\n")
     
-    # Mulai pantau Network
-    print("[*] Memulai Network Listener...", flush=True)
-    page.listen.start() 
+    page = ChromiumPage(co)
+    print("\n[*] MEMULAI SNIFFING STRIP 4030...")
+    
+    page.listen.start()
     
     try:
-        url = 'https://www.visionplus.id/webclient/?pageId=4030'
-        print(f"[*] Menuju URL: {url}", flush=True)
-        page.get(url)
+        # 1. Buka halaman utama 4030
+        url_main = 'https://www.visionplus.id/webclient/?pageId=4030'
+        page.get(url_main)
         
-        # Simulasi Interaksi untuk memancing API keluar
-        print("[*] Melakukan Auto-Scroll (6 Step) untuk memicu API...", flush=True)
-        for s in range(6):
-            page.scroll.down(2500)
-            print(f"    > Scroll Step {s+1}/6 dijalankan.", flush=True)
-            time.sleep(3) # Jeda agar API sempat merespon
+        # Jeda untuk memastikan semua paket strips terpanggil
+        print("[*] Menunggu API Strips muncul...")
+        time.sleep(5)
+        page.scroll.down(3000)
+        time.sleep(5)
 
-        print("\n[*] Menganalisis dan menyimpan paket JSON...", flush=True)
+        print("\n[*] Menyimpan semua paket JSON yang masuk...")
         count = 0
         
-        # Tangkap semua paket yang lewat di buffer
-        for res in page.listen.steps(count=120, timeout=5):
+        # 2. Tangkap semua file (Termasuk 9 strip detail tersebut)
+        for res in page.listen.steps(count=100, timeout=10):
             try:
-                # Syarat: Harus ada body dan formatnya JSON (dict/list)
                 if res.response.body is not None:
                     body = res.response.body
-                    
                     if isinstance(body, (dict, list)):
                         count += 1
                         
-                        # Ambil nama endpoint URL agar file mudah dikenali (misal: menu.json)
-                        url_endpoint = res.url.split('/')[-1].split('?')[0] or "root_api"
-                        # Bersihkan karakter aneh jika ada
-                        filename = f"debug_json/paket_{count}_{url_endpoint}.json"
+                        # Identifikasi nama file
+                        # Jika paket berasal dari /elements/strips/xxxxx
+                        if '/elements/strips/' in res.url:
+                            strip_id = res.url.split('/')[-1].split('?')[0]
+                            filename = f"debug_json/DETAIL_STRIP_{strip_id}.json"
+                        elif '/elements/page/4030' in res.url:
+                            filename = f"debug_json/MAIN_PAGE_4030.json"
+                        else:
+                            url_path = res.url.split('/')[-1].split('?')[0] or "api"
+                            filename = f"debug_json/paket_{count}_{url_path}.json"
                         
-                        # Simpan masing-masing paket ke file tersendiri
                         with open(filename, "w", encoding="utf-8") as f:
                             json.dump(body, f, indent=4)
                         
-                        print(f"    [SAVED] #{count}: {filename}", flush=True)
-                
-            except Exception:
-                # Skip jika body bukan JSON atau error lainnya
+                        print(f"    [SAVED] {filename}")
+            except:
                 continue
 
-        print(f"\n[+] SELESAI: Berhasil menyimpan {count} file JSON di folder 'debug_json'.")
+        print(f"\n[+] BERHASIL: Cek folder 'debug_json'.")
+        print("[*] File dengan awalan 'DETAIL_STRIP_' adalah isi dari 9 event tersebut.")
 
     except Exception as e:
-        print(f"\n[-] ERROR FATAL: {e}")
+        print(f"[-] ERROR: {e}")
     finally:
-        print("\n[*] Menutup browser session...", flush=True)
         page.listen.stop()
         page.quit()
 
 if __name__ == "__main__":
-    scrap_vision_raw_per_file()
+    scrap_vision_nested()
