@@ -3,73 +3,65 @@ import json
 import os
 import time
 
-output_dir = 'debug_json'
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+# Pastikan folder ada
+if not os.path.exists('debug_json'):
+    os.makedirs('debug_json')
+    print("[*] Folder debug_json siap.")
 
 def scrap_vision_target_1799():
     co = ChromiumOptions()
-    co.headless()
+    co.headless() # Wajib untuk GitHub Actions
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
-    co.set_argument('--disable-dev-shm-usage')
-    
+    co.set_argument('--disable-dev-shm-usage') # Penting untuk lingkungan Docker/Actions
+    co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+
     page = ChromiumPage(co)
-    print("\n[*] FOKUS TARGET: STRIP 1799 & 1779 (LIVE EVENTS)...")
+    print("--- TARGETED SNIFFING: API 1799 ONLY ---", flush=True)
     
-    # Kita tambahkan 1779 dan 1799 ke daftar buruan
-    target_ids = ['1799', '1779', '18894', '13452'] 
+    # Mulai listen sebelum membuka URL
+    page.listen.start('1799') # Langsung filter target '1799' agar efisien
     
     try:
-        page.get('https://www.visionplus.id/webclient/?pageId=4030')
-        print("[*] Sinkronisasi Session... (10 detik)")
-        time.sleep(10)
+        url = 'https://www.visionplus.id/webclient/?pageId=4030'
+        print(f"[*] Membuka Vision+ Sports Page...", flush=True)
+        page.get(url)
+        
+        # Trigger scroll agar API dipanggil
+        for s in range(3):
+            page.scroll.down(1500)
+            print(f"    > Triggering data (Step {s+1}/3)...", flush=True)
+            time.sleep(3) # Beri jeda lebih lama agar loading selesai
 
-        for s_id in target_ids:
-            print(f"    [>] Menarik Konten Strip ID: {s_id}...")
+        print("[*] Menunggu paket 1799 muncul...", flush=True)
+        
+        # GANTI STEPS DENGAN WAIT (Lebih stabil)
+        res = page.listen.wait(timeout=60) 
+        
+        if res:
+            print(f"[+] Paket ditemukan: {res.url}", flush=True)
+            body = res.response.body
             
-            # Gunakan pageSize besar agar semua jadwal keluar
-            api_url = (
-                f"https://www.visionplus.id/elements/strips/{s_id}?"
-                "language=ENG&mode=guest&page=0&pageSize=100&partition=IndonesiaPartition&region=Indonesia&target=WEB"
-            )
-            
-            script = f"""
-            return fetch('{api_url}', {{
-                "headers": {{
-                    "accept": "application/json",
-                    "x-requested-with": "XMLHttpRequest"
-                }}
-            }})
-            .then(res => res.json())
-            .catch(err => "ERROR");
-            """
-            
-            result = page.run_js(script)
-            
-            if result and result != "ERROR":
-                filename = f"{output_dir}/DETAIL_STRIP_{s_id}.json"
+            if body:
+                filename = "debug_json/paket_21_1799.json"
                 with open(filename, "w", encoding="utf-8") as f:
-                    json.dump(result, f, indent=4)
-                
-                # Cek isi konten
-                items = result.get('contents', [])
-                print(f"    [SUCCESS] ID {s_id}: Tersimpan {len(items)} pertandingan.")
-                
-                # Jika ada konten, tampilkan 3 judul pertama di log buat bukti
-                if items:
-                    for idx, item in enumerate(items[:3]):
-                        print(f"        - Event {idx+1}: {item.get('title')}")
+                    json.dump(body, f, indent=4)
+                print(f"[OK] BERHASIL! Data disimpan ke {filename}", flush=True)
             else:
-                print(f"    [FAILED] ID {s_id} tidak merespon.")
-            
-            time.sleep(5)
+                print("[-] Respon kosong (body is None)", flush=True)
+        else:
+            print("[-] Gagal: Paket 1799 tidak lewat dalam 60 detik.", flush=True)
 
     except Exception as e:
-        print(f"[-] Error: {e}")
+        print(f"[-] Error fatal: {e}", flush=True)
     finally:
+        # Stop listener dengan aman
+        try:
+            page.listen.stop()
+        except:
+            pass
         page.quit()
-        print("\n[*] PROSES TARGET KHUSUS SELESAI.")
+        print("[*] Selesai.", flush=True)
 
 if __name__ == "__main__":
     scrap_vision_target_1799()
