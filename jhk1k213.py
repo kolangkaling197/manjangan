@@ -7,7 +7,7 @@ if not os.path.exists('debug_json'):
     os.makedirs('debug_json')
     print("[*] Folder debug_json siap.")
 
-def scrap_vision_target_1799():
+def scrap_vision_all_strips():
     co = ChromiumOptions()
     co.headless()
     co.set_argument('--no-sandbox')
@@ -17,38 +17,31 @@ def scrap_vision_target_1799():
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("--- DIAGNOSTIC MODE: LISTEN ALL + PRINT SEMUA URL ---", flush=True)
+    print("--- SCRAPING SEMUA STRIP DI PAGE 4030 ---", flush=True)
    
-    # Listen SEMUA request (tidak dibatasi 1799)
-    page.listen.start()
+    # Listen ke SEMUA strip (bukan hanya 1799)
+    page.listen.start('strips')
    
     try:
         url = 'https://www.visionplus.id/webclient/?pageId=4030'
-        print(f"[*] Membuka halaman...", flush=True)
+        print(f"[*] Membuka halaman Live Sport Events...", flush=True)
         page.get(url)
         page.wait.doc_loaded(timeout=15)
         
-        print("[*] Mulai scroll agresif + diagnostic (20 step)...")
-        max_content = 0
-        best_body = None
-        caught_urls = []
+        print("[*] Scroll super agresif untuk load semua strip...")
+        strip_data = {}   # simpan per strip
         
-        for s in range(20):   # 20x scroll biar sangat agresif
-            page.scroll.to_bottom()   # pakai to_bottom agar lebih kuat
-            print(f" > Scroll step {s+1}/20...", flush=True)
-            time.sleep(4)
+        for s in range(18):
+            page.scroll.to_bottom()
+            print(f" > Scroll step {s+1}/18...", flush=True)
+            time.sleep(3.5)
             
-            res = page.listen.wait(timeout=6)
-            if res and res.response.body:
+            res = page.listen.wait(timeout=8)
+            if res and 'strips' in res.url and res.response.body:
                 url_str = res.url
-                caught_urls.append(url_str)
-                print(f"   [CAUGHT] {url_str}", flush=True)
+                strip_id = url_str.split('/strips/')[1].split('?')[0]
+                print(f"   [CAUGHT] Strip ID: {strip_id}", flush=True)
                 
-                # Cek apakah ini strip/content
-                if any(x in url_str for x in ['strips', 'elements', 'content', '1799', '1800']):
-                    print(f"   *** POTENTIAL NEW BATCH: {url_str} ***", flush=True)
-                
-                # Parse body dan hitung event
                 try:
                     body = res.response.body
                     if isinstance(body, (bytes, bytearray)):
@@ -56,44 +49,41 @@ def scrap_vision_target_1799():
                     elif isinstance(body, str):
                         body = json.loads(body)
                     
-                    content_count = sum(1 for item in body if isinstance(item, dict) and item.get("cellType") == "CONTENT")
-                    if content_count > max_content:
-                        max_content = content_count
-                        best_body = body
-                        print(f"   [+] Event CONTENT naik jadi: {content_count}", flush=True)
+                    # Hitung berapa event CONTENT
+                    content_list = [item for item in body if isinstance(item, dict) and item.get("cellType") == "CONTENT"]
+                    count = len(content_list)
+                    
+                    strip_data[strip_id] = {
+                        "url": url_str,
+                        "content_count": count,
+                        "data": body
+                    }
+                    
+                    print(f"   [+] Strip {strip_id} → {count} event", flush=True)
+                    
+                    # Simpan tiap strip
+                    with open(f"debug_json/strip_{strip_id}.json", "w", encoding="utf-8") as f:
+                        json.dump(body, f, indent=4, ensure_ascii=False)
+                        
                 except:
                     pass
         
-        # Coba klik Load More button (kalau ada)
-        print("[*] Mencoba klik Load More button...")
-        try:
-            # Bisa pakai text atau class (sesuai website Vision+)
-            load_more = page.ele('text:contains("Lebih")') or page.ele('text:contains("More")') or page.ele('.load-more') or page.ele('a[href*="pageId=4030"]')
-            if load_more:
-                load_more.click()
-                print("[+] Load More button diklik!", flush=True)
-                time.sleep(6)
-                res = page.listen.wait(timeout=10)
-                if res:
-                    print(f"   [CAUGHT after click] {res.url}", flush=True)
-        except Exception as click_err:
-            print(f"   [-] Tidak menemukan Load More button: {click_err}", flush=True)
-        
-        # Simpan hasil terbaik
-        if best_body:
-            filename = "debug_json/paket_21_1799.json"
-            with open(filename, "w", encoding="utf-8") as f:
-                json.dump(best_body, f, indent=4, ensure_ascii=False)
-            print(f"[OK] BERHASIL! Total CONTENT event: {max_content} → disimpan ke {filename}", flush=True)
-        else:
-            print("[-] Tidak ada data CONTENT yang berhasil diambil.", flush=True)
+        # Cari strip dengan event terbanyak (kemungkinan besar 32)
+        if strip_data:
+            best_strip = max(strip_data.values(), key=lambda x: x["content_count"])
+            best_id = max(strip_data, key=lambda k: strip_data[k]["content_count"])
             
-        # Tampilkan semua URL yang pernah tertangkap
-        print(f"\n[*] Total {len(caught_urls)} request tertangkap. URL yang berpotensi strip:")
-        for u in caught_urls:
-            if any(x in u for x in ['strips', 'elements', 'content']):
-                print(f"   → {u}")
-        
+            print(f"\n[OK] STRIP TERBAIK: {best_id} ({best_strip['content_count']} event)")
+            print(f"[OK] Total strip yang berhasil di-load: {len(strip_data)}")
+            
+            # Simpan juga sebagai paket utama
+            with open("debug_json/paket_full_events.json", "w", encoding="utf-8") as f:
+                json.dump(best_strip["data"], f, indent=4, ensure_ascii=False)
+            
+            print(f"[OK] Data lengkap disimpan ke debug_json/paket_full_events.json")
+        else:
+            print("[-] Tidak ada strip yang tertangkap.")
+            
     except Exception as e:
         print(f"[-] Error fatal: {e}", flush=True)
     finally:
@@ -102,4 +92,4 @@ def scrap_vision_target_1799():
         print("[*] Browser ditutup. Selesai.", flush=True)
 
 if __name__ == "__main__":
-    scrap_vision_target_1799()
+    scrap_vision_all_strips()
