@@ -10,58 +10,70 @@ if not os.path.exists('debug_json'):
 
 def scrap_vision_target_1799():
     co = ChromiumOptions()
-    co.headless() # Wajib untuk GitHub Actions
+    co.headless()
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
-    co.set_argument('--disable-dev-shm-usage') # Penting untuk lingkungan Docker/Actions
-    co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
-
+    co.set_argument('--disable-dev-shm-usage')
+    co.set_argument('--disable-blink-features=AutomationControlled')  # anti-detect tambahan
+    co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
+    
     page = ChromiumPage(co)
     print("--- TARGETED SNIFFING: API 1799 ONLY ---", flush=True)
-    
-    # Mulai listen sebelum membuka URL
-    page.listen.start('1799') # Langsung filter target '1799' agar efisien
-    
+   
+    # Mulai listen SEBELUM buka halaman
+    page.listen.start('1799')
+   
     try:
         url = 'https://www.visionplus.id/webclient/?pageId=4030'
         print(f"[*] Membuka Vision+ Sports Page...", flush=True)
         page.get(url)
         
-        # Trigger scroll agar API dipanggil
-        for s in range(3):
-            page.scroll.down(1500)
-            print(f"    > Triggering data (Step {s+1}/3)...", flush=True)
-            time.sleep(3) # Beri jeda lebih lama agar loading selesai
-
+        # Tunggu halaman benar-benar loaded dulu
+        print("[*] Menunggu halaman load complete...", flush=True)
+        page.wait.load_complete(timeout=15)
+        
+        # Trigger scroll (lebih agresif)
+        for s in range(4):
+            page.scroll.down(1200)
+            print(f" > Triggering data (Step {s+1}/4)...", flush=True)
+            time.sleep(2.5)
+        
         print("[*] Menunggu paket 1799 muncul...", flush=True)
         
-        # GANTI STEPS DENGAN WAIT (Lebih stabil)
-        res = page.listen.wait(timeout=60) 
+        # Loop wait biar lebih aman (bisa nangkap kalau ada delay)
+        res = None
+        for attempt in range(8):  # max 8x percobaan
+            res = page.listen.wait(timeout=12)
+            if res:
+                print(f"[+] Paket ditemukan pada attempt {attempt+1}: {res.url}", flush=True)
+                break
+            print(f"[-] Attempt {attempt+1}/8: belum ketemu...", flush=True)
         
-        if res:
-            print(f"[+] Paket ditemukan: {res.url}", flush=True)
+        if res and res.response.body:
             body = res.response.body
+            # Safety: kalau body masih bytes/str, parse dulu
+            if isinstance(body, (bytes, bytearray)):
+                body = json.loads(body.decode('utf-8'))
+            elif isinstance(body, str):
+                body = json.loads(body)
             
-            if body:
-                filename = "debug_json/paket_21_1799.json"
-                with open(filename, "w", encoding="utf-8") as f:
-                    json.dump(body, f, indent=4)
-                print(f"[OK] BERHASIL! Data disimpan ke {filename}", flush=True)
-            else:
-                print("[-] Respon kosong (body is None)", flush=True)
+            filename = "debug_json/paket_21_1799.json"
+            with open(filename, "w", encoding="utf-8") as f:
+                json.dump(body, f, indent=4, ensure_ascii=False)
+            
+            print(f"[OK] BERHASIL! Data disimpan ke {filename} ({len(str(body))} chars)", flush=True)
         else:
-            print("[-] Gagal: Paket 1799 tidak lewat dalam 60 detik.", flush=True)
-
+            print("[-] Gagal: Paket 1799 tidak ditemukan dalam waktu tunggu.", flush=True)
+            
     except Exception as e:
         print(f"[-] Error fatal: {e}", flush=True)
     finally:
-        # Stop listener dengan aman
         try:
             page.listen.stop()
         except:
             pass
         page.quit()
-        print("[*] Selesai.", flush=True)
+        print("[*] Browser ditutup. Selesai.", flush=True)
 
 if __name__ == "__main__":
     scrap_vision_target_1799()
