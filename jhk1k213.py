@@ -7,72 +7,72 @@ output_dir = 'debug_json'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-def scrap_vision_brute():
+def scrap_vision_final_boss():
     co = ChromiumOptions()
     co.headless()
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
     
     page = ChromiumPage(co)
-    print("\n[*] MEMULAI MODE BRUTE FORCE (DIRECT ID ACCESS)...")
+    print("\n[*] MEMULAI MODE FINAL BOSS (API DIRECT FETCH)...")
     
     try:
-        # STEP 1: Ambil Peta Utama (Isinya daftar ID 9 Strip itu)
+        # STEP 1: Ambil Peta Utama
         main_api = "https://www.visionplus.id/elements/page/4030?language=ENG&mode=guest&partition=IndonesiaPartition&region=Indonesia&target=WEB"
-        print(f"[*] Mengambil daftar ID dari: {main_api}")
+        print(f"[*] Mengambil peta utama...")
         
         page.get(main_api)
         time.sleep(5)
         
-        # Ekstrak konten JSON dari halaman
-        raw_html = page.html
-        if 'pre style=' in raw_html:
-            json_str = raw_html.split('pre style="word-wrap: break-word; white-space: pre-wrap;">')[1].split('</pre>')[0]
-            main_data = json.loads(json_str)
-        else:
-            # Fallback jika tampilan beda
-            main_data = json.loads(page.ele('tag:body').text)
+        # Ambil data dari elemen body langsung (cara paling aman)
+        raw_text = page.ele('tag:body').text
+        main_data = json.loads(raw_text)
 
         # Simpan file utama
         with open(f"{output_dir}/UTAMA_4030.json", "w") as f:
             json.dump(main_data, f, indent=4)
 
-        # STEP 2: Cari semua URL Strip
+        # STEP 2: Cari semua ID Strip
         target_urls = []
         for comp in main_data.get('components', []):
             for content in comp.get('contents', []):
                 load_url = content.get('load', {}).get('url')
                 if load_url and '/elements/strips/' in load_url:
-                    full_url = f"https://www.visionplus.id{load_url}?language=ENG&mode=guest&partition=IndonesiaPartition&region=Indonesia&target=WEB"
+                    # Bersihkan URL agar tidak double parameter
+                    clean_path = load_url.split('?')[0]
+                    full_url = f"https://www.visionplus.id{clean_path}?language=ENG&mode=guest&partition=IndonesiaPartition&region=Indonesia&target=WEB"
                     target_urls.append(full_url)
 
-        print(f"[+] Ditemukan {len(target_urls)} Target Strip. Mulai download paksa...")
+        print(f"[+] Ditemukan {len(target_urls)} Target Strip. Mulai download...")
 
-        # STEP 3: Hajar satu per satu
+        # STEP 3: Download menggunakan direct navigation
         for index, s_url in enumerate(target_urls):
             strip_id = s_url.split('/')[-1].split('?')[0]
-            print(f"    [>] Downloading {index+1}/{len(target_urls)}: ID {strip_id}")
+            print(f"    [>] Ambil Data Strip {index+1}/{len(target_urls)} (ID: {strip_id})")
             
+            # Kunjungi URL API langsung
             page.get(s_url)
-            time.sleep(2) # Jeda sopan agar tidak kena block
+            time.sleep(3) # Kasih napas 3 detik
             
             try:
-                # Ambil JSON dari browser
-                s_raw = page.html.split('pre style="word-wrap: break-word; white-space: pre-wrap;">')[1].split('</pre>')[0]
-                s_json = json.loads(s_raw)
+                # Ambil teks mentah dari body browser
+                content_text = page.ele('tag:body').text
+                
+                # Validasi apakah isinya JSON
+                strip_json = json.loads(content_text)
                 
                 filename = f"{output_dir}/DETAIL_STRIP_{strip_id}.json"
                 with open(filename, "w", encoding="utf-8") as f:
-                    json.dump(s_json, f, indent=4)
-                print(f"    [SUCCESS] {filename}")
-            except:
-                print(f"    [FAILED] Gagal ambil ID {strip_id}")
+                    json.dump(strip_json, f, indent=4)
+                print(f"    [SUCCESS] Tersimpan ke {filename}")
+            except Exception as e:
+                print(f"    [FAILED] Gagal simpan ID {strip_id}. Error: {e}")
 
     except Exception as e:
-        print(f"[-] Error: {e}")
+        print(f"[-] Error Global: {e}")
     finally:
         page.quit()
-        print("\n[*] SEMUA STRIP BERHASIL DIAMANKAN.")
+        print("\n[*] PROSES SELESAI.")
 
 if __name__ == "__main__":
-    scrap_vision_brute()
+    scrap_vision_final_boss()
