@@ -6,9 +6,8 @@ import re
 
 if not os.path.exists('debug_json_clean'):
     os.makedirs('debug_json_clean')
-    print("[*] Folder debug_json_clean siap.")
 
-def scrap_vision_clean_strips():
+def scrap_vision_all_clean_strips():
     co = ChromiumOptions()
     co.headless()
     co.set_argument('--no-sandbox')
@@ -18,24 +17,23 @@ def scrap_vision_clean_strips():
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("--- SCRAPING CLEAN STRIP (hanya file yang ada angkanya) ---", flush=True)
+    print("--- SCRAPING SEMUA CLEAN STRIP (termasuk 14235) ---", flush=True)
    
-    page.listen.start('strips')   # hanya dengar strip
-    
+    page.listen.start('strips')
+   
     try:
         url = 'https://www.visionplus.id/webclient/?pageId=4030'
         page.get(url)
         page.wait.doc_loaded(timeout=15)
         
-        print("[*] Scroll agresif untuk ambil semua strip...")
-        for s in range(15):
+        print("[*] Scroll super agresif + auto-request semua strip...")
+        for s in range(20):
             page.scroll.to_bottom()
-            print(f" > Scroll step {s+1}/15", flush=True)
-            time.sleep(3.5)
+            print(f" > Scroll step {s+1}/20", flush=True)
+            time.sleep(3)
             
-            res = page.listen.wait(timeout=8)
-            if res and res.response.body and '/strips/' in res.url:
-                # Ambil ID strip dari URL
+            res = page.listen.wait(timeout=6)
+            if res and '/strips/' in res.url:
                 match = re.search(r'/strips/(\d+)', res.url)
                 if match:
                     strip_id = match.group(1)
@@ -50,13 +48,12 @@ def scrap_vision_clean_strips():
                         with open(filename, "w", encoding="utf-8") as f:
                             json.dump(body, f, indent=4, ensure_ascii=False)
                         
-                        # Hitung event
                         content_count = sum(1 for item in body if isinstance(item, dict) and item.get("cellType") == "CONTENT")
                         print(f"[OK] clean_strip_{strip_id}.json → {content_count} event", flush=True)
                     except:
                         pass
         
-        print("\n[🎉 SELESAI] Semua clean_strip_*.json sudah disimpan!")
+        print("\n[🎉 SELESAI] Semua clean_strip sudah disimpan!")
         
     except Exception as e:
         print(f"[-] Error: {e}", flush=True)
@@ -66,4 +63,4 @@ def scrap_vision_clean_strips():
         print("[*] Browser ditutup.")
 
 if __name__ == "__main__":
-    scrap_vision_clean_strips()
+    scrap_vision_all_clean_strips()
