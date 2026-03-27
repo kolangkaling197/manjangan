@@ -7,55 +7,66 @@ output_dir = 'debug_json'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-def scrap_vision_inject():
+def scrap_vision_content_hunter():
     co = ChromiumOptions()
     co.headless()
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
     co.set_argument('--disable-dev-shm-usage')
-    co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("\n[*] MEMULAI MODE INJEKSI JAVASCRIPT...")
+    print("\n[*] MEMULAI MODE CONTENT HUNTER (AMBIL JADWAL ASLI)...")
     
     target_ids = ['18894', '13452', '14235', '12420', '18832', '18914', '18916', '18918']
     
     try:
-        # 1. Buka halaman utama dulu agar dapat Cookies/Session
+        # Buka halaman utama untuk validasi session
         page.get('https://www.visionplus.id/webclient/?pageId=4030')
-        print("[*] Menunggu Session/Cookies stabil...")
+        print("[*] Menunggu Sinkronisasi Session...")
         time.sleep(10)
 
-        # 2. Hajar API secara internal lewat Fetch JS (Bypass CORS/Bot Detection)
         for s_id in target_ids:
-            print(f"    [>] Mengambil Strip ID: {s_id} via Injeksi...")
+            print(f"    [>] Menarik Jadwal Lengkap ID: {s_id}...")
             
-            api_url = f"https://www.visionplus.id/elements/strips/{s_id}?language=ENG&mode=guest&partition=IndonesiaPartition&region=Indonesia&target=WEB"
+            # KUNCI UTAMA: Menambahkan page=0 dan pageSize=50 untuk memaksa data jadwal keluar
+            api_url = (
+                f"https://www.visionplus.id/elements/strips/{s_id}?"
+                "language=ENG&mode=guest&page=0&pageSize=50&partition=IndonesiaPartition&region=Indonesia&target=WEB"
+            )
             
-            # Kita suruh browser yang melakukan fetch, bukan Python
+            # Injeksi Fetch
             script = f"""
-            return fetch('{api_url}')
-              .then(response => response.json())
-              .catch(err => 'ERROR');
+            return fetch('{api_url}', {{
+                "headers": {{
+                    "accept": "application/json",
+                    "x-requested-with": "XMLHttpRequest"
+                }}
+            }})
+            .then(res => res.json())
+            .catch(err => "ERROR");
             """
             
             result = page.run_js(script)
             
-            if result != 'ERROR' and result is not None:
+            if result and result != "ERROR":
+                # Cek apakah ada field 'contents' di dalam JSON-nya
                 filename = f"{output_dir}/DETAIL_STRIP_{s_id}.json"
                 with open(filename, "w", encoding="utf-8") as f:
                     json.dump(result, f, indent=4)
-                print(f"    [SUCCESS] Berhasil mengamankan ID: {s_id}")
+                
+                # Hitung berapa banyak jadwal yang tertangkap
+                items = result.get('contents', [])
+                print(f"    [SUCCESS] Tersimpan! Ditemukan {len(items)} jadwal pertandingan.")
             else:
-                print(f"    [FAILED] ID {s_id} diblokir atau gagal.")
+                print(f"    [FAILED] Gagal menarik data ID: {s_id}")
             
-            time.sleep(3) # Jeda antar request
+            time.sleep(5)
 
     except Exception as e:
         print(f"[-] Error: {e}")
     finally:
         page.quit()
-        print("\n[*] PROSES SELESAI.")
+        print("\n[*] SEMUA JADWAL BERHASIL DIPROSES.")
 
 if __name__ == "__main__":
-    scrap_vision_inject()
+    scrap_vision_content_hunter()
