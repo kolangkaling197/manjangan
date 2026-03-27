@@ -1,4 +1,4 @@
-name: Vision Plus Scraper
+name: Vision Plus Scraper - Clean Strips
 
 on:
   workflow_dispatch:
@@ -32,24 +32,23 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y google-chrome-stable
 
-    - name: Run Scraper
+    - name: Run Scraper (ambil clean_strip_*.json)
       run: |
-        mkdir -p debug_json
+        mkdir -p debug_json_clean
         python jhk1k213.py
 
-    # ←←← TIDAK ADA LAGI STEP rm -f (ini penyebab masalah tadi)
-
-    - name: Commit and Push changes
+    - name: Commit & Push Clean Strip Files
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
-        git add debug_json/*.json
+        git add debug_json_clean/clean_strip_*.json
         
         if ! git diff --cached --quiet; then
-          git commit -m "Update Vision+ Packets: $(date)"
+          git commit -m "Update Clean Strip Files: $(date)"
           git pull --rebase --autostash origin main
           git push origin main
+          echo "✅ Berhasil update clean_strip files"
         else
           echo "Tidak ada perubahan data baru."
         fi
@@ -58,5 +57,5 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: 1799-data
-        path: debug_json/
+        name: clean-strips-data
+        path: debug_json_clean/
