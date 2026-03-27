@@ -17,27 +17,38 @@ def scrap_vision_target_1799():
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("--- TARGETED SNIFFING: ALL STRIPS (untuk load more) ---", flush=True)
+    print("--- DIAGNOSTIC MODE: LISTEN ALL + PRINT SEMUA URL ---", flush=True)
    
-    # Dengar SEMUA request (bukan hanya 1799) supaya nangkap batch ke-2
+    # Listen SEMUA request (tidak dibatasi 1799)
     page.listen.start()
    
     try:
         url = 'https://www.visionplus.id/webclient/?pageId=4030'
-        print(f"[*] Membuka Vision+ Sports Page...", flush=True)
+        print(f"[*] Membuka halaman...", flush=True)
         page.get(url)
         page.wait.doc_loaded(timeout=15)
         
-        print("[*] Scroll agresif untuk trigger load more (target 32 event)...")
-        events_before = 0
-        for s in range(12):          # naikkan jadi 12x
-            page.scroll.down(800)
-            print(f" > Scroll step {s+1}/12...", flush=True)
-            time.sleep(3)            # jeda lebih lama biar loading selesai
+        print("[*] Mulai scroll agresif + diagnostic (20 step)...")
+        max_content = 0
+        best_body = None
+        caught_urls = []
+        
+        for s in range(20):   # 20x scroll biar sangat agresif
+            page.scroll.to_bottom()   # pakai to_bottom agar lebih kuat
+            print(f" > Scroll step {s+1}/20...", flush=True)
+            time.sleep(4)
             
-            # Cek apakah ada paket baru
-            res = page.listen.wait(timeout=8)
+            res = page.listen.wait(timeout=6)
             if res and res.response.body:
+                url_str = res.url
+                caught_urls.append(url_str)
+                print(f"   [CAUGHT] {url_str}", flush=True)
+                
+                # Cek apakah ini strip/content
+                if any(x in url_str for x in ['strips', 'elements', 'content', '1799', '1800']):
+                    print(f"   *** POTENTIAL NEW BATCH: {url_str} ***", flush=True)
+                
+                # Parse body dan hitung event
                 try:
                     body = res.response.body
                     if isinstance(body, (bytes, bytearray)):
@@ -45,34 +56,44 @@ def scrap_vision_target_1799():
                     elif isinstance(body, str):
                         body = json.loads(body)
                     
-                    # Hitung berapa CONTENT event di paket ini
                     content_count = sum(1 for item in body if isinstance(item, dict) and item.get("cellType") == "CONTENT")
-                    if content_count > events_before:
-                        print(f"   [+] Dapat {content_count} event baru!", flush=True)
-                        events_before = content_count
+                    if content_count > max_content:
+                        max_content = content_count
+                        best_body = body
+                        print(f"   [+] Event CONTENT naik jadi: {content_count}", flush=True)
                 except:
                     pass
         
-        print("[*] Menunggu paket terakhir...", flush=True)
-        res = page.listen.wait(timeout=15)
+        # Coba klik Load More button (kalau ada)
+        print("[*] Mencoba klik Load More button...")
+        try:
+            # Bisa pakai text atau class (sesuai website Vision+)
+            load_more = page.ele('text:contains("Lebih")') or page.ele('text:contains("More")') or page.ele('.load-more') or page.ele('a[href*="pageId=4030"]')
+            if load_more:
+                load_more.click()
+                print("[+] Load More button diklik!", flush=True)
+                time.sleep(6)
+                res = page.listen.wait(timeout=10)
+                if res:
+                    print(f"   [CAUGHT after click] {res.url}", flush=True)
+        except Exception as click_err:
+            print(f"   [-] Tidak menemukan Load More button: {click_err}", flush=True)
         
-        if res and res.response.body:
-            body = res.response.body
-            if isinstance(body, (bytes, bytearray)):
-                body = json.loads(body.decode('utf-8'))
-            elif isinstance(body, str):
-                body = json.loads(body)
-            
+        # Simpan hasil terbaik
+        if best_body:
             filename = "debug_json/paket_21_1799.json"
             with open(filename, "w", encoding="utf-8") as f:
-                json.dump(body, f, indent=4, ensure_ascii=False)
-            
-            total_content = sum(1 for item in body if isinstance(item, dict) and item.get("cellType") == "CONTENT")
-            print(f"[OK] BERHASIL! Total CONTENT event: {total_content} (seharusnya 32)", flush=True)
-            print(f"[OK] Data disimpan ke {filename}", flush=True)
+                json.dump(best_body, f, indent=4, ensure_ascii=False)
+            print(f"[OK] BERHASIL! Total CONTENT event: {max_content} → disimpan ke {filename}", flush=True)
         else:
-            print("[-] Masih belum ketemu batch ke-2.", flush=True)
+            print("[-] Tidak ada data CONTENT yang berhasil diambil.", flush=True)
             
+        # Tampilkan semua URL yang pernah tertangkap
+        print(f"\n[*] Total {len(caught_urls)} request tertangkap. URL yang berpotensi strip:")
+        for u in caught_urls:
+            if any(x in u for x in ['strips', 'elements', 'content']):
+                print(f"   → {u}")
+        
     except Exception as e:
         print(f"[-] Error fatal: {e}", flush=True)
     finally:
