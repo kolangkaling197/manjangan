@@ -14,7 +14,7 @@ def scrap_vision_target_1799():
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
     co.set_argument('--disable-dev-shm-usage')
-    co.set_argument('--disable-blink-features=AutomationControlled')  # anti-detect tambahan
+    co.set_argument('--disable-blink-features=AutomationControlled')
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
@@ -28,9 +28,9 @@ def scrap_vision_target_1799():
         print(f"[*] Membuka Vision+ Sports Page...", flush=True)
         page.get(url)
         
-        # Tunggu halaman benar-benar loaded dulu
+        # ←←← INI YANG BARU (fix error load_complete)
         print("[*] Menunggu halaman load complete...", flush=True)
-        page.wait.load_complete(timeout=15)
+        page.wait.doc_loaded(timeout=15)   # ← ganti dari load_complete
         
         # Trigger scroll (lebih agresif)
         for s in range(4):
@@ -40,9 +40,9 @@ def scrap_vision_target_1799():
         
         print("[*] Menunggu paket 1799 muncul...", flush=True)
         
-        # Loop wait biar lebih aman (bisa nangkap kalau ada delay)
+        # Loop wait biar lebih aman
         res = None
-        for attempt in range(8):  # max 8x percobaan
+        for attempt in range(8):
             res = page.listen.wait(timeout=12)
             if res:
                 print(f"[+] Paket ditemukan pada attempt {attempt+1}: {res.url}", flush=True)
@@ -51,7 +51,7 @@ def scrap_vision_target_1799():
         
         if res and res.response.body:
             body = res.response.body
-            # Safety: kalau body masih bytes/str, parse dulu
+            # Safety parse kalau body masih bytes/str
             if isinstance(body, (bytes, bytearray)):
                 body = json.loads(body.decode('utf-8'))
             elif isinstance(body, str):
