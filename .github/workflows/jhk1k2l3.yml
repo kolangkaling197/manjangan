@@ -1,14 +1,13 @@
 name: Vision Plus Scraper
 
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
   push:
     branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     permissions:
       contents: write
 
@@ -16,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # Ambil history lengkap agar rebase lancar
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -38,26 +37,12 @@ jobs:
         mkdir -p debug_json
         python jhk1k213.py
 
-    - name: Commit and Push changes
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        
-        git add debug_json/*.json
-        
-        if ! git diff --cached --quiet; then
-          git commit -m "Update Vision+ Packets: $(date)"
-          
-          # ANTI-REJECTED: Tarik data terbaru sebelum push
-          git pull --rebase origin main
-          git push origin main
-        else
-          echo "Tidak ada perubahan data baru."
-        fi
-
-    - name: Upload Artifacts
+    - name: Upload Artifacts (JSON selalu tersimpan di sini)
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: 1799-data
         path: debug_json/
+
+    # ←←← Commit & Push dihapus karena sudah pakai .gitignore
+    # Repo tetap bersih, tidak ada lagi conflict selamanya!
