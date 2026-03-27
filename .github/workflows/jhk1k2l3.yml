@@ -15,6 +15,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Ambil history lengkap agar rebase lancar
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -41,19 +43,19 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
-        # 1. Tambahkan SEMUA file .json di folder debug_json
-        # Gunakan wildcard * agar paket_1, paket_6, paket_51 semuanya kena
         git add debug_json/*.json
         
-        # 2. Cek apakah ada file yang masuk ke area 'staged' (siap commit)
         if ! git diff --cached --quiet; then
-          git commit -m "Update All Vision+ Packets: $(date)"
-          git push
+          git commit -m "Update Vision+ Packets: $(date)"
+          
+          # ANTI-REJECTED: Tarik data terbaru sebelum push
+          git pull --rebase origin main
+          git push origin main
         else
-          echo "Tidak ada perubahan data baru pada paket-paket JSON."
+          echo "Tidak ada perubahan data baru."
         fi
 
-    - name: Upload Artifacts (Optional)
+    - name: Upload Artifacts
       if: always()
       uses: actions/upload-artifact@v4
       with:
