@@ -1,0 +1,12 @@
+{
+    "data": {
+        "ids": null,
+        "loc": {
+            "co": "united states",
+            "ci": "redmond",
+            "re": "washington"
+        }
+    },
+    "status": 200,
+    "message": "user not exist for list and segment"
+}
