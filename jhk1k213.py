@@ -7,67 +7,55 @@ output_dir = 'debug_json'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-def scrap_vision_sniffer():
+def scrap_vision_inject():
     co = ChromiumOptions()
     co.headless()
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
     co.set_argument('--disable-dev-shm-usage')
+    co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("\n[*] MEMULAI MODE SUPER SNIFFER (SCROLL & CAPTURE)...")
+    print("\n[*] MEMULAI MODE INJEKSI JAVASCRIPT...")
     
-    # Target ID yang kamu cari
     target_ids = ['18894', '13452', '14235', '12420', '18832', '18914', '18916', '18918']
-    found_ids = set()
-
-    # Mulai dengerin network
-    page.listen.start()
     
     try:
-        url = 'https://www.visionplus.id/webclient/?pageId=4030'
-        page.get(url)
-        
-        # Tunggu sampai halaman stabil
+        # 1. Buka halaman utama dulu agar dapat Cookies/Session
+        page.get('https://www.visionplus.id/webclient/?pageId=4030')
+        print("[*] Menunggu Session/Cookies stabil...")
         time.sleep(10)
 
-        # --- SCROLLING BERTAHAP ---
-        for i in range(25): # 25 kali scroll
-            dist = (i + 1) * 800
-            page.run_js(f'window.scrollTo(0, {dist});')
-            print(f"    [>] Scroll ke {dist}px... ({i+1}/25)")
+        # 2. Hajar API secara internal lewat Fetch JS (Bypass CORS/Bot Detection)
+        for s_id in target_ids:
+            print(f"    [>] Mengambil Strip ID: {s_id} via Injeksi...")
             
-            # Setiap scroll, kita cek paket yang masuk
-            time.sleep(3)
+            api_url = f"https://www.visionplus.id/elements/strips/{s_id}?language=ENG&mode=guest&partition=IndonesiaPartition&region=Indonesia&target=WEB"
             
-            for res in page.listen.steps(count=10, timeout=1):
-                try:
-                    if '/elements/strips/' in res.url:
-                        strip_id = res.url.split('/')[-1].split('?')[0]
-                        
-                        if strip_id in target_ids and strip_id not in found_ids:
-                            body = res.response.body
-                            if body:
-                                filename = f"{output_dir}/DETAIL_STRIP_{strip_id}.json"
-                                with open(filename, "w", encoding="utf-8") as f:
-                                    json.dump(body, f, indent=4)
-                                
-                                found_ids.add(strip_id)
-                                print(f"    [FOUND] Berhasil menangkap ID: {strip_id}")
-                except:
-                    continue
+            # Kita suruh browser yang melakukan fetch, bukan Python
+            script = f"""
+            return fetch('{api_url}')
+              .then(response => response.json())
+              .catch(err => 'ERROR');
+            """
             
-            # Jika semua sudah ketemu, berhenti
-            if len(found_ids) >= len(target_ids):
-                print("[!] Semua target ID sudah tertangkap!")
-                break
+            result = page.run_js(script)
+            
+            if result != 'ERROR' and result is not None:
+                filename = f"{output_dir}/DETAIL_STRIP_{s_id}.json"
+                with open(filename, "w", encoding="utf-8") as f:
+                    json.dump(result, f, indent=4)
+                print(f"    [SUCCESS] Berhasil mengamankan ID: {s_id}")
+            else:
+                print(f"    [FAILED] ID {s_id} diblokir atau gagal.")
+            
+            time.sleep(3) # Jeda antar request
 
     except Exception as e:
         print(f"[-] Error: {e}")
     finally:
-        page.listen.stop()
         page.quit()
-        print(f"\n[*] SELESAI. Berhasil dapat {len(found_ids)} dari {len(target_ids)} target.")
+        print("\n[*] PROSES SELESAI.")
 
 if __name__ == "__main__":
-    scrap_vision_sniffer()
+    scrap_vision_inject()
