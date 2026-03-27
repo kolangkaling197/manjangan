@@ -3,67 +3,63 @@ import json
 import os
 import time
 
-if not os.path.exists('debug_json'):
-    os.makedirs('debug_json')
+# Folder output
+output_dir = 'debug_json'
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
-def scrap_vision_direct():
+def scrap_vision_auto():
+    # Setting headless agar bisa jalan di server GitHub
     co = ChromiumOptions()
     co.headless()
     co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
     
     page = ChromiumPage(co)
-    print("\n[*] MEMULAI MODE AUTO-COLLECTOR (DIRECT STRIP ACCESS)...")
+    print("[*] MEMULAI SCRAPING OTOMATIS...")
+    
+    page.listen.start()
     
     try:
-        # STEP 1: Ambil daftar ID dari halaman utama
-        url_main = 'https://www.visionplus.id/elements/page/4030?language=ENG&mode=guest&partition=IndonesiaPartition&region=Indonesia&target=WEB'
-        print(f"[*] Mengambil peta utama dari API...")
-        page.get(url_main)
+        # Buka halaman
+        page.get('https://www.visionplus.id/webclient/?pageId=4030')
         
-        # Ambil JSON mentah dari body halaman
-        main_data = json.loads(page.html.split('pre style="word-wrap: break-word; white-space: pre-wrap;">')[1].split('</pre>')[0])
-        
-        # Simpan file utama
-        with open("debug_json/UTAMA_PAGE_4030.json", "w") as f:
-            json.dump(main_data, f, indent=4)
-
-        # STEP 2: Cari semua ID Strip (target 9 event)
-        strip_urls = []
-        for comp in main_data.get('components', []):
-            for content in comp.get('contents', []):
-                load_url = content.get('load', {}).get('url')
-                if load_url and '/elements/strips/' in load_url:
-                    # Buat URL lengkap dengan parameter agar valid
-                    full_strip_url = f"https://www.visionplus.id{load_url}?language=ENG&mode=guest&partition=IndonesiaPartition&region=Indonesia&target=WEB"
-                    strip_urls.append(full_strip_url)
-        
-        print(f"[*] Ditemukan {len(strip_urls)} target strip. Mulai mendownload satu per satu...")
-
-        # STEP 3: Hajar satu-satu secara direct
-        for index, s_url in enumerate(strip_urls):
-            strip_id = s_url.split('/')[-1].split('?')[0]
-            print(f"    [>] Mengambil Strip {index+1}/{len(strip_urls)} (ID: {strip_id})...")
+        # Simulasi scroll otomatis agar semua strip (MotoGP, dll) terpancing keluar
+        for _ in range(10):
+            page.scroll.down(1500)
+            time.sleep(2) # Beri jeda agar API sempat nembak
             
-            page.get(s_url)
-            time.sleep(2) # Jeda singkat biar gak dianggap DDOS
-            
+        print("[*] Menganalisis paket data...")
+        count = 0
+        
+        # Ambil paket yang sudah tertangkap di buffer
+        for res in page.listen.steps(count=100, timeout=10):
             try:
-                # Ambil JSON dari tampilan browser
-                strip_json = json.loads(page.html.split('pre style="word-wrap: break-word; white-space: pre-wrap;">')[1].split('</pre>')[0])
-                filename = f"debug_json/DETAIL_STRIP_{strip_id}.json"
-                
-                with open(filename, "w", encoding="utf-8") as f:
-                    json.dump(strip_json, f, indent=4)
-                print(f"    [SUCCESS] Tersimpan: {filename}")
+                body = res.response.body
+                if isinstance(body, (dict, list)):
+                    count += 1
+                    
+                    # Logika penamaan: Prioritaskan ID Strip (angka)
+                    url_part = res.url.split('/')[-1].split('?')[0]
+                    
+                    if 'strips' in res.url:
+                        filename = f"{output_dir}/DETAIL_STRIP_{url_part}.json"
+                    else:
+                        filename = f"{output_dir}/paket_{count:03d}_{url_part[:20]}.json"
+                    
+                    with open(filename, "w", encoding="utf-8") as f:
+                        json.dump(body, f, indent=4)
+                    
+                    print(f"    [SAVED] {filename}")
             except:
-                print(f"    [FAILED] Gagal parsing JSON untuk ID: {strip_id}")
+                continue
 
     except Exception as e:
         print(f"[-] Error: {e}")
     finally:
-        print("\n[*] Misi Selesai. Semua strip target telah diproses.")
+        page.listen.stop()
         page.quit()
+        print(f"\n[+] Sukses menyimpan {count} file.")
 
 if __name__ == "__main__":
-    scrap_vision_direct()
+    scrap_vision_auto()
