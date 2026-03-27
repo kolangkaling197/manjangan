@@ -2,115 +2,119 @@ from DrissionPage import ChromiumPage, ChromiumOptions
 import json
 import os
 import time
+import glob
 
-# Buat folder untuk hasil scan jika belum ada
+# 1. Persiapan Folder (Wajib ada untuk GitHub Actions)
 if not os.path.exists('debug_json'):
     os.makedirs('debug_json')
-    print("[*] Folder 'debug_json' berhasil dibuat.")
+    print("[*] Folder 'debug_json' siap.")
+
+def merge_all_json_to_master():
+    """Fungsi untuk menyatukan semua paket JSON menjadi satu file sakti"""
+    print("\n" + "="*30)
+    print("[*] MEMULAI PROSES MERGER (SAPU JAGAT)...")
+    all_combined_nodes = []
+    
+    # Ambil semua file paket_*.json di folder debug_json
+    files = glob.glob("debug_json/paket_*.json")
+    print(f"[*] Menemukan {len(files)} file mentah untuk dibedah.")
+    
+    for file_path in files:
+        if "live_events.json" in file_path: continue # Lewati file hasil merger itu sendiri
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                
+                nodes = []
+                # Cari data 'nodes' di root atau di dalam 'clusters'
+                if isinstance(data, dict):
+                    if 'nodes' in data:
+                        nodes = data['nodes']
+                    elif 'clusters' in data:
+                        for cluster in data.get('clusters', []):
+                            if 'nodes' in cluster:
+                                nodes.extend(cluster['nodes'])
+                
+                if nodes:
+                    all_combined_nodes.extend(nodes)
+                    print(f"    [+] Berhasil ekstrak {len(nodes)} event dari {os.path.basename(file_path)}")
+        except Exception:
+            continue
+
+    if all_combined_nodes:
+        # Hapus duplikat berdasarkan ID agar file ringan (penting untuk Cloudflare)
+        unique_nodes = {n['id']: n for n in all_combined_nodes if 'id' in n}.values()
+        
+        # SIMPAN HASIL AKHIR UNTUK CLOUDFLARE WORKER
+        final_output = "debug_json/live_events.json"
+        with open(final_output, "w", encoding="utf-8") as f:
+            json.dump({"nodes": list(unique_nodes)}, f, indent=4)
+        
+        print(f"\n[OK] TOTAL: {len(unique_nodes)} event unik disimpan ke {final_output}")
+        print("="*30 + "\n")
+    else:
+        print("\n[!] PERINGATAN: Tidak ada data event yang ditemukan untuk digabung.")
 
 def scrap_vision_deep_sniff():
-    # KONFIGURASI HEADLESS (Penting untuk GitHub Actions)
+    # 2. Konfigurasi Browser Headless (Wajib di GitHub)
     co = ChromiumOptions()
-    co.headless()  
-    co.set_argument('--no-sandbox')  
+    co.headless()
+    co.set_argument('--no-sandbox')
     co.set_argument('--disable-gpu')
     co.set_argument('--disable-dev-shm-usage')
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
 
     page = ChromiumPage(co)
-    print("\n" + "="*50)
-    print("--- DEEP SNIFFING VISION+ (FULL LOG MODE) ---")
-    print("="*50 + "\n")
+    print("\n--- DEEP SNIFFING VISION+ START ---")
     
-    # Mulai pantau aktivitas network
-    print("[*] Memulai Network Listener...", flush=True)
+    # Mulai pantau Network
     page.listen.start() 
     
     try:
-        # Buka halaman target
         url = 'https://www.visionplus.id/webclient/?pageId=4030'
-        print(f"[*] Menuju URL: {url}", flush=True)
+        print(f"[*] Menuju URL: {url}")
         page.get(url)
         
-        # Cek apakah halaman terbuka
-        if page.wait.ele_displayed('tag:body', timeout=15):
-            print("[+] Halaman Body terdeteksi. Mulai interaksi...", flush=True)
-        
-        count = 0
-        found_data = False
-        
-        # SIMULASI INTERAKSI
-        print("[*] Melakukan Auto-Scroll untuk memancing API...", flush=True)
-        for s in range(5):
-            page.scroll.down(2000)
-            print(f"    > Scroll Step {s+1}/5 dijalankan.", flush=True)
-            time.sleep(3) # Beri jeda lebih lama agar API sempat merespon
+        # 3. Simulasi Interaksi untuk Memancing API
+        print("[*] Melakukan Auto-Scroll (6 Step)...")
+        for s in range(6):
+            page.scroll.down(2500)
+            print(f"    > Step {s+1}/6")
+            time.sleep(3) # Jeda agar paket sempat terkirim/diterima
 
-        # PROSES ANALISIS PAKET
-        print("\n[*] Menganalisis paket network yang masuk...", flush=True)
-        
-        # Menggunakan langkah-langkah yang tertangkap di buffer
+        # 4. Tangkap dan Simpan Semua Paket JSON
+        print("\n[*] Menyimpan semua paket mentah...")
+        count = 0
         for res in page.listen.steps(count=100, timeout=5):
             try:
-                # Log setiap URL yang lewat (Singkat)
-                short_url = res.url[:70] + "..." if len(res.url) > 70 else res.url
-                
                 if res.response.body is not None:
                     body = res.response.body
-                    url_path = res.url.split('/')[-1].split('?')[0]
-                    if not url_path: url_path = "root_api"
-                    
                     if isinstance(body, dict):
                         count += 1
+                        # Ambil nama unik dari URL (misal: menu, list, page)
+                        url_path = res.url.split('/')[-1].split('?')[0] or "api"
                         filename = f"debug_json/paket_{count}_{url_path}.json"
                         
-                        # Simpan ke file
                         with open(filename, "w", encoding="utf-8") as f:
                             json.dump(body, f, indent=4)
                         
-                        # LOG DETAIL KE CONSOLE
-                        print(f"    [FILE] #{count} disimpan: {filename}", flush=True)
-                        print(f"    [tautan mencurigakan telah dihapus] {short_url}", flush=True)
-                        
-                        # Cek kata kunci target
+                        # Deteksi instan jika ada target menarik
                         body_str = str(body).lower()
-                        targets = ['clusters', 'nodes', 'originaltitle', 'sport']
-                        match = [t for t in targets if t in body_str]
-                        
-                        if match:
-                            print(f"    [!!!] TARGET TERDETEKSI: {match} di {filename}", flush=True)
-                            found_data = True
-                        print("-" * 30, flush=True)
-                else:
-                    # Log jika ada request tapi body kosong (misal: 204 atau error)
-                    pass
-
-            except Exception as e:
-                print(f"    [!] Skip paket karena: {e}", flush=True)
+                        if any(x in body_str for x in ['nodes', 'sport', 'originaltitle']):
+                            print(f"    [!!!] TARGET DITEMUKAN: Paket #{count} ({url_path})")
+            except:
                 continue
-            
-            if count > 80: 
-                print("[*] Limit paket tercapai (80), menghentikan sniffing.", flush=True)
-                break
 
-        if not found_data:
-            print("\n" + "!"*50)
-            print("[-] SCAN SELESAI: Tidak ditemukan pola JSON Event yang pas.")
-            print("[-] Kemungkinan halaman terdeteksi bot atau API berubah.")
-            print("!"*50)
-            # Ambil screenshot sebagai bukti terakhir
-            page.get_screenshot(path='debug_json/last_seen_error.png')
-            print("[*] Screenshot terakhir disimpan: debug_json/last_seen_error.png")
-        else:
-            print(f"\n[+] BERHASIL: Menangkap {count} paket JSON. Silakan cek folder 'debug_json'.")
+        # 5. Jalankan Proses Merger (Penyatuan untuk Cloudflare)
+        merge_all_json_to_master()
 
     except Exception as e:
         print(f"\n[-] ERROR FATAL: {e}")
     finally:
-        print("\n[*] Menutup Session...", flush=True)
+        print("[*] Menutup Session...")
         page.listen.stop()
         page.quit()
-        print("[*] Selesai.")
 
 if __name__ == "__main__":
     scrap_vision_deep_sniff()
