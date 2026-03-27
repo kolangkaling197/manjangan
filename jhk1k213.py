@@ -7,7 +7,7 @@ output_dir = 'debug_json'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-def scrap_vision_content_hunter():
+def scrap_vision_target_1799():
     co = ChromiumOptions()
     co.headless()
     co.set_argument('--no-sandbox')
@@ -15,26 +15,25 @@ def scrap_vision_content_hunter():
     co.set_argument('--disable-dev-shm-usage')
     
     page = ChromiumPage(co)
-    print("\n[*] MEMULAI MODE CONTENT HUNTER (AMBIL JADWAL ASLI)...")
+    print("\n[*] FOKUS TARGET: STRIP 1799 & 1779 (LIVE EVENTS)...")
     
-    target_ids = ['18894', '13452', '14235', '12420', '18832', '18914', '18916', '18918']
+    # Kita tambahkan 1779 dan 1799 ke daftar buruan
+    target_ids = ['1799', '1779', '18894', '13452'] 
     
     try:
-        # Buka halaman utama untuk validasi session
         page.get('https://www.visionplus.id/webclient/?pageId=4030')
-        print("[*] Menunggu Sinkronisasi Session...")
+        print("[*] Sinkronisasi Session... (10 detik)")
         time.sleep(10)
 
         for s_id in target_ids:
-            print(f"    [>] Menarik Jadwal Lengkap ID: {s_id}...")
+            print(f"    [>] Menarik Konten Strip ID: {s_id}...")
             
-            # KUNCI UTAMA: Menambahkan page=0 dan pageSize=50 untuk memaksa data jadwal keluar
+            # Gunakan pageSize besar agar semua jadwal keluar
             api_url = (
                 f"https://www.visionplus.id/elements/strips/{s_id}?"
-                "language=ENG&mode=guest&page=0&pageSize=50&partition=IndonesiaPartition&region=Indonesia&target=WEB"
+                "language=ENG&mode=guest&page=0&pageSize=100&partition=IndonesiaPartition&region=Indonesia&target=WEB"
             )
             
-            # Injeksi Fetch
             script = f"""
             return fetch('{api_url}', {{
                 "headers": {{
@@ -49,16 +48,20 @@ def scrap_vision_content_hunter():
             result = page.run_js(script)
             
             if result and result != "ERROR":
-                # Cek apakah ada field 'contents' di dalam JSON-nya
                 filename = f"{output_dir}/DETAIL_STRIP_{s_id}.json"
                 with open(filename, "w", encoding="utf-8") as f:
                     json.dump(result, f, indent=4)
                 
-                # Hitung berapa banyak jadwal yang tertangkap
+                # Cek isi konten
                 items = result.get('contents', [])
-                print(f"    [SUCCESS] Tersimpan! Ditemukan {len(items)} jadwal pertandingan.")
+                print(f"    [SUCCESS] ID {s_id}: Tersimpan {len(items)} pertandingan.")
+                
+                # Jika ada konten, tampilkan 3 judul pertama di log buat bukti
+                if items:
+                    for idx, item in enumerate(items[:3]):
+                        print(f"        - Event {idx+1}: {item.get('title')}")
             else:
-                print(f"    [FAILED] Gagal menarik data ID: {s_id}")
+                print(f"    [FAILED] ID {s_id} tidak merespon.")
             
             time.sleep(5)
 
@@ -66,7 +69,7 @@ def scrap_vision_content_hunter():
         print(f"[-] Error: {e}")
     finally:
         page.quit()
-        print("\n[*] SEMUA JADWAL BERHASIL DIPROSES.")
+        print("\n[*] PROSES TARGET KHUSUS SELESAI.")
 
 if __name__ == "__main__":
-    scrap_vision_content_hunter()
+    scrap_vision_target_1799()
