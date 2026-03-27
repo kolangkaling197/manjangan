@@ -1,0 +1,1429 @@
+{
+    "id": 3130,
+    "version": "e3bb8a4f8930493b161bbeb01fcdb3bb",
+    "analyticsRef": "3130_HOME",
+    "personalised": true,
+    "display": {
+        "localisation": [
+            {
+                "language": "ENG",
+                "title": "Home"
+            }
+        ]
+    },
+    "irisRequestRefreshStart": "2026-03-27T07:00:00Z",
+    "irisRequestRefreshPeriodSec": 3600,
+    "components": [
+        {
+            "id": "ADBANNER_2663",
+            "analyticsRef": "152_HOME_CAROUSEL_INDONESIA",
+            "ordinal": 0,
+            "type": "ADBANNER",
+            "adType": "SLIDER",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": ""
+                    }
+                }
+            ]
+        },
+        {
+            "id": "BANNER_STRIP_2663",
+            "analyticsRef": "152_HOME_CAROUSEL_INDONESIA",
+            "ordinal": 0,
+            "bannerStripType": "SLIDER",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": "",
+                        "personalised": false,
+                        "url": "/elements/bannerstrip/152",
+                        "method": "GET",
+                        "params": {
+                            "version": "2e903d0762486c72e901213d13398cf8",
+                            "target": "WEB",
+                            "renderVersion": 110005,
+                            "mode": "GUEST"
+                        }
+                    }
+                }
+            ],
+            "type": "BANNERSTRIP"
+        },
+        {
+            "id": "MENU_522",
+            "ordinal": 1,
+            "type": "MENU",
+            "menuType": "TEXT",
+            "contents": [
+                {
+                    "display": {
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Menu Web"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/menu/522",
+                        "method": "GET",
+                        "params": {
+                            "version": "7b766c9a421f556cf526b02b0a382080",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_12192",
+            "analyticsRef": "12192_VISION+_MICRODRAMA",
+            "ordinal": 2,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "BIG_POSTER",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Vision+ Microdrama"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/12192",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "429040b84dee4bd9af89bce7676604dc",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1799",
+            "analyticsRef": "1799_LIVE_SPORT_EVENTS",
+            "ordinal": 3,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "SNAPSHOT",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Live Sport Events"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1799",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "89801c35b57f33be45cd14dd0cd46359",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1180",
+            "analyticsRef": "1180_VISION+_ORIGINALS",
+            "ordinal": 4,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Vision+ Originals"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1180",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "8ab438ee829e97fdc71b6b01c435ea54",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1784",
+            "analyticsRef": "1784_NEW_RELEASES",
+            "ordinal": 5,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "New Releases"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1784",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "e942c3d62e457dbcf4239ec910fc1cd0",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AUTO_STRIP_16234",
+            "analyticsRef": "16234_TODAY'S_RECOMMENDATION",
+            "ordinal": 6,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "SNAPSHOT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Today's Recommendation"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/16234",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "4dd373e70f9c10b85f08b72e2d1379bb",
+                            "target": "WEB",
+                            "partition": "IndonesiaPartition",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_4395",
+            "analyticsRef": "4395_NEW_EPISODES_ON_NATIONAL_TV",
+            "ordinal": 7,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "BIG_POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "New Episodes on National TV"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/4395",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "93f5237f2ceb6ada2e59ba8f4a644f07",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "ADBANNER_13960",
+            "analyticsRef": "6985_INDONESIAN_IDOL_2026",
+            "ordinal": 8,
+            "type": "ADBANNER",
+            "adType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": ""
+                    }
+                }
+            ]
+        },
+        {
+            "id": "BANNER_STRIP_13960",
+            "analyticsRef": "6985_INDONESIAN_IDOL_2026",
+            "ordinal": 8,
+            "bannerStripType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": "",
+                        "personalised": false,
+                        "url": "/elements/bannerstrip/6985",
+                        "method": "GET",
+                        "params": {
+                            "version": "75535cf659e5d481f35855ed80c668a8",
+                            "target": "WEB",
+                            "renderVersion": 110005,
+                            "mode": "GUEST"
+                        }
+                    }
+                }
+            ],
+            "type": "BANNERSTRIP"
+        },
+        {
+            "id": "STRIP_17812",
+            "analyticsRef": "17812_INDONESIAN_IDOL_XIV",
+            "ordinal": 9,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Indonesian Idol XIV"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/17812",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "32a42a413b37f537026509a4e5e59a14",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_2975",
+            "analyticsRef": "2975_CATCH_YOUR_MATCH",
+            "ordinal": 10,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "SNAPSHOT",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Catch Your Match"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/2975",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "75db401f53e775e8191db46f960ccceb",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_8836",
+            "analyticsRef": "8836_UPCOMING_ON_VISION+",
+            "ordinal": 11,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "BIG_POSTER",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Upcoming on Vision+"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/8836",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "3628efacbb4a57e0db5f89f3f007e070",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_6992",
+            "analyticsRef": "6992_BEIN_SPORTS",
+            "ordinal": 12,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "SNAPSHOT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "beIN SPORTS"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/6992",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "6ca0e557e7f46baa05f9545f525098f9",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "ADBANNER_12846",
+            "analyticsRef": "6125_TIMNAS_INLINE_SAUDI_IRAK",
+            "ordinal": 13,
+            "type": "ADBANNER",
+            "adType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": ""
+                    }
+                }
+            ]
+        },
+        {
+            "id": "BANNER_STRIP_12846",
+            "analyticsRef": "6125_TIMNAS_INLINE_SAUDI_IRAK",
+            "ordinal": 13,
+            "bannerStripType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": "",
+                        "personalised": false,
+                        "url": "/elements/bannerstrip/6125",
+                        "method": "GET",
+                        "params": {
+                            "version": "12eecd72d0a3de6a70d8e5b535c57d31",
+                            "target": "WEB",
+                            "renderVersion": 110005,
+                            "mode": "GUEST"
+                        }
+                    }
+                }
+            ],
+            "type": "BANNERSTRIP"
+        },
+        {
+            "id": "STRIP_1188",
+            "analyticsRef": "1188_TOP_10_THIS_WEEK",
+            "ordinal": 17,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "BIG_SQUARE",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Top 10 This Week"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1188",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "c178733b1bdc189acec6012955c9acc4",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_15655",
+            "analyticsRef": "15655_BUNDESLIGA_2025/26_-_HIGHLIGHTS",
+            "ordinal": 18,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Bundesliga 2025/26 - Highlights"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/15655",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "e9f787fb78d168ac8e789ea115593122",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "AUTO_STRIP_1736",
+            "analyticsRef": "1736_AIRING_TODAY_ON_TV",
+            "ordinal": 19,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "SNAPSHOT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Airing Today on TV"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1736",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "f575704363d492ed38439e28abd39813",
+                            "target": "WEB",
+                            "partition": "IndonesiaPartition",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1825",
+            "analyticsRef": "1825_YOUR_FAVORITE_TV_CHANNEL",
+            "ordinal": 20,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "CIRCLE",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Your Favorite TV Channel"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1825",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "20e69f2109e6b313dc366be3cd859de5",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_18812",
+            "analyticsRef": "18812_EID_AL-FITR_BLESSINGS_WATCHLIST",
+            "ordinal": 21,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "BIG_POSTER",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Eid al-Fitr Blessings Watchlist"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/18812",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "4384c91d839ff318452c089e74aa4a5e",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_18353",
+            "analyticsRef": "18353_BEST_OF_CHINESE_DRAMA",
+            "ordinal": 22,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Best of Chinese Drama"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/18353",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "8fc119c8f7d93f74b86fbad4b5d0f600",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "ADBANNER_14028",
+            "analyticsRef": "7007_MASTERCHEF_INDONESIA",
+            "ordinal": 23,
+            "type": "ADBANNER",
+            "adType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": ""
+                    }
+                }
+            ]
+        },
+        {
+            "id": "BANNER_STRIP_14028",
+            "analyticsRef": "7007_MASTERCHEF_INDONESIA",
+            "ordinal": 23,
+            "bannerStripType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": "",
+                        "personalised": false,
+                        "url": "/elements/bannerstrip/7007",
+                        "method": "GET",
+                        "params": {
+                            "version": "a5782728c3286630185adde59c685174",
+                            "target": "WEB",
+                            "renderVersion": 110005,
+                            "mode": "GUEST"
+                        }
+                    }
+                }
+            ],
+            "type": "BANNERSTRIP"
+        },
+        {
+            "id": "AUTO_STRIP_1842",
+            "analyticsRef": "1842_NEWS_UPDATE",
+            "ordinal": 24,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "SNAPSHOT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "News Update"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1842",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "aba8f3c060edf6939fca0ca649d7a3e4",
+                            "target": "WEB",
+                            "partition": "IndonesiaPartition",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_12689",
+            "analyticsRef": "12689_HOLLYWOOD_BOX_OFFICE",
+            "ordinal": 25,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Hollywood Box Office"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/12689",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "3159385a87b03c211be1203f5bb0883f",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1755",
+            "analyticsRef": "1755_HOLLYWOOD_ACTION_&_ADRENALINE",
+            "ordinal": 26,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Hollywood Action & Adrenaline"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1755",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "0fefc95039757e933eef135b0f46e76d",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "ADBANNER_9254",
+            "analyticsRef": "1485_VIU_X_VISION+_INLINE",
+            "ordinal": 27,
+            "type": "ADBANNER",
+            "adType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": ""
+                    }
+                }
+            ]
+        },
+        {
+            "id": "BANNER_STRIP_9254",
+            "analyticsRef": "1485_VIU_X_VISION+_INLINE",
+            "ordinal": 27,
+            "bannerStripType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": "",
+                        "personalised": false,
+                        "url": "/elements/bannerstrip/1485",
+                        "method": "GET",
+                        "params": {
+                            "version": "fd5dc4c3de5cbc158ba5a87fef56b9bd",
+                            "target": "WEB",
+                            "renderVersion": 110005,
+                            "mode": "GUEST"
+                        }
+                    }
+                }
+            ],
+            "type": "BANNERSTRIP"
+        },
+        {
+            "id": "STRIP_6312",
+            "analyticsRef": "6312_COMBO_MEVVAH_VIU",
+            "ordinal": 28,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Combo MeVVah Viu"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/6312",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "27d88cdb64f9b48e1fc26ac57df4b87a",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1798",
+            "analyticsRef": "1798_ASIAN_ACTION_MOVIES",
+            "ordinal": 29,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Asian Action Movies"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1798",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "c32881fb960cd8b1b72da5d463feac76",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_2736",
+            "analyticsRef": "2736_BEST_OF_BOLLYWOOD",
+            "ordinal": 30,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Best of Bollywood"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/2736",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "e2c615591d67971d2d07d8d5f76e9db2",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "ADBANNER_13581",
+            "analyticsRef": "6669_COMBO_ASIA_-_WEBSITE",
+            "ordinal": 31,
+            "type": "ADBANNER",
+            "adType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": ""
+                    }
+                }
+            ]
+        },
+        {
+            "id": "BANNER_STRIP_13581",
+            "analyticsRef": "6669_COMBO_ASIA_-_WEBSITE",
+            "ordinal": 31,
+            "bannerStripType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": "",
+                        "personalised": false,
+                        "url": "/elements/bannerstrip/6669",
+                        "method": "GET",
+                        "params": {
+                            "version": "0dbf01614a82b69d08f91ad04ca69a84",
+                            "target": "WEB",
+                            "renderVersion": 110005,
+                            "mode": "GUEST"
+                        }
+                    }
+                }
+            ],
+            "type": "BANNERSTRIP"
+        },
+        {
+            "id": "STRIP_17197",
+            "analyticsRef": "17197_COMBO_ASIA_IQIYI",
+            "ordinal": 32,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Combo Asia iQIYI"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/17197",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "eccd3e55aa7c416e8102c7dabd4e070d",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_6392",
+            "analyticsRef": "6392_INDONESIAN_BOX_OFFICE_MOVIES",
+            "ordinal": 33,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Indonesian Box Office Movies"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/6392",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "c898997ecbe1582102325eaa91938170",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1571",
+            "analyticsRef": "1571_HOUSE_OF_SINETRON",
+            "ordinal": 34,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "House of Sinetron"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1571",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "188a99173091d37357c483b89f82b47d",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "ADBANNER_13604",
+            "analyticsRef": "6705_RCTI+_PROMO",
+            "ordinal": 35,
+            "type": "ADBANNER",
+            "adType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": ""
+                    }
+                }
+            ]
+        },
+        {
+            "id": "BANNER_STRIP_13604",
+            "analyticsRef": "6705_RCTI+_PROMO",
+            "ordinal": 35,
+            "bannerStripType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": "",
+                        "personalised": false,
+                        "url": "/elements/bannerstrip/6705",
+                        "method": "GET",
+                        "params": {
+                            "version": "3f80c106684a8fdec8997f8842869493",
+                            "target": "WEB",
+                            "renderVersion": 110005,
+                            "mode": "GUEST"
+                        }
+                    }
+                }
+            ],
+            "type": "BANNERSTRIP"
+        },
+        {
+            "id": "STRIP_15656",
+            "analyticsRef": "15656_LA_LIGA_2025/26_-_HIGHLIGHTS",
+            "ordinal": 36,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "La Liga 2025/26 - Highlights"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/15656",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "ff0e09304d2010bc3b5baada033be8b8",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1795",
+            "analyticsRef": "1795_ASIAN_HORROR_MOVIES",
+            "ordinal": 37,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Asian Horror Movies"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1795",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "3695c2634795dc57511949d1871983f3",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1190",
+            "analyticsRef": "1190_EXPLORE_BY_GENRE",
+            "ordinal": 38,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "REDUCED_SNAPSHOT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Explore by Genre"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1190",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "aee95c096a71e081989a1c327996c8be",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_7732",
+            "analyticsRef": "7732_TOP_10_MOVIES",
+            "ordinal": 40,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "BIG_SQUARE",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Top 10 Movies"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/7732",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "f0bb8719d4e0d23c08049f616444db3e",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_15020",
+            "analyticsRef": "15020_FAVORITE_KIDS_SHOWS",
+            "ordinal": 41,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Favorite Kids Shows"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/15020",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "dc07528e21f961679f176ae16e44450f",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_7878",
+            "analyticsRef": "7878_KIDS_SHOW_FROM_MOONBUG",
+            "ordinal": 42,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "linkPosition": "RIGHT",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Kids Show from Moonbug"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/7878",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "5e1453f370447e4f8c4007c175f71786",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1623",
+            "analyticsRef": "1623_EXCITING_ADVENTURE",
+            "ordinal": 43,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Exciting Adventure"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1623",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "07ca77b2c6b45bfe283e79f3a22279f3",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_5056",
+            "analyticsRef": "5056_FAMILY_FRIENDLY_MOVIES",
+            "ordinal": 44,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Family Friendly Movies"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/5056",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "0cd4332df75a58f88e5d5f02ad8e34e4",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "ADBANNER_2666",
+            "analyticsRef": "151_HOME_INLINE",
+            "ordinal": 45,
+            "type": "ADBANNER",
+            "adType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": ""
+                    }
+                }
+            ]
+        },
+        {
+            "id": "BANNER_STRIP_2666",
+            "analyticsRef": "151_HOME_INLINE",
+            "ordinal": 45,
+            "bannerStripType": "INLINE",
+            "contents": [
+                {
+                    "load": {
+                        "slotId": "",
+                        "personalised": false,
+                        "url": "/elements/bannerstrip/151",
+                        "method": "GET",
+                        "params": {
+                            "version": "8b4fc8e14ec82441178fc071b989e215",
+                            "target": "WEB",
+                            "renderVersion": 110005,
+                            "mode": "GUEST"
+                        }
+                    }
+                }
+            ],
+            "type": "BANNERSTRIP"
+        },
+        {
+            "id": "STRIP_1622",
+            "analyticsRef": "1622_DAILY_SOAPS_FOR_KIDS",
+            "ordinal": 46,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Daily Soaps for Kids"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1622",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "1903e1a7e584dddcad94b019d7a1e962",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1753",
+            "analyticsRef": "1753_INDONESIAN_COMEDY_SERIES",
+            "ordinal": 47,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Indonesian Comedy Series"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1753",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "550e6886e77d062fba61a6d699a83008",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1032",
+            "analyticsRef": "1032_FTV_COLLECTION",
+            "ordinal": 48,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "FTV Collection"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1032",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "2377e76cdc490ce70ad8f3d256030b8f",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "STRIP_1595",
+            "analyticsRef": "1595_REALITY_SHOWS",
+            "ordinal": 49,
+            "type": "STRIP",
+            "contents": [
+                {
+                    "display": {
+                        "imageType": "POSTER",
+                        "localisation": [
+                            {
+                                "language": "ENG",
+                                "title": "Reality Shows"
+                            }
+                        ]
+                    },
+                    "load": {
+                        "url": "/elements/strips/1595",
+                        "personalised": false,
+                        "method": "GET",
+                        "params": {
+                            "version": "caf517542d295a5fa5de51b3f6111f5c",
+                            "target": "WEB",
+                            "renderVersion": 110005
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
