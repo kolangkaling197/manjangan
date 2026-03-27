@@ -3,7 +3,6 @@ import json
 import os
 import time
 
-# Pastikan folder ada
 if not os.path.exists('debug_json'):
     os.makedirs('debug_json')
     print("[*] Folder debug_json siap.")
@@ -18,40 +17,47 @@ def scrap_vision_target_1799():
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("--- TARGETED SNIFFING: API 1799 ONLY ---", flush=True)
+    print("--- TARGETED SNIFFING: ALL STRIPS (untuk load more) ---", flush=True)
    
-    # Mulai listen SEBELUM buka halaman
-    page.listen.start('1799')
+    # Dengar SEMUA request (bukan hanya 1799) supaya nangkap batch ke-2
+    page.listen.start()
    
     try:
         url = 'https://www.visionplus.id/webclient/?pageId=4030'
         print(f"[*] Membuka Vision+ Sports Page...", flush=True)
         page.get(url)
+        page.wait.doc_loaded(timeout=15)
         
-        # ←←← INI YANG BARU (fix error load_complete)
-        print("[*] Menunggu halaman load complete...", flush=True)
-        page.wait.doc_loaded(timeout=15)   # ← ganti dari load_complete
+        print("[*] Scroll agresif untuk trigger load more (target 32 event)...")
+        events_before = 0
+        for s in range(12):          # naikkan jadi 12x
+            page.scroll.down(800)
+            print(f" > Scroll step {s+1}/12...", flush=True)
+            time.sleep(3)            # jeda lebih lama biar loading selesai
+            
+            # Cek apakah ada paket baru
+            res = page.listen.wait(timeout=8)
+            if res and res.response.body:
+                try:
+                    body = res.response.body
+                    if isinstance(body, (bytes, bytearray)):
+                        body = json.loads(body.decode('utf-8'))
+                    elif isinstance(body, str):
+                        body = json.loads(body)
+                    
+                    # Hitung berapa CONTENT event di paket ini
+                    content_count = sum(1 for item in body if isinstance(item, dict) and item.get("cellType") == "CONTENT")
+                    if content_count > events_before:
+                        print(f"   [+] Dapat {content_count} event baru!", flush=True)
+                        events_before = content_count
+                except:
+                    pass
         
-        # Trigger scroll (lebih agresif)
-        for s in range(4):
-            page.scroll.down(1200)
-            print(f" > Triggering data (Step {s+1}/4)...", flush=True)
-            time.sleep(2.5)
-        
-        print("[*] Menunggu paket 1799 muncul...", flush=True)
-        
-        # Loop wait biar lebih aman
-        res = None
-        for attempt in range(8):
-            res = page.listen.wait(timeout=12)
-            if res:
-                print(f"[+] Paket ditemukan pada attempt {attempt+1}: {res.url}", flush=True)
-                break
-            print(f"[-] Attempt {attempt+1}/8: belum ketemu...", flush=True)
+        print("[*] Menunggu paket terakhir...", flush=True)
+        res = page.listen.wait(timeout=15)
         
         if res and res.response.body:
             body = res.response.body
-            # Safety parse kalau body masih bytes/str
             if isinstance(body, (bytes, bytearray)):
                 body = json.loads(body.decode('utf-8'))
             elif isinstance(body, str):
@@ -61,17 +67,16 @@ def scrap_vision_target_1799():
             with open(filename, "w", encoding="utf-8") as f:
                 json.dump(body, f, indent=4, ensure_ascii=False)
             
-            print(f"[OK] BERHASIL! Data disimpan ke {filename} ({len(str(body))} chars)", flush=True)
+            total_content = sum(1 for item in body if isinstance(item, dict) and item.get("cellType") == "CONTENT")
+            print(f"[OK] BERHASIL! Total CONTENT event: {total_content} (seharusnya 32)", flush=True)
+            print(f"[OK] Data disimpan ke {filename}", flush=True)
         else:
-            print("[-] Gagal: Paket 1799 tidak ditemukan dalam waktu tunggu.", flush=True)
+            print("[-] Masih belum ketemu batch ke-2.", flush=True)
             
     except Exception as e:
         print(f"[-] Error fatal: {e}", flush=True)
     finally:
-        try:
-            page.listen.stop()
-        except:
-            pass
+        page.listen.stop()
         page.quit()
         print("[*] Browser ditutup. Selesai.", flush=True)
 
