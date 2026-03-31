@@ -5,6 +5,232 @@
             "ordinal": 0,
             "cellType": "CONTENT",
             "display": {
+                "parentalRating": 8,
+                "isAdult": false,
+                "genres": [
+                    "1;4;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/external-entities/79999/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "205/701205-POSTER-l.jpg",
+                                "m": "205/701205-POSTER-m.jpg",
+                                "s": "205/701205-POSTER-s.jpg",
+                                "xl": "205/701205-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "That's My Boy (Galaxy Premium)"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND4060809446007451",
+                        "deliveryId": "DLVY3817440906000834"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND4060809446007451",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3817440906000834",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-27T14:00:00Z",
+                        "broadcastEnd": "2026-03-27T15:45:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-27T15:45:00Z",
+                        "visibilityCatchupStart": "2026-03-27T15:50:00Z",
+                        "visibilityCatchupEnd": "2026-04-03T12:34:30Z",
+                        "channelServiceId": "00000000000000000048",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d84q7nw4qf3j3/DASH/45c0752c6b6b4397b80243ac9fed96fd/HLS/b3038c517ff1418fa5e43f1da0b4f6d4/00000000000000000048?start=1774619700&end=1774626600",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d84q7nw4qf3j3/DASH/45c0752c6b6b4397b80243ac9fed96fd/HLS/b3038c517ff1418fa5e43f1da0b4f6d4/00000000000000000048?start=1774619700&end=1774626600",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 1,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 5,
+                "isAdult": false,
+                "genres": [
+                    "1;2;1;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/external-entities/79997/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "203/701203-POSTER-l.jpg",
+                                "m": "203/701203-POSTER-m.jpg",
+                                "s": "203/701203-POSTER-s.jpg",
+                                "xl": "203/701203-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Jumanji: Welcome To The Jungle (Galaxy Premium)"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND5363131126006581",
+                        "deliveryId": "DLVY3817440135003608"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND5363131126006581",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY3817440135003608",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-24T14:00:00Z",
+                        "broadcastEnd": "2026-03-24T15:50:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-24T15:50:00Z",
+                        "visibilityCatchupStart": "2026-03-24T15:55:00Z",
+                        "visibilityCatchupEnd": "2026-03-31T12:34:30Z",
+                        "channelServiceId": "00000000000000000048",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d84q7nw4qf3j3/DASH/45c0752c6b6b4397b80243ac9fed96fd/HLS/b3038c517ff1418fa5e43f1da0b4f6d4/00000000000000000048?start=1774360500&end=1774367700",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d84q7nw4qf3j3/DASH/45c0752c6b6b4397b80243ac9fed96fd/HLS/b3038c517ff1418fa5e43f1da0b4f6d4/00000000000000000048?start=1774360500&end=1774367700",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 2,
+            "cellType": "CONTENT",
+            "display": {
                 "parentalRating": 7,
                 "isAdult": false,
                 "genres": [
@@ -309,7 +535,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 1,
+            "ordinal": 3,
             "cellType": "CONTENT",
             "display": {
                 "parentalRating": 2,
@@ -567,7 +793,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 2,
+            "ordinal": 4,
             "cellType": "CONTENT",
             "display": {
                 "parentalRating": 2,
@@ -874,7 +1100,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 3,
+            "ordinal": 5,
             "cellType": "CONTENT",
             "display": {
                 "parentalRating": 0,
@@ -1132,7 +1358,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 4,
+            "ordinal": 6,
             "cellType": "PAGE",
             "display": {
                 "parentalRating": 0,
@@ -1176,7 +1402,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 9,
+            "ordinal": 7,
             "cellType": "CONTENT",
             "display": {
                 "parentalRating": 5,
@@ -1484,7 +1710,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 10,
+            "ordinal": 8,
             "cellType": "CONTENT",
             "display": {
                 "parentalRating": 2,
@@ -1741,7 +1967,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 11,
+            "ordinal": 9,
             "cellType": "PAGE",
             "display": {
                 "parentalRating": 0,
@@ -1785,7 +2011,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 13,
+            "ordinal": 10,
             "cellType": "CONTENT",
             "display": {
                 "parentalRating": 7,
@@ -6713,7 +6939,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 14,
+            "ordinal": 11,
             "cellType": "PAGE",
             "display": {
                 "parentalRating": 6,
@@ -6757,7 +6983,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 15,
+            "ordinal": 12,
             "cellType": "CONTENT",
             "display": {
                 "parentalRating": 5,
@@ -11685,7 +11911,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 16,
+            "ordinal": 13,
             "cellType": "PAGE",
             "display": {
                 "parentalRating": 4,
@@ -11729,7 +11955,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 17,
+            "ordinal": 14,
             "cellType": "CONTENT",
             "display": {
                 "parentalRating": 8,
@@ -12036,7 +12262,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 18,
+            "ordinal": 15,
             "cellType": "PAGE",
             "display": {
                 "parentalRating": 6,
@@ -12080,7 +12306,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 19,
+            "ordinal": 16,
             "cellType": "CONTENT",
             "display": {
                 "parentalRating": 4,
@@ -12398,7 +12624,7 @@
             "type": "CELL"
         },
         {
-            "ordinal": 20,
+            "ordinal": 17,
             "cellType": "CONTENT",
             "display": {
                 "parentalRating": 7,

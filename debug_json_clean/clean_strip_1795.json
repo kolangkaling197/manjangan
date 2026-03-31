@@ -1,0 +1,1028 @@
+{
+    "id": 1795,
+    "nodes": [
+        {
+            "ordinal": 0,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 7,
+                "isAdult": false,
+                "genres": [
+                    "1;3;2;0",
+                    "1;8;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/18675/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "861/52861-POSTER-l.jpg",
+                                "m": "854/52854-POSTER-m.jpg",
+                                "s": "866/52866-POSTER-s.jpg",
+                                "xl": "859/52859-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Fate Jealous Greed"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND5466565349005063",
+                        "deliveryId": "DLVY2087435830007826"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND5466565349005063",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY2087435830007826",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-29T14:30:00Z",
+                        "broadcastEnd": "2026-03-29T16:10:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-29T16:10:00Z",
+                        "visibilityCatchupStart": "2026-03-29T16:15:00Z",
+                        "visibilityCatchupEnd": "2026-04-05T13:04:30Z",
+                        "channelServiceId": "00000000000000000041",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774794300&end=1774800900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774794300&end=1774800900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 1,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 7,
+                "isAdult": false,
+                "genres": [
+                    "1;3;2;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/18693/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "848/52848-POSTER-l.jpg",
+                                "m": "846/52846-POSTER-m.jpg",
+                                "s": "839/52839-POSTER-s.jpg",
+                                "xl": "852/52852-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Endless Love"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND5466568147006011",
+                        "deliveryId": "DLVY2087435808001962"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND5466568147006011",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY2087435808001962",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-29T11:30:00Z",
+                        "broadcastEnd": "2026-03-29T13:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-29T13:00:00Z",
+                        "visibilityCatchupStart": "2026-03-29T13:05:00Z",
+                        "visibilityCatchupEnd": "2026-04-05T10:04:30Z",
+                        "channelServiceId": "00000000000000000041",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774783500&end=1774789500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774783500&end=1774789500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 2,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 7,
+                "isAdult": false,
+                "genres": [
+                    "1;3;2;0",
+                    "1;1;2;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/148660/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "340/323340-POSTER-l.jpg",
+                                "m": "335/323335-POSTER-m.jpg",
+                                "s": "343/323343-POSTER-s.jpg",
+                                "xl": "339/323339-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Anak Perjanjian Syaitan 2"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND0804667575006490",
+                        "deliveryId": "DLVY2087435668002346"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND0804667575006490",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY2087435668002346",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-28T14:30:00Z",
+                        "broadcastEnd": "2026-03-28T16:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-28T16:00:00Z",
+                        "visibilityCatchupStart": "2026-03-28T16:05:00Z",
+                        "visibilityCatchupEnd": "2026-04-04T13:04:30Z",
+                        "channelServiceId": "00000000000000000041",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774707900&end=1774713900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774707900&end=1774713900",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 3,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 7,
+                "isAdult": false,
+                "genres": [
+                    "1;3;2;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/36125/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "168/91168-POSTER-l.jpg",
+                                "m": "165/91165-POSTER-m.jpg",
+                                "s": "160/91160-POSTER-s.jpg",
+                                "xl": "162/91162-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Ghost Wedding"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND6679410771002852",
+                        "deliveryId": "DLVY2087435645003843"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND6679410771002852",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY2087435645003843",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-28T11:25:00Z",
+                        "broadcastEnd": "2026-03-28T13:00:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-28T13:00:00Z",
+                        "visibilityCatchupStart": "2026-03-28T13:05:00Z",
+                        "visibilityCatchupEnd": "2026-04-04T09:59:30Z",
+                        "channelServiceId": "00000000000000000041",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774696800&end=1774703100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774696800&end=1774703100",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 4,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 7,
+                "isAdult": false,
+                "genres": [
+                    "1;3;2;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/217766/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "609/570609-POSTER-l.jpg",
+                                "m": "605/570605-POSTER-m.jpg",
+                                "s": "606/570606-POSTER-s.jpg",
+                                "xl": "617/570617-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "The Getaway"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND8888435774004040",
+                        "deliveryId": "DLVY2087435494006757"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND8888435774004040",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY2087435494006757",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-27T13:00:00Z",
+                        "broadcastEnd": "2026-03-27T14:35:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-27T14:35:00Z",
+                        "visibilityCatchupStart": "2026-03-27T14:40:00Z",
+                        "visibilityCatchupEnd": "2026-04-03T11:34:30Z",
+                        "channelServiceId": "00000000000000000041",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774616100&end=1774622400",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774616100&end=1774622400",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 5,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 7,
+                "isAdult": false,
+                "genres": [
+                    "1;3;2;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/36153/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "423/70423-POSTER-l.jpg",
+                                "m": "421/70421-POSTER-m.jpg",
+                                "s": "424/70424-POSTER-s.jpg",
+                                "xl": "420/70420-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Get In The Dark"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND6679426147005309",
+                        "deliveryId": "DLVY2087435310004837"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND6679426147005309",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY2087435310004837",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-26T14:25:00Z",
+                        "broadcastEnd": "2026-03-26T16:05:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-26T16:05:00Z",
+                        "visibilityCatchupStart": "2026-03-26T16:10:00Z",
+                        "visibilityCatchupEnd": "2026-04-02T12:59:30Z",
+                        "channelServiceId": "00000000000000000041",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774534800&end=1774541400",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774534800&end=1774541400",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 6,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 7,
+                "isAdult": false,
+                "genres": [
+                    "1;3;2;0",
+                    "1;1;0;0",
+                    "1;2;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/18669/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "394/67394-POSTER-l.jpg",
+                                "m": "387/67387-POSTER-m.jpg",
+                                "s": "395/67395-POSTER-s.jpg",
+                                "xl": "390/67390-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Detrimental"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND5466564354009484",
+                        "deliveryId": "DLVY2087435299007992"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND5466564354009484",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY2087435299007992",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-26T13:00:00Z",
+                        "broadcastEnd": "2026-03-26T14:25:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-26T14:25:00Z",
+                        "visibilityCatchupStart": "2026-03-26T14:30:00Z",
+                        "visibilityCatchupEnd": "2026-04-02T11:34:30Z",
+                        "channelServiceId": "00000000000000000041",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774529700&end=1774535400",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774529700&end=1774535400",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 8,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 7,
+                "isAdult": false,
+                "genres": [
+                    "1;2;0;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/279254/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "004/651004-POSTER-l.jpg",
+                                "m": "008/651008-POSTER-m.jpg",
+                                "s": "010/651010-POSTER-s.jpg",
+                                "xl": "014/651014-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Zhong Kui Exorcism"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND9667533766008158",
+                        "deliveryId": "DLVY2087435092002291"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND9667533766008158",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY2087435092002291",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-25T06:40:00Z",
+                        "broadcastEnd": "2026-03-25T08:10:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-25T08:10:00Z",
+                        "visibilityCatchupStart": "2026-03-25T08:15:00Z",
+                        "visibilityCatchupEnd": "2026-04-01T05:14:30Z",
+                        "channelServiceId": "00000000000000000041",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774420500&end=1774426500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774420500&end=1774426500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 9,
+            "cellType": "CONTENT",
+            "display": {
+                "parentalRating": 7,
+                "isAdult": false,
+                "genres": [
+                    "1;3;0;0",
+                    "1;3;1;0",
+                    "1;1;2;0"
+                ],
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/cn/278760/POSTER/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "822/651822-POSTER-l.jpg",
+                                "m": "821/651821-POSTER-m.jpg",
+                                "s": "823/651823-POSTER-s.jpg",
+                                "xl": "819/651819-POSTER-xl.jpg"
+                            }
+                        },
+                        "contentTitle": "Open The Coffin"
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "CONTENT",
+                    "url": "/managetv/tvinfo/content/get",
+                    "method": "GET",
+                    "params": {
+                        "cid": "STND9598272434008385",
+                        "deliveryId": "DLVY2087434975008014"
+                    }
+                }
+            },
+            "additional": {
+                "contentReference": "STND9598272434008385",
+                "contentTrickplayDisabled": false,
+                "deliveries": [
+                    {
+                        "context": "LTV",
+                        "reference": "DLVY2087434975008014",
+                        "resolution": "HD",
+                        "broadcastStart": "2026-03-24T13:00:00Z",
+                        "broadcastEnd": "2026-03-24T14:40:00Z",
+                        "visibilityStart": "1970-01-01T00:00:00Z",
+                        "visibilityEnd": "2026-03-24T14:40:00Z",
+                        "visibilityCatchupStart": "2026-03-24T14:45:00Z",
+                        "visibilityCatchupEnd": "2026-03-31T11:34:30Z",
+                        "channelServiceId": "00000000000000000041",
+                        "channelTrickplayDisabled": false,
+                        "catchupStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774356900&end=1774363500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "bufferSize": 600000,
+                                "startPadding": 300,
+                                "endPadding": 300,
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        "startOverStreams": [
+                            {
+                                "url": "multirights:mediapackage/live//EG_d2tjypxxy769fn/DASH/3c619ecc120b46e999d1eaa627cc544f/HLS/aa4142c653334a5cae16df2e113b7b88/00000000000000000041?start=1774356900&end=1774363500",
+                                "sys": "MULTIRIGHTS",
+                                "pro": "mediapackage",
+                                "comb": [
+                                    {
+                                        "packg": "DASH",
+                                        "drm": [
+                                            "WV"
+                                        ]
+                                    },
+                                    {
+                                        "packg": "HLS",
+                                        "drm": [
+                                            "FPS"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "type": "CELL"
+        }
+    ]
+}
