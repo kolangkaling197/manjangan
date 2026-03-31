@@ -20,7 +20,7 @@ def scrap_vision_github_actions():
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("--- MODE DUMP TOTAL SUPER AGRESIF (SUPPORT /elements/strips/) ---")
+    print("--- MODE DUMP TOTAL (SAMA SEPERTI VS CODE + AGRESIF) ---")
     
     page.listen.start()
     
@@ -30,7 +30,7 @@ def scrap_vision_github_actions():
         print(f"[*] Membuka: {target_url}")
         page.wait.doc_loaded(timeout=20)
         
-        print("[*] SCROLL SUPER AGRESIF + DELAY NATURAL (4 menit)...")
+        print("[*] SCROLL OTOMATIS SUPER AGRESIF (mirip manual scroll VS Code)...")
         
         count = 0
         strip_count = 0
@@ -38,21 +38,24 @@ def scrap_vision_github_actions():
         duration = 240  # 4 menit
         
         while time.time() - start_time < duration:
-            for _ in range(8):                    # scroll lebih banyak & dalam
-                page.scroll.down(1200)
-                time.sleep(1.8)
+            # Scroll agresif seperti manual di VS Code
+            for _ in range(10):  # 10x scroll kecil tiap siklus
+                page.scroll.down(900)
+                time.sleep(1.2)
             
-            # Drain semua packet
+            # Drain SEMUA packet (penting!)
+            packet_count = 0
             while True:
-                res = page.listen.wait(timeout=0.3)
+                res = page.listen.wait(timeout=0.4)
                 if not res:
                     break
+                packet_count += 1
                 
                 try:
                     url = res.url
                     body = res.response.body
                     
-                    # Parsing body
+                    # Parsing body (sama seperti script VS Code kamu)
                     if isinstance(body, (str, bytes)):
                         try:
                             body = json.loads(body.decode('utf-8') if isinstance(body, bytes) else body)
@@ -62,14 +65,20 @@ def scrap_vision_github_actions():
                     if isinstance(body, (dict, list)):
                         count += 1
                         
-                        # Simpan semua paket
                         url_clean = url.split('/')[-1].split('?')[0][:30]
-                        paket_filename = f"{output_dir}/paket_{count:03d}_{url_clean}.json"
-                        wrapper = {"url": url, "method": res.request.method, "headers": dict(res.request.headers), "response_body": body}
-                        with open(paket_filename, "w", encoding="utf-8") as f:
-                            json.dump(wrapper, f, indent=4, ensure_ascii=False)
+                        filename = f"{output_dir}/paket_{count:03d}_{url_clean}.json"
                         
-                        # === CLEAN STRIP BARU (support /elements/strips/ dan /strips/) ===
+                        with open(filename, "w", encoding="utf-8") as f:
+                            json.dump({
+                                "url": url,
+                                "method": res.request.method,
+                                "headers": dict(res.request.headers),
+                                "response_body": body
+                            }, f, indent=4, ensure_ascii=False)
+                        
+                        print(f"[{count:03d}] Tersimpan: {filename}")
+                        
+                        # === SIMPAN CLEAN STRIP (support /elements/strips/ dan /strips/) ===
                         if '/strips/' in url:
                             match = re.search(r'/strips/(\d+)', url)
                             if match:
