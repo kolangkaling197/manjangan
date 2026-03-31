@@ -1,0 +1,255 @@
+{
+    "id": 6992,
+    "nodes": [
+        {
+            "ordinal": 0,
+            "cellType": "PAGE",
+            "editChecksum": "b4ad621d3bc92bb4e81617dc4a799d0a",
+            "display": {
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/external-entities/23418/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "068/206068-SNAPSHOT-l.png",
+                                "m": "068/206068-SNAPSHOT-m.png",
+                                "s": "068/206068-SNAPSHOT-s.png",
+                                "xl": "068/206068-SNAPSHOT-xl.png"
+                            }
+                        }
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "PAGE",
+                    "url": "/elements/page/3990",
+                    "method": "GET",
+                    "personalised": false,
+                    "pageId": 3990
+                }
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 1,
+            "cellType": "PAGE",
+            "editChecksum": "5f05d956a855cac37ed3df734172fb5f",
+            "display": {
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/external-entities/23412/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "062/206062-SNAPSHOT-l.png",
+                                "m": "062/206062-SNAPSHOT-m.png",
+                                "s": "062/206062-SNAPSHOT-s.png",
+                                "xl": "062/206062-SNAPSHOT-xl.png"
+                            }
+                        }
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "PAGE",
+                    "url": "/elements/page/3930",
+                    "method": "GET",
+                    "personalised": false,
+                    "pageId": 3930
+                }
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 2,
+            "cellType": "PAGE",
+            "editChecksum": "37021db063b4ea9e9857706a80db1ceb",
+            "display": {
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/external-entities/23413/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "063/206063-SNAPSHOT-l.png",
+                                "m": "063/206063-SNAPSHOT-m.png",
+                                "s": "063/206063-SNAPSHOT-s.png",
+                                "xl": "063/206063-SNAPSHOT-xl.png"
+                            }
+                        }
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "PAGE",
+                    "url": "/elements/page/3970",
+                    "method": "GET",
+                    "personalised": false,
+                    "pageId": 3970
+                }
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 3,
+            "cellType": "PAGE",
+            "editChecksum": "ee16e69fa88aaacb5e7c79e0b4e3d8e1",
+            "display": {
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/external-entities/23417/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "067/206067-SNAPSHOT-l.png",
+                                "m": "067/206067-SNAPSHOT-m.png",
+                                "s": "067/206067-SNAPSHOT-s.png",
+                                "xl": "067/206067-SNAPSHOT-xl.png"
+                            }
+                        }
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "PAGE",
+                    "url": "/elements/page/4010",
+                    "method": "GET",
+                    "personalised": false,
+                    "pageId": 4010
+                }
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 4,
+            "cellType": "PAGE",
+            "editChecksum": "5818953dbe60e810404bbef4d39a7b55",
+            "display": {
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/external-entities/23414/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "064/206064-SNAPSHOT-l.png",
+                                "m": "064/206064-SNAPSHOT-m.png",
+                                "s": "064/206064-SNAPSHOT-s.png",
+                                "xl": "064/206064-SNAPSHOT-xl.png"
+                            }
+                        }
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "PAGE",
+                    "url": "/elements/page/3996",
+                    "method": "GET",
+                    "personalised": false,
+                    "pageId": 3996
+                }
+            },
+            "type": "CELL"
+        },
+        {
+            "ordinal": 5,
+            "cellType": "APP",
+            "editChecksum": "20e215b425fe5bc68c5fa59c72dc0bd8",
+            "display": {
+                "localisation": [
+                    {
+                        "language": "ENG",
+                        "title": "",
+                        "subtitle": "",
+                        "images": {
+                            "url": "images/external-entities/23604/SNAPSHOT/{image-size}/0",
+                            "sizes": [
+                                "s",
+                                "l",
+                                "m",
+                                "xl"
+                            ]
+                        },
+                        "imgLnks": {
+                            "url": "images/repository/{image-size}",
+                            "sizes": {
+                                "l": "071/208071-SNAPSHOT-l.jpg",
+                                "m": "071/208071-SNAPSHOT-m.jpg",
+                                "s": "071/208071-SNAPSHOT-s.jpg",
+                                "xl": "071/208071-SNAPSHOT-xl.jpg"
+                            }
+                        }
+                    }
+                ]
+            },
+            "interaction": {
+                "select": {
+                    "type": "APP",
+                    "appReference": "SUBSCRIPTION",
+                    "analyticsRef": "47877"
+                }
+            },
+            "type": "CELL"
+        }
+    ]
+}
