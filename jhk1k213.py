@@ -9,6 +9,9 @@ clean_dir = 'debug_json_clean'
 os.makedirs(output_dir, exist_ok=True)
 os.makedirs(clean_dir, exist_ok=True)
 
+# === 6 STRIP PENTING YANG KAMU INGINKAN ===
+STRIP_IDS = [13752, 15752, 18894, 18918, 18973, 18974]
+
 def scrap_vision_github_actions():
     co = ChromiumOptions()
     co.headless()
@@ -16,100 +19,61 @@ def scrap_vision_github_actions():
     co.set_argument('--disable-gpu')
     co.set_argument('--disable-dev-shm-usage')
     co.set_argument('--disable-blink-features=AutomationControlled')
-    co.set_argument('--window-size=1920,1200')
+    co.set_argument('--window-size=1920,1080')
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("--- MODE DUMP SUPER AGRESIF V5.1 (18973, 15752, 18894, dll) ---")
-    
-    page.listen.start()
+    print("--- MODE DIRECT FETCH 6 STRIP PENTING ---")
     
     try:
-        target_url = 'https://www.visionplus.id/webclient/?pageId=4030'
-        page.get(target_url)
-        print(f"[*] Membuka: {target_url}")
-        page.wait.doc_loaded(timeout=30)
+        # Buka halaman dulu (supaya session terbentuk)
+        page.get('https://www.visionplus.id/webclient/?pageId=4030')
+        page.wait.doc_loaded(timeout=15)
         
-        print("[*] SCROLL SMOOTH JS + BOLAK-BALIK (6 menit)...")
+        print("[*] Mulai fetch langsung 6 strip API...")
         
-        count = 0
-        strip_count = 0
-        start_time = time.time()
-        duration = 360  # 6 menit
-        
-        while time.time() - start_time < duration:
-            # PASS 1: Scroll ke bawah dengan smooth
-            for i in range(15):
-                page.run_js(f"window.scrollBy({{top: {800 + i*60}, left: 0, behavior: 'smooth'}});")
-                time.sleep(1.1)
+        for strip_id in STRIP_IDS:
+            api_url = f"https://www.visionplus.id/elements/strips/{strip_id}?target=WEB"
+            print(f"[+] Fetching strip {strip_id} → {api_url}")
             
-            # PASS 2: Scroll ke atas lalu ke bawah lagi (trigger lazy-load)
-            page.run_js("window.scrollTo({top: 0, left: 0, behavior: 'smooth'});")
-            time.sleep(2.5)
-            for _ in range(10):
-                page.run_js("window.scrollBy({top: 1300, left: 0, behavior: 'smooth'});")
-                time.sleep(1.4)
+            # Header lengkap supaya tidak kena 400
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+                "Referer": "https://www.visionplus.id/webclient/?pageId=4030",
+                "IRIS-APP-VERSION": "11.4.13(0)_prd",
+                "IRIS-DEVICE-TYPE": "WINDOWS/CHROME",
+                "IRIS-DEVICE-CLASS": "PC",
+                "IRIS-DEVICE-REGION": "Indonesia",
+                "IRIS-APP-MODE": "Guest",
+                "IRIS-DEVICE-STATUS": "INACTIVE",
+                "IRIS-HW-DEVICE-ID": "99ce7946-c6b0-4449-8dd2-fce01f1b0560",
+            }
             
-            # Drain semua packet
-            while True:
-                res = page.listen.wait(timeout=0.25)
-                if not res:
-                    break
-                
+            # Pakai page.fetch (lebih stabil di headless)
+            response = page.fetch(api_url, headers=headers)
+            
+            if response.status_code == 200:
                 try:
-                    url = res.url
-                    body = res.response.body
+                    data = response.json()
+                    clean_filename = f"{clean_dir}/clean_strip_{strip_id}.json"
                     
-                    if isinstance(body, (str, bytes)):
-                        try:
-                            body = json.loads(body.decode('utf-8') if isinstance(body, bytes) else body)
-                        except:
-                            continue
+                    with open(clean_filename, "w", encoding="utf-8") as f:
+                        json.dump(data, f, indent=4, ensure_ascii=False)
                     
-                    if isinstance(body, (dict, list)):
-                        count += 1
-                        
-                        url_clean = url.split('/')[-1].split('?')[0][:30]
-                        filename = f"{output_dir}/paket_{count:03d}_{url_clean}.json"
-                        
-                        with open(filename, "w", encoding="utf-8") as f:
-                            json.dump({
-                                "url": url,
-                                "method": res.request.method,
-                                "headers": dict(res.request.headers),
-                                "response_body": body
-                            }, f, indent=4, ensure_ascii=False)
-                        
-                        print(f"[{count:03d}] Tersimpan: {filename}")
-                        
-                        # Simpan clean strip
-                        if '/strips/' in url:
-                            match = re.search(r'/strips/(\d+)', url)
-                            if match:
-                                strip_id = match.group(1)
-                                clean_filename = f"{clean_dir}/clean_strip_{strip_id}.json"
-                                
-                                with open(clean_filename, "w", encoding="utf-8") as f:
-                                    json.dump(body, f, indent=4, ensure_ascii=False)
-                                
-                                content_count = sum(1 for item in body if isinstance(item, dict) and item.get("cellType") == "CONTENT") if isinstance(body, list) else 0
-                                print(f" → ✅ clean_strip_{strip_id}.json → {content_count} event")
-                                strip_count += 1
-                                
+                    content_count = sum(1 for item in data if isinstance(item, dict) and item.get("cellType") == "CONTENT") if isinstance(data, list) else 0
+                    
+                    print(f"   ✅ Berhasil! clean_strip_{strip_id}.json → {content_count} event")
                 except:
-                    continue
-            
-            elapsed = int(time.time() - start_time)
-            if elapsed % 30 == 0:
-                print(f"[*] Monitoring... ({elapsed}/{duration}s) | Strip ditemukan: {strip_count}")
+                    print(f"   ❌ Gagal parse JSON strip {strip_id}")
+            else:
+                print(f"   ❌ Gagal fetch strip {strip_id} (status {response.status_code})")
         
-        print(f"\n[+] SELESAI! Total paket: {count} | Strip tersimpan: {strip_count}")
-        print(f"[+] Clean strip disimpan di folder '{clean_dir}'")
+        print(f"\n[+] SELESAI! Semua 6 strip sudah diproses.")
+        print(f"[+] File disimpan di folder '{clean_dir}'")
         
     except Exception as e:
         print(f"[-] Error: {e}")
     finally:
-        page.listen.stop()
         page.quit()
         print("[*] Browser ditutup.")
 
