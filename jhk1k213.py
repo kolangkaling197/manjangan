@@ -16,11 +16,11 @@ def scrap_vision_github_actions():
     co.set_argument('--disable-gpu')
     co.set_argument('--disable-dev-shm-usage')
     co.set_argument('--disable-blink-features=AutomationControlled')
-    co.set_argument('--window-size=1920,1080')
+    co.set_argument('--window-size=1920,1200')
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("--- MODE DUMP TOTAL (SAMA SEPERTI VS CODE + AGRESIF) ---")
+    print("--- MODE DUMP NUCLEAR (untuk nangkap 18973, 15752, dll) ---")
     
     page.listen.start()
     
@@ -28,25 +28,27 @@ def scrap_vision_github_actions():
         target_url = 'https://www.visionplus.id/webclient/?pageId=4030'
         page.get(target_url)
         print(f"[*] Membuka: {target_url}")
-        page.wait.doc_loaded(timeout=20)
+        page.wait.doc_loaded(timeout=25)
         
-        print("[*] SCROLL OTOMATIS SUPER AGRESIF (mirip manual scroll VS Code)...")
+        print("[*] SCROLL NUCLEAR + FAKE MOUSE MOVEMENT (5 menit)...")
         
         count = 0
         strip_count = 0
         start_time = time.time()
-        duration = 240  # 4 menit
+        duration = 300  # 5 menit
         
         while time.time() - start_time < duration:
-            # Scroll agresif seperti manual di VS Code
-            for _ in range(10):  # 10x scroll kecil tiap siklus
-                page.scroll.down(900)
-                time.sleep(1.2)
+            # Scroll nuclear
+            for _ in range(12):
+                page.scroll.down(1100)
+                # Fake mouse movement supaya JS lazy-load trigger
+                page.run_js("window.scrollBy(0, 300);")
+                time.sleep(0.8)
             
-            # Drain SEMUA packet (penting!)
+            # Drain semua packet
             packet_count = 0
             while True:
-                res = page.listen.wait(timeout=0.4)
+                res = page.listen.wait(timeout=0.3)
                 if not res:
                     break
                 packet_count += 1
@@ -55,7 +57,6 @@ def scrap_vision_github_actions():
                     url = res.url
                     body = res.response.body
                     
-                    # Parsing body (sama seperti script VS Code kamu)
                     if isinstance(body, (str, bytes)):
                         try:
                             body = json.loads(body.decode('utf-8') if isinstance(body, bytes) else body)
@@ -78,7 +79,7 @@ def scrap_vision_github_actions():
                         
                         print(f"[{count:03d}] Tersimpan: {filename}")
                         
-                        # === SIMPAN CLEAN STRIP (support /elements/strips/ dan /strips/) ===
+                        # === CLEAN STRIP (support path baru /elements/strips/) ===
                         if '/strips/' in url:
                             match = re.search(r'/strips/(\d+)', url)
                             if match:
@@ -89,14 +90,14 @@ def scrap_vision_github_actions():
                                     json.dump(body, f, indent=4, ensure_ascii=False)
                                 
                                 content_count = sum(1 for item in body if isinstance(item, dict) and item.get("cellType") == "CONTENT") if isinstance(body, list) else 0
-                                print(f" → clean_strip_{strip_id}.json → {content_count} event")
+                                print(f" → ✅ clean_strip_{strip_id}.json → {content_count} event")
                                 strip_count += 1
                                 
                 except:
                     continue
             
             elapsed = int(time.time() - start_time)
-            if elapsed % 20 == 0:
+            if elapsed % 30 == 0:
                 print(f"[*] Monitoring... ({elapsed}/{duration}s) | Strip ditemukan: {strip_count}")
         
         print(f"\n[+] SELESAI! Total paket: {count} | Strip tersimpan: {strip_count}")
