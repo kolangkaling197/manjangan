@@ -20,7 +20,7 @@ def scrap_vision_github_actions():
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("--- MODE DUMP SUPER AGRESIF V5.0 (untuk 18973, 15752, dll) ---")
+    print("--- MODE DUMP SUPER AGRESIF V5.1 (18973, 15752, 18894, dll) ---")
     
     page.listen.start()
     
@@ -30,7 +30,7 @@ def scrap_vision_github_actions():
         print(f"[*] Membuka: {target_url}")
         page.wait.doc_loaded(timeout=30)
         
-        print("[*] SCROLL + FAKE MOUSE + SMOOTH JS (6 menit)...")
+        print("[*] SCROLL SMOOTH JS + BOLAK-BALIK (6 menit)...")
         
         count = 0
         strip_count = 0
@@ -38,20 +38,17 @@ def scrap_vision_github_actions():
         duration = 360  # 6 menit
         
         while time.time() - start_time < duration:
-            # PASS 1: Scroll ke bawah dengan smooth JS
+            # PASS 1: Scroll ke bawah dengan smooth
             for i in range(15):
-                # Smooth scroll via JavaScript
-                page.run_js(f"window.scrollBy({{top: {800 + i*50}, left: 0, behavior: 'smooth'}});")
-                # Fake mouse movement
-                page.mouse.move(500 + (i % 5) * 100, 300 + (i % 7) * 80)
+                page.run_js(f"window.scrollBy({{top: {800 + i*60}, left: 0, behavior: 'smooth'}});")
                 time.sleep(1.1)
             
-            # PASS 2: Scroll ke atas sedikit lalu ke bawah lagi (trigger lazy load)
+            # PASS 2: Scroll ke atas lalu ke bawah lagi (trigger lazy-load)
             page.run_js("window.scrollTo({top: 0, left: 0, behavior: 'smooth'});")
-            time.sleep(2)
-            for _ in range(8):
-                page.run_js("window.scrollBy({top: 1200, left: 0, behavior: 'smooth'});")
-                time.sleep(1.3)
+            time.sleep(2.5)
+            for _ in range(10):
+                page.run_js("window.scrollBy({top: 1300, left: 0, behavior: 'smooth'});")
+                time.sleep(1.4)
             
             # Drain semua packet
             while True:
@@ -85,7 +82,7 @@ def scrap_vision_github_actions():
                         
                         print(f"[{count:03d}] Tersimpan: {filename}")
                         
-                        # Simpan clean strip (support /elements/strips/ dan /strips/)
+                        # Simpan clean strip
                         if '/strips/' in url:
                             match = re.search(r'/strips/(\d+)', url)
                             if match:
