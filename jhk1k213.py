@@ -20,7 +20,7 @@ def scrap_vision_github_actions():
     co.set_user_agent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36')
     
     page = ChromiumPage(co)
-    print("--- MODE DUMP TOTAL SUPER AGRESIF (untuk 15+ event) ---")
+    print("--- MODE DUMP TOTAL SUPER AGRESIF (SUPPORT /elements/strips/) ---")
     
     page.listen.start()
     
@@ -30,32 +30,29 @@ def scrap_vision_github_actions():
         print(f"[*] Membuka: {target_url}")
         page.wait.doc_loaded(timeout=20)
         
-        print("[*] SCROLL SUPER AGRESIF + DELAY NATURAL...")
+        print("[*] SCROLL SUPER AGRESIF + DELAY NATURAL (4 menit)...")
         
         count = 0
         strip_count = 0
         start_time = time.time()
-        duration = 180  # 3 menit biar semua strip ke-load
+        duration = 240  # 4 menit
         
         while time.time() - start_time < duration:
-            # Scroll bertahap (lebih natural)
-            for _ in range(5):  # 5x scroll kecil tiap iterasi
-                page.scroll.down(800)
-                time.sleep(1.2)
+            for _ in range(8):                    # scroll lebih banyak & dalam
+                page.scroll.down(1200)
+                time.sleep(1.8)
             
-            # Drain SEMUA packet
-            packet_count = 0
+            # Drain semua packet
             while True:
-                res = page.listen.wait(timeout=0.5)
+                res = page.listen.wait(timeout=0.3)
                 if not res:
                     break
-                packet_count += 1
                 
                 try:
                     url = res.url
                     body = res.response.body
                     
-                    # Parsing body (bisa str/bytes/dict)
+                    # Parsing body
                     if isinstance(body, (str, bytes)):
                         try:
                             body = json.loads(body.decode('utf-8') if isinstance(body, bytes) else body)
@@ -72,7 +69,7 @@ def scrap_vision_github_actions():
                         with open(paket_filename, "w", encoding="utf-8") as f:
                             json.dump(wrapper, f, indent=4, ensure_ascii=False)
                         
-                        # === CLEAN STRIP ===
+                        # === CLEAN STRIP BARU (support /elements/strips/ dan /strips/) ===
                         if '/strips/' in url:
                             match = re.search(r'/strips/(\d+)', url)
                             if match:
@@ -90,7 +87,7 @@ def scrap_vision_github_actions():
                     continue
             
             elapsed = int(time.time() - start_time)
-            if elapsed % 15 == 0:
+            if elapsed % 20 == 0:
                 print(f"[*] Monitoring... ({elapsed}/{duration}s) | Strip ditemukan: {strip_count}")
         
         print(f"\n[+] SELESAI! Total paket: {count} | Strip tersimpan: {strip_count}")
